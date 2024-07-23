@@ -1,0 +1,13 @@
+:root {
+    --main-color: rgb(118, 208, 235);
+    --main-color-dark: rgb(9, 182, 235);
+    --main-color-tr: rgba(118, 208, 235, 0.04);
+    --main-color-2tr: rgba(118, 208, 235, 0.16);
+}
+body {
+    background: white;
+}
+h1, h2, h3, h4, p, a, span {
+    font-family: 'Inter', sans-serif;
+    color: rgba(0, 0, 0, 0.8);
+}

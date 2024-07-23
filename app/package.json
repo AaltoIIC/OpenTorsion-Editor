@@ -21,6 +21,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@xyflow/svelte": "^0.1.13"
+		"@xyflow/svelte": "^0.1.13",
+		"svelte-jsoneditor": "^0.23.7"
 	}
 }
