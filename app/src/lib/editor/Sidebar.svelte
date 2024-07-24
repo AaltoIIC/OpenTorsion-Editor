@@ -1,21 +1,27 @@
-<script>
+<script lang="ts">
     import ComponentListItem from "$lib/editor/CompontentListItem.svelte";
     import { basicComponents } from "./basicComponents";
+
+    export let mode = "main-editor";
+    export let onAddElement = (type: String) => {};
 </script>
 
 <div class="main-sidebar">
     <a data-sveltekit-preload-data="hover" href="/">
         <img class="main-logo" src="./logo.svg" alt="Co-Des logo">
     </a>
+    {#if mode === "main-editor"}
     <div class="component-cont">
         <div class="component-upper">
             <h3>Components:</h3>
-            <button>
-                Create Component
-                <svg class="icon-create" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                </svg>                  
-            </button>
+            <a href="/component-editor">
+                <button>
+                    Create Component
+                    <svg class="icon-create" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>                  
+                </button>
+            </a>
         </div>
         <div class="component-list">
             {#each basicComponents as component}
@@ -23,12 +29,175 @@
             {/each}
         </div>
     </div>
+    {:else if mode === "component-editor"}
+    <div class="element-cont">
+        <div class="element-upper">
+            <h3>Elements:</h3>
+        </div>
+        <div class="element-list">
+            <div class="element-list-item">
+                <div class="main-illustration-cont">
+                    <div class="disk">
+                    </div>
+                </div>
+                <div class="element-info">
+                    <div>
+                        <h4>Disk</h4>
+                        <p>Parameters: name, damping, excitation, inertia</p>
+                    </div>
+                    <div>
+                        <button on:click={() => onAddElement("disk")}>Add to Component
+                            <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>                                           
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="element-list-item">
+                <div class="main-illustration-cont">
+                    <div class="shaft">
+                    </div>
+                </div>
+                <div class="element-info">
+                    <div>
+                        <h4>Shaft</h4>
+                        <p>Parameters: name, damping, excitation, stiffness</p>
+                    </div>
+                    <div>
+                        <button on:click={() => onAddElement("shaft")}>Add to Component
+                            <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>              
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="element-list-item">
+                <div class="main-illustration-cont">
+                    <div class="gear">
+                        <div class="gear-inner">
+                        </div>
+                    </div>
+                </div>
+                <div class="element-info">
+                    <div>
+                        <h4>Gear</h4>
+                        <p>Parameters: name, damping, excitation, inertia, diameter, teeth</p>
+                    </div>
+                    <div>
+                        <button on:click={() => onAddElement("gear")}>Add to Component
+                            <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>                 
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
 </div>
 <style>
-    .component-upper h3 {
+    .icon-add-to-component {
+        width: 16px;
+        height: 16px;
+        margin: 0 0 -3px 0;
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.9);;
+        stroke-width: 1.8px;
+        stroke-linejoin: round;
+    }
+    .element-info h4 {
+        margin: 0;
+    }
+    .element-info p {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+        margin: 0;
+    }
+    .element-info button {
+        background-color: rgb(34, 34, 34);
+    }
+    .disk {
+        height: 80px;
+        width: 20px;
+        background-color: var(--main-color);
+        background-image:linear-gradient( to bottom, rgba(0,0,0,0.1), rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+        margin: 10px auto;
+        border-radius: 2px;
+        border: solid 2px rgba(0, 0, 0, 0.04);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    }
+    .shaft {
+        height: 14px;
+        width: 72px;
+        background-color: var(--main-color);
+        background-image:linear-gradient( to bottom, rgba(0,0,0,0.05), rgba(255,255,255,0.05), rgba(0,0,0,0.05));
+        margin: 41px auto;
+        border-radius: 2px;
+        border: solid 2px rgba(0, 0, 0, 0.04);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    }
+    .gear {
+        height: 60px;
+        width: 20px;
+        margin: 20px auto;
+        border-radius: 2px;
+        border: solid 2px rgba(0, 0, 0, 0.04);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        background-color: var(--main-color);
+        background-image: repeating-linear-gradient(
+            0deg,
+            rgba(0,0,0,0.1) 0%,
+            rgba(0,0,0,0.1) 7%,
+            rgba(255,255,255,0.1) 7%,
+            rgba(255,255,255,0.1) 14%
+        );
+    }
+    .gear-inner {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient( to bottom, rgba(0, 0, 0, 0.07), rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.07));
+    }
+    .main-illustration-cont {
+        height: 100px;
+        width: 100px;
+        --dot-bg: white;
+        --dot-color: rgb(100, 100, 100);
+        --dot-size: 1px;
+        --dot-space: 16px;
+        background:
+            linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
+            linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
+            var(--dot-color);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+    }
+    .element-list-item {
+        display: flex;
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        width: calc(100% - 12px);
+        margin: 5px;
+        height: 100px;
+        overflow: hidden;
+        transition: .2s;
+        background-color: rgb(244, 244, 244);
+    }
+    .element-list-item:hover {
+        border: solid 1px rgba(0, 0, 0, 0.4);
+    }
+    .element-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 6px;
+        width: calc(100% - 100px);
+    }
+    .component-upper h3, .element-upper h3 {
         font-size: 16px;
     }
-    .component-upper {
+    .component-upper, .element-upper {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -41,7 +210,7 @@
         height: 18px;
         margin: 0 0 -4px 0;
     }
-    .component-list {
+    .component-list, .element-list {
         width: 100%;
         height: 60vh;
         border-top: solid 2px rgba(0, 0, 0, 0.1);

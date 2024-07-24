@@ -47,6 +47,10 @@
         margin: 5px;
         height: 100px;
         overflow: hidden;
+        transition: .2s;
+    }
+    .component-list-item:hover {
+        border: solid 1px rgba(0, 0, 0, 0.4);
     }
     .main-img {
         height: 100%;
@@ -55,15 +59,15 @@
     }
     button {
         color: rgba(255, 255, 255, 0.9);
-        background-color: var(--main-color);
+        background-color: rgb(30, 30, 30);
         padding: 8px;
         font-weight: 500;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: none;
         border-radius: 5px;
         cursor: pointer;
         transition: .2s;
     }
     button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.6);
+        background-color: rgb(80, 80, 80);
     }
 </style>

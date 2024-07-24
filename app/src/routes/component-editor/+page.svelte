@@ -1,8 +1,14 @@
 <script lang="ts">
-    import FlowEditor from "$lib/editor/FlowEditor.svelte";
+    import {
+      SvelteFlowProvider
+    } from '@xyflow/svelte';
+    import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/editor/Sidebar.svelte";
     import { JSONEditor } from 'svelte-jsoneditor'
 
+    let componentEditor: any;
+
+    // resize editor
     let content = {
         text: undefined, // can be used to pass a stringified JSON document instead
         json: {
@@ -10,7 +16,7 @@
         }
     }
 
-    // resize editor
+    
     let editorElement: HTMLElement;
     let jsonEditorHeight = 200;
     let jsonEditorHeightPx = "";
@@ -42,7 +48,9 @@
         }}
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
-            <FlowEditor />
+            <SvelteFlowProvider>
+                <ComponentEditor bind:this={componentEditor} />
+            </SvelteFlowProvider>
         </div>
         <div class="json-editor"
             bind:this={editorElement}>
@@ -54,41 +62,34 @@
             mainMenuBar={false}
             navigationBar={false} />
         </div>
-        <button class="analyze-button">
-            Analyze DDT
-            <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>              
-        </button>
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href="/">
+            <a href="/new">
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
-                Back
+                Back to Powertrain Editor
             </a>
-            <a href="/analyze">
-                Analysis
-            </a>
+        </div>
+        <div class="component-name-cont">
+            Component:
+            <span
+            class="input"
+            role="textbox" 
+            contenteditable>Untitled Component</span>
         </div>
         <div class="buttons">
             <button>
-                Export
-                <svg class="icon-dropdown" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg>              
-            </button>
-            <button>
-                Save
+                Save Component
             </button>
         </div>
     </div>
-    <Sidebar mode="main-editor" />
+    <Sidebar mode="component-editor" onAddElement={(value) => {componentEditor ? componentEditor.addElement(value) : ''}} />
 </div>
 
 <style>
+    /* Resizing JSON editor */
     .resize-slider {
         width: 100%;
         height: 6px;
@@ -104,30 +105,29 @@
     .json-editor {
         height: var(--json-editor-height);
     }
-    .icon-analyze {
-        width: 22px;
-        height: 22px;
-        margin: 0 0 -6px 0;
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 1.8px;
-        stroke-linejoin: round;
+
+    /* component name field */
+    .component-name-cont {
+        color: rgba(255, 255, 255, 0.9);
+        display: inline-block;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        height: fit-content;
+        margin-right: 82px;
     }
-    .analyze-button {
-        position: fixed;
-        bottom: 32px;
-        right: 32px;
-        z-index: 10;
-        font-size: 16px;
-        border: solid 2px rgba(255, 255, 255, 0.3);
-        background-color: var(--main-color);
-        box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
-        padding: 9px 12px 10px 12px;
-        font-weight: 400;
+    .component-name-cont .input {
+        line-height: 1;
+        padding: 8px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+        border: solid 2px rgba(255, 255, 255, 0.1);
+        color:rgba(255, 255, 255, 0.9);
+        font-family: 'Inter', sans-serif;
+        width: fit-content;
+        font-weight: 600;
+        margin-left: 8px;
     }
-    .analyze-button:hover {
-        border: solid 2px rgba(255, 255, 255, 0.6);
-    }
+
     .main-editor-area {
         position: absolute;
         top: 68px;
@@ -138,15 +138,6 @@
         background-color: rgb(255, 255, 255);
     }
 
-    .icon-dropdown {
-        width: 15px;
-        height: 15px;
-        margin: 0 0 -3px 0;
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2px;
-        stroke-linejoin: round;
-    }
     button {
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color);
@@ -184,7 +175,7 @@
         justify-content: space-between;
         vertical-align: middle;
     }
-    .top-menu .buttons, .top-menu .links {
+    .top-menu .buttons, .top-menu .links, .top-menu .component-name-cont {
         height: fit-content;
         align-self: center;
     }
