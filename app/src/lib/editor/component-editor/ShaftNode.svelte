@@ -32,6 +32,12 @@
         border-top: solid 6px rgba(0, 0, 0, 0.04);
         border-bottom: solid 6px rgba(0, 0, 0, 0.04);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 40px 120px;
+        z-index: -1;
+        transition: .3s;
+        cursor: pointer;
+    }
+    .shaft:hover {
+        filter: brightness(1.05);
     }
     p {
         font-size: 32px;

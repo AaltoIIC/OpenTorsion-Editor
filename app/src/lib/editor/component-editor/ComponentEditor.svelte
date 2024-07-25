@@ -22,7 +22,10 @@
       'empty': EmptyNode
     };
 
-    // create disk, shaft, gear nodes, and make them unmovable
+    // keep track of json code
+    export let componentJSON: {name: string, nodes: any[]};
+
+    // add element
     let nOfElements = 0;
     let currentPosition = 0;
     export const addElement = (type: String) => {
@@ -40,6 +43,14 @@
               position: { x: currentPosition, y: 150 }
             }]);
             currentPosition += 111;
+
+            // update JSON
+            componentJSON.nodes.push({
+                        name: "Element1",
+                        type: "Disk",
+                        damping: 0,
+                        inertia: 8.35e+06
+             });
         } else if (type === "shaft") {
             nodes.update(n => [...n, {
               id: `${nOfElements}`,
@@ -77,14 +88,12 @@
     ]);
    
 
-    const edges = writable([]);   
-    const snapGrid = [25, 25];
-
+    const edges = writable([]); 
 </script>
 <SvelteFlow
-  {nodes}
-  {edges}
-  {nodeTypes}
+  nodes={nodes}
+  edges={edges}
+  nodeTypes={nodeTypes}
   fitView
 >
   <Controls />

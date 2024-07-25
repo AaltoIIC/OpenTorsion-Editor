@@ -163,14 +163,7 @@
     .main-illustration-cont {
         height: 100px;
         width: 100px;
-        --dot-bg: white;
-        --dot-color: rgb(100, 100, 100);
-        --dot-size: 1px;
-        --dot-space: 16px;
-        background:
-            linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
-            linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
-            var(--dot-color);
+        background-color: rgba(0, 0, 0, 0.1);
         border-right: solid 1px rgba(0, 0, 0, 0.1);
     }
     .element-list-item {
@@ -182,7 +175,6 @@
         height: 100px;
         overflow: hidden;
         transition: .2s;
-        background-color: rgb(244, 244, 244);
     }
     .element-list-item:hover {
         border: solid 1px rgba(0, 0, 0, 0.4);

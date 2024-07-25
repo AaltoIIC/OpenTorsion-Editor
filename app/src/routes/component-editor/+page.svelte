@@ -8,12 +8,15 @@
 
     let componentEditor: any;
 
-    // resize editor
+    // JSON code of the component
+    let componentJSON = {
+        name: "Untitled Component",
+        nodes: []
+    }
+    // JSON editor content
     let content = {
-        text: undefined, // can be used to pass a stringified JSON document instead
-        json: {
-            hello: "world"
-        }
+        text: undefined,
+        json: componentJSON
     }
 
     
@@ -49,7 +52,7 @@
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
             <SvelteFlowProvider>
-                <ComponentEditor bind:this={componentEditor} />
+                <ComponentEditor bind:this={componentEditor} componentJSON={componentJSON} />
             </SvelteFlowProvider>
         </div>
         <div class="json-editor"
@@ -69,7 +72,7 @@
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
-                Back to Powertrain Editor
+                Back to System Editor
             </a>
         </div>
         <div class="component-name-cont">

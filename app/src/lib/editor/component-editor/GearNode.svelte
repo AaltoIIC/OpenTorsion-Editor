@@ -1,20 +1,39 @@
 <script lang="ts">
     import {type NodeProps } from '@xyflow/svelte';
     import type { Writable } from 'svelte/store';
+    import ElementLayover from './ElementLayover.svelte';
    
     type $$Props = NodeProps;
    
-    export let data: { color: Writable<string> };
+    let layoverElement: any;
+    export let data: {
+        name: Writable<string>,
+        damping: Writable<number>,
+        excitation: Writable<number>,
+        inertia: Writable<number>,
+        diameter: Writable<number>,
+        teeth: Writable<number>
+    };
    
-    const { color } = data;
+    let onHover = false;
 </script>
 
-<div class="disk-outer">
-    <div class="gear">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="disk-outer"
+    on:mouseenter={() => onHover = true}
+    on:mouseleave={() => onHover = false}>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="gear"
+        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}>
         <div class="gear-inner">
         </div>
     </div>
     <p>Gear</p>
+    <ElementLayover
+        bind:this={layoverElement}
+        nodeOnHover={onHover}
+        params={data} />
 </div>
 <style>
     .gear {
@@ -32,6 +51,11 @@
             transparent 7%,
             transparent 14%
         );
+        transition: .3s;
+        cursor: pointer;
+    }
+    .gear:hover {
+        filter: brightness(1.05);
     }
     .gear-inner {
         width: 100%;
