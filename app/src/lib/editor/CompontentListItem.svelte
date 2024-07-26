@@ -24,6 +24,7 @@
         font-size: 14px;
         color: rgba(0, 0, 0, 0.6);
         margin: 0;
+        font-family: "Roboto Mono", monospace;
     }
     h4 {
         margin: 0;
@@ -32,6 +33,9 @@
         width: 20px;
         height: 20px;
         margin: 0 0 -5px 0;
+        stroke: rgba(255, 255, 255, 0.9);
+        stroke-width: 2px;
+        stroke-linejoin: round;
     }
     .component-info {
         display: flex;
@@ -66,6 +70,7 @@
         border-radius: 5px;
         cursor: pointer;
         transition: .2s;
+        font-family: "Roboto Mono", monospace;
     }
     button:hover {
         background-color: rgb(80, 80, 80);

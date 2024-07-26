@@ -105,19 +105,22 @@
         margin: 0 0 -3px 0;
         fill: none;
         stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 1.8px;
+        stroke-width: 2.2px;
         stroke-linejoin: round;
     }
     .element-info h4 {
         margin: 0;
     }
     .element-info p {
-        font-size: 14px;
+        font-size: 12px;
+        line-height: 1;
         color: rgba(0, 0, 0, 0.6);
         margin: 0;
+        font-family: "Roboto Mono", monospace;
     }
     .element-info button {
         background-color: rgb(34, 34, 34);
+        font-family: "Roboto Mono", monospace;
     }
     .disk {
         height: 80px;
@@ -201,6 +204,9 @@
         width: 18px;
         height: 18px;
         margin: 0 0 -4px 0;
+        stroke: rgba(255, 255, 255, 0.9);
+        stroke-width: 1.8px;
+        stroke-linejoin: round;
     }
     .component-list, .element-list {
         width: 100%;
@@ -230,6 +236,7 @@
         border-radius: 5px;
         cursor: pointer;
         transition: .2s;
+        font-family: "Roboto Mono", monospace;
     }
     button:hover {
         border: 1px solid rgba(255, 255, 255, 0.8);

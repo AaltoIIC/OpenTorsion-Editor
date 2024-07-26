@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Portal from "svelte-portal";
+    import type { ElementType } from '$lib/types/types';
+    import { currentJSON } from '../../../stores';
+    import LayoverPropery from './LayoverPropery.svelte';
+    
 
-    export let params = {
-        name: "Element name",
-        damping: 0.5,
-        excitation: 3432
-    };
-
+    export let params: ElementType;
+    export let possibleParams: string[] = ['name', 'type', 'damping', 'excitation'];
 
     // handle layover behavior (position, visibility, etc.)
     
@@ -42,7 +42,6 @@
     };
 
     const handleScrollandMove = () => {
-        console.log('scroll');
         isOpen = false;
         isEditing = false;
     }
@@ -51,7 +50,7 @@
         window.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('pointerdown', handleClickOutside);
         document.addEventListener('keydown', handleKeydown);
-        window.addEventListener('wheel', handleScrollandMove, true);
+        window.addEventListener('wheel', handleScrollandMove);
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('pointerdown', handleClickOutside);
@@ -59,6 +58,7 @@
             window.removeEventListener('wheel', handleScrollandMove);
         };
     });
+
 </script>
 <Portal target="body">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -75,8 +75,19 @@
         <div class="params-cont">
             {#each Object.entries(params) as [paramName, paramVal]}
                 {#if paramName != 'name'}
-                    <p>{paramName}: <span contenteditable>{paramVal}</span></p>
+                    <LayoverPropery
+                        paramName={paramName}
+                        paramValue={paramVal}
+                        isEditing={isEditing}
+                    />
                 {/if}
+            {/each}
+            {#each possibleParams.filter(item => !(item in params)) as undefinedParam}
+                    <LayoverPropery
+                        paramName={undefinedParam}
+                        paramValue={undefined}
+                        isEditing={isEditing}
+                    />
             {/each}
         </div>
         <button class="close-btn"
@@ -94,22 +105,21 @@
         cursor: pointer;
         width: 15px;
         height: 15px;
-        color: rgb(214, 81, 81);
+        padding: 4px;
+        border-radius: 5px;
+        background-color: rgb(214, 81, 81);
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        color: rgba(255, 255, 255, 0.9);
         display: none;
+    }
+    .name-cont.editing svg:hover {
+        border: solid 1px rgba(255, 255, 255, 0.1); 
     }
     .name-cont.editing span {
         border-bottom: solid 2px rgba(0, 0, 0, 0.1);
     }
     .name-cont span {
         padding: 1px;
-    }
-    .params-cont span {
-        padding: 2px;
-        border-radius: 5px;
-        border: solid 2px rgba(0, 0, 0, 0.1);
-    }
-    .params-cont p {
-        margin: 9px;
     }
     .close-btn {
         width: 100%;
@@ -124,8 +134,13 @@
         border: solid 1px rgba(0, 0, 0, 0.1);
         cursor: pointer;
     }
+    .close-btn:hover {
+        border: solid 1px rgba(255, 255, 255, 0.3);
+    }
     .params-cont {
-        padding: 4px 12px;
+        display: flex;
+        flex-direction: column;
+        padding: 4px 2px 4px 2px;
     }
     .name-cont {
         padding: 8px 12px;
@@ -139,7 +154,7 @@
     .main-layover-cont {
         display: none;
         position: absolute;
-        width: 200px;
+        width: 210px;
         height: fit-content;
         background-color: rgba(255, 255, 255, 1);
         border-radius: 5px;

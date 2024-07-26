@@ -1,21 +1,14 @@
 <script lang="ts">
     import { type NodeProps } from '@xyflow/svelte';
-    import ElementLayover from './ElementLayover.svelte';
+    import ElementLayover from './element-layover/ElementLayover.svelte';
+    import type { ElementType } from '$lib/types/types';
    
     type $$Props = NodeProps;
    
-    export let data: { label: string };
+    export let data: ElementType;
 
     let layoverElement: any;
     let onHover = false;
-
-
-    export let params = {
-        name: "Disk",
-        damping: 0.5,
-        excitation: 3432
-    };
-
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -29,18 +22,19 @@
     <ElementLayover
         bind:this={layoverElement}
         nodeOnHover={onHover}
-        params={params} />
+        params={data}
+        possibleParams={['name', 'type', 'damping', 'excitation', 'inertia']} />
 </div>
 <style>
     .disk {
-        height: 400px;
-        width: 100px;
+        height: 80px;
+        width: 20px;
         background-color: var(--main-color);
         background-image: linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
-        margin: 50px 0 0 0;
-        border-radius: 8px;
-        border: solid 6px rgba(0, 0, 0, 0.04);
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 40px 120px;
+        margin: 10px 0 0 0;
+        border-radius: 1.6px;
+        border: solid 1px rgba(0, 0, 0, 0.04);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
         transition: .3s;
         cursor: pointer;
         z-index: -1;
@@ -49,10 +43,10 @@
         filter: brightness(1.05);
     }
     p {
-        font-size: 32px;
+        font-size: 6.4px;
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
-        font-family: 'Inter', sans-serif;
+        font-family: "Roboto Mono", monospace;
     }
     .disk-outer {
         position: relative;

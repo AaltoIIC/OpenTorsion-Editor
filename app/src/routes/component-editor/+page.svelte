@@ -4,20 +4,54 @@
     } from '@xyflow/svelte';
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/editor/Sidebar.svelte";
-    import { JSONEditor } from 'svelte-jsoneditor'
+    import { JSONEditor } from 'svelte-jsoneditor';
+    import { currentJSON } from '../../lib/stores';
+    import { allComponents } from '../../lib/stores';
+    import { goto } from '$app/navigation';
 
     let componentEditor: any;
 
-    // JSON code of the component
-    let componentJSON = {
+    // Initialize JSON Content
+    currentJSON.set({
         name: "Untitled Component",
-        nodes: []
-    }
+        elements: []
+    });
+
     // JSON editor content
     let content = {
         text: undefined,
-        json: componentJSON
+        json: {}
     }
+    currentJSON.subscribe(value => {
+        content = {
+            text: undefined,
+            json: value
+        };
+    });
+    const handleTitleChange = (event: Event) => {
+        const illegalChars = /['"\n]/g;
+        if (illegalChars.test((event.target as HTMLElement).innerText)) {
+            (event.target as HTMLElement).innerText = (event.target as HTMLElement).innerText.replace(illegalChars, '');
+        }
+
+        currentJSON.update(value => {
+            return {
+                ...value,
+                name: (event.target as HTMLElement).innerText
+            }
+        });
+    }
+
+    const saveComponent = () => {
+        allComponents.update(value => {
+            return [
+                ...value,
+                content.json
+            ]
+        });
+        goto('/new');
+    }
+
 
     
     let editorElement: HTMLElement;
@@ -52,7 +86,7 @@
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
             <SvelteFlowProvider>
-                <ComponentEditor bind:this={componentEditor} componentJSON={componentJSON} />
+                <ComponentEditor bind:this={componentEditor} />
             </SvelteFlowProvider>
         </div>
         <div class="json-editor"
@@ -80,10 +114,12 @@
             <span
             class="input"
             role="textbox" 
+            bind:innerText={$currentJSON.name}
+            on:input={handleTitleChange}
             contenteditable>Untitled Component</span>
         </div>
         <div class="buttons">
-            <button>
+            <button on:click={saveComponent}>
                 Save Component
             </button>
         </div>

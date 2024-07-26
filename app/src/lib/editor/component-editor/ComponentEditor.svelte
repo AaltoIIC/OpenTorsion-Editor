@@ -1,5 +1,6 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
+    import { currentJSON } from '../../stores';
     import {
       SvelteFlow,
       Controls,
@@ -22,9 +23,6 @@
       'empty': EmptyNode
     };
 
-    // keep track of json code
-    export let componentJSON: {name: string, nodes: any[]};
-
     // add element
     let nOfElements = 0;
     let currentPosition = 0;
@@ -35,40 +33,86 @@
         }
         nOfElements++;
         if (type === "disk") {
+            let data = {
+              name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
+              type: "Disk",
+              damping: 0,
+              inertia: 8.35e+06
+            }
+
             nodes.update(n => [...n, {
               id: `${nOfElements}`,
               type: 'disk',
               dragHandle: '.none',
-              data: { label: 'Node' },
+              data: data,
               position: { x: currentPosition, y: 150 }
             }]);
-            currentPosition += 111;
+            currentPosition += 21;
 
             // update JSON
-            componentJSON.nodes.push({
-                        name: "Element1",
-                        type: "Disk",
-                        damping: 0,
-                        inertia: 8.35e+06
-             });
+            currentJSON.update(value => {
+                return {
+                    ...value,
+                    elements: [
+                        ...(value.elements ? value.elements : []),
+                        data
+                    ]
+                }
+            });
+
         } else if (type === "shaft") {
+            let data ={
+                            name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
+                            type: "ShaftDiscrete",
+                            damping: 0,
+                            stiffness: 4.49e+09
+            }
+
             nodes.update(n => [...n, {
               id: `${nOfElements}`,
               type: 'shaft',
               dragHandle: '.none',
-              data: { label: 'Node' },
+              data: data,
               position: { x: currentPosition, y: 150 }
             }]);
-            currentPosition += 358;
+            currentPosition += 72;
+
+            // update JSON
+            currentJSON.update(value => {
+                return {
+                    ...value,
+                    elements: [
+                        ...(value.elements ? value.elements : []),
+                        data
+                    ]
+                }
+            });
         } else if (type === "gear") {
+            let data = {
+                            name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
+                            type: "Gear",
+                            damping: 0
+            }
+
             nodes.update(n => [...n, {
               id: `${nOfElements}`,
               type: 'gear',
               dragHandle: '.none',
-              data: { label: 'Node' },
+              data: data,
               position: { x: currentPosition, y: 150 }
             }]);
-            currentPosition += 111;
+            currentPosition += 21;
+
+            // update JSON
+            currentJSON.update(value => {
+                return {
+                    ...value,
+                    elements: [
+                        ...(value.elements ? value.elements : []),
+                        data
+                    ]
+                }
+            });
         }
 
         setTimeout(() => {

@@ -39,4 +39,7 @@
         background-color: var(--main-color-2tr);
         border-radius: 50%;
     }
+    p {
+        font-family: "Roboto Mono", monospace;
+    }
 </style>

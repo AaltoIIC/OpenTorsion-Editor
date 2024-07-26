@@ -107,10 +107,10 @@
     .icon-analyze {
         width: 22px;
         height: 22px;
-        margin: 0 0 -6px 0;
+        margin: 0 0 -5px 0;
         fill: none;
         stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 1.8px;
+        stroke-width: 2.4px;
         stroke-linejoin: round;
     }
     .analyze-button {
@@ -123,7 +123,8 @@
         background-color: var(--main-color);
         box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
         padding: 9px 12px 10px 12px;
-        font-weight: 400;
+        font-weight: 500;
+        font-family: "Roboto Mono", monospace;
     }
     .analyze-button:hover {
         border: solid 2px rgba(255, 255, 255, 0.6);

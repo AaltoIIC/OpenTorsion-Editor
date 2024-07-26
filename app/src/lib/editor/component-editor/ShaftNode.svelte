@@ -1,22 +1,34 @@
 <script lang="ts">
     import {type NodeProps } from '@xyflow/svelte';
-    import type { Writable } from 'svelte/store';
+    import ElementLayover from './element-layover/ElementLayover.svelte';
+    import type { ElementType } from '$lib/types/types';
    
     type $$Props = NodeProps;
    
-    export let data: { color: Writable<string> };
-   
-    const { color } = data;
+    export let data: ElementType;
+
+    let layoverElement: any;
+    let onHover = false;
 </script>
 
-<div class="disk-outer">
-    <div class="shaft"></div>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="shaft-outer"
+    on:mouseenter={() => onHover = true}
+    on:mouseleave={() => onHover = false}>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="shaft"
+        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}></div>
     <p>Shaft</p>
+    <ElementLayover
+        bind:this={layoverElement}
+        nodeOnHover={onHover}
+        params={data}
+        possibleParams={['name', 'type', 'damping', 'excitation', 'stiffness']} />
 </div>
 <style>
     .shaft {
-        height: 70px;
-        width: 360px;
+        height: 14px;
+        width: 72px;
         background-color: var(--main-color);
         background-image:
             linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)),
@@ -28,10 +40,10 @@
                 rgba(0, 0, 0, 0.05) 100%
             )
             ;
-        margin: 205px auto;
-        border-top: solid 6px rgba(0, 0, 0, 0.04);
-        border-bottom: solid 6px rgba(0, 0, 0, 0.04);
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 40px 120px;
+        margin: 42px auto;
+        border-top: solid 1px rgba(0, 0, 0, 0.04);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.04);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
         z-index: -1;
         transition: .3s;
         cursor: pointer;
@@ -40,9 +52,9 @@
         filter: brightness(1.05);
     }
     p {
-        font-size: 32px;
+        font-size: 6.4px;
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
-        font-family: 'Inter', sans-serif;
+        font-family: "Roboto Mono", monospace;
     }
 </style>
