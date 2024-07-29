@@ -1,9 +1,20 @@
 <script lang="ts">
     import ComponentListItem from "$lib/editor/CompontentListItem.svelte";
     import { basicComponents } from "./basicComponents";
+    import { currentJSON } from "$lib/stores";
+    import { addElement } from "./component-editor/componentHelpers";
 
     export let mode = "main-editor";
-    export let onAddElement = (type: String) => {};
+
+    const addEl = (type: string) => {
+        currentJSON.update(value => {
+            return {
+                ...value,
+                elements: addElement((value.elements ? value.elements : []), type)
+            }
+        });
+    }
+
 </script>
 
 <div class="main-sidebar">
@@ -46,7 +57,7 @@
                         <p>Parameters: name, damping, excitation, inertia</p>
                     </div>
                     <div>
-                        <button on:click={() => onAddElement("disk")}>Add to Component
+                        <button on:click={() => addEl('disk')}>Add to Component
                             <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                             </svg>                                           
@@ -65,7 +76,7 @@
                         <p>Parameters: name, damping, excitation, stiffness</p>
                     </div>
                     <div>
-                        <button on:click={() => onAddElement("shaft")}>Add to Component
+                        <button on:click={() => addEl('shaft')}>Add to Component
                             <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                             </svg>              
@@ -86,7 +97,7 @@
                         <p>Parameters: name, damping, excitation, inertia, diameter, teeth</p>
                     </div>
                     <div>
-                        <button on:click={() => onAddElement("gear")}>Add to Component
+                        <button on:click={() => addEl('gear')}>Add to Component
                             <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                             </svg>                 
@@ -99,6 +110,13 @@
     {/if}
 </div>
 <style>
+    .element-cont {
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
     .icon-add-to-component {
         width: 16px;
         height: 16px;
@@ -112,21 +130,22 @@
         margin: 0;
     }
     .element-info p {
-        font-size: 12px;
+        font-size: 14px;
         line-height: 1;
         color: rgba(0, 0, 0, 0.6);
         margin: 0;
-        font-family: "Roboto Mono", monospace;
     }
     .element-info button {
         background-color: rgb(34, 34, 34);
-        font-family: "Roboto Mono", monospace;
+        font-family: "Inter", sans-serif;
+        font-weight: 550;
+        border-radius: 100px;
+        padding: 10px 12px;
     }
     .disk {
         height: 80px;
         width: 20px;
         background-color: var(--main-color);
-        background-image:linear-gradient( to bottom, rgba(0,0,0,0.1), rgba(255,255,255,0.1), rgba(0,0,0,0.1));
         margin: 10px auto;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
@@ -136,7 +155,6 @@
         height: 14px;
         width: 72px;
         background-color: var(--main-color);
-        background-image:linear-gradient( to bottom, rgba(0,0,0,0.05), rgba(255,255,255,0.05), rgba(0,0,0,0.05));
         margin: 41px auto;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
@@ -152,27 +170,25 @@
         background-color: var(--main-color);
         background-image: repeating-linear-gradient(
             0deg,
-            rgba(0,0,0,0.1) 0%,
-            rgba(0,0,0,0.1) 7%,
-            rgba(255,255,255,0.1) 7%,
-            rgba(255,255,255,0.1) 14%
+            rgba(255,255,255,0.1) 0%,
+            rgba(255,255,255,0.1) 9.09%,
+            rgba(0,0,0,0.1) 9.09%,
+            rgba(0,0,0,0.1) 18.18%
         );
     }
     .gear-inner {
         width: 100%;
         height: 100%;
-        background: linear-gradient( to bottom, rgba(0, 0, 0, 0.07), rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.07));
     }
     .main-illustration-cont {
         height: 100px;
         width: 100px;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: var(--main-color-2tr);
         border-right: solid 1px rgba(0, 0, 0, 0.1);
     }
     .element-list-item {
         display: flex;
         border: solid 1px rgba(0, 0, 0, 0.1);
-        border-radius: 5px;
         width: calc(100% - 12px);
         margin: 5px;
         height: 100px;
@@ -233,10 +249,9 @@
         padding: 8px;
         font-weight: 500;
         border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         transition: .2s;
-        font-family: "Roboto Mono", monospace;
     }
     button:hover {
         border: 1px solid rgba(255, 255, 255, 0.8);

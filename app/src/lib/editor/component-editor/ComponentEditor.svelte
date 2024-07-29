@@ -1,6 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { currentJSON } from '../../stores';
+    import { renderNodes } from './componentHelpers';
     import {
       SvelteFlow,
       Controls,
@@ -21,105 +22,7 @@
       'shaft': ShaftNode,
       'gear': GearNode,
       'empty': EmptyNode
-    };
-
-    // add element
-    let nOfElements = 0;
-    let currentPosition = 0;
-    export const addElement = (type: String) => {
-        if (nOfElements === 0) {
-            nodes.update(n => []);
-            nOfElements++;
-        }
-        nOfElements++;
-        if (type === "disk") {
-            let data = {
-              name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
-              type: "Disk",
-              damping: 0,
-              inertia: 8.35e+06
-            }
-
-            nodes.update(n => [...n, {
-              id: `${nOfElements}`,
-              type: 'disk',
-              dragHandle: '.none',
-              data: data,
-              position: { x: currentPosition, y: 150 }
-            }]);
-            currentPosition += 21;
-
-            // update JSON
-            currentJSON.update(value => {
-                return {
-                    ...value,
-                    elements: [
-                        ...(value.elements ? value.elements : []),
-                        data
-                    ]
-                }
-            });
-
-        } else if (type === "shaft") {
-            let data ={
-                            name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
-                            type: "ShaftDiscrete",
-                            damping: 0,
-                            stiffness: 4.49e+09
-            }
-
-            nodes.update(n => [...n, {
-              id: `${nOfElements}`,
-              type: 'shaft',
-              dragHandle: '.none',
-              data: data,
-              position: { x: currentPosition, y: 150 }
-            }]);
-            currentPosition += 72;
-
-            // update JSON
-            currentJSON.update(value => {
-                return {
-                    ...value,
-                    elements: [
-                        ...(value.elements ? value.elements : []),
-                        data
-                    ]
-                }
-            });
-        } else if (type === "gear") {
-            let data = {
-                            name: `Element ${$currentJSON.elements ? $currentJSON.elements.length + 1 : 1}`,
-                            type: "Gear",
-                            damping: 0
-            }
-
-            nodes.update(n => [...n, {
-              id: `${nOfElements}`,
-              type: 'gear',
-              dragHandle: '.none',
-              data: data,
-              position: { x: currentPosition, y: 150 }
-            }]);
-            currentPosition += 21;
-
-            // update JSON
-            currentJSON.update(value => {
-                return {
-                    ...value,
-                    elements: [
-                        ...(value.elements ? value.elements : []),
-                        data
-                    ]
-                }
-            });
-        }
-
-        setTimeout(() => {
-            fitView();
-        }, 0);
-    }
-   
+    };   
   
     const nodes = writable([
       {
@@ -132,7 +35,18 @@
     ]);
    
 
-    const edges = writable([]); 
+    const edges = writable([]);
+
+    currentJSON.subscribe(value => {
+      if (!value.elements) {
+        alert('Malformed JSON');
+      } else {
+        nodes.set(renderNodes(value.elements));
+        setTimeout(() => {
+            fitView();
+        }, 0);
+      }
+    });
 </script>
 <SvelteFlow
   nodes={nodes}

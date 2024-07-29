@@ -14,7 +14,7 @@
             <button>Add
                 <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>              
+                </svg>        
             </button>
         </div>
     </div>
@@ -52,6 +52,12 @@
         height: 100px;
         overflow: hidden;
         transition: .2s;
+
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .component-list-item:hover {
         border: solid 1px rgba(0, 0, 0, 0.4);

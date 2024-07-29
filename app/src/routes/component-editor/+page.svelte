@@ -5,9 +5,9 @@
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/editor/Sidebar.svelte";
     import { JSONEditor } from 'svelte-jsoneditor';
-    import { currentJSON } from '../../lib/stores';
-    import { allComponents } from '../../lib/stores';
+    import { currentJSON, allComponents, notification } from '../../lib/stores';
     import { goto } from '$app/navigation';
+    import Notification from '$lib/Notification.svelte';
 
     let componentEditor: any;
 
@@ -22,12 +22,20 @@
         text: undefined,
         json: {}
     }
+    // make sure the JSON editor is updated when the JSON content changes
     currentJSON.subscribe(value => {
         content = {
             text: undefined,
             json: value
         };
     });
+    // make sure the JSON content is updated when the JSON editor changes
+    $: {
+        if (content.json) {
+            currentJSON.set(content.json);
+        }
+    }
+
     const handleTitleChange = (event: Event) => {
         const illegalChars = /['"\n]/g;
         if (illegalChars.test((event.target as HTMLElement).innerText)) {
@@ -48,6 +56,12 @@
                 ...value,
                 content.json
             ]
+        });
+
+        notification.set({
+            message: "Component saved succesfully.",
+            type: "success",
+            duration: 3000
         });
         goto('/new');
     }
@@ -119,15 +133,39 @@
             contenteditable>Untitled Component</span>
         </div>
         <div class="buttons">
-            <button on:click={saveComponent}>
-                Save Component
+            <button class="save-btn" on:click={saveComponent}>
+                <svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>                  
+                <span>Save Component</span>
             </button>
         </div>
     </div>
     <Sidebar mode="component-editor" onAddElement={(value) => {componentEditor ? componentEditor.addElement(value) : ''}} />
 </div>
+<Notification />
 
 <style>
+    .save-btn {
+        padding: 0;
+        display: flex;
+    }
+    .save-btn span {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 9px 10px 9px 12px;
+        font-weight: 500;
+    }
+    .icon-save {
+        width: 18px;
+        height: 18px;
+        stroke: rgba(255, 255, 255, 0.9);
+        stroke-width: 2px;
+        stroke-linejoin: round;
+        padding: 8px 6px 13px 8px;
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        margin: 0 -2px -5px 0;
+    }
+
     /* Resizing JSON editor */
     .resize-slider {
         width: 100%;
@@ -152,7 +190,7 @@
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         height: fit-content;
-        margin-right: 82px;
+        margin-left: -82px;
     }
     .component-name-cont .input {
         line-height: 1;
@@ -180,10 +218,10 @@
     button {
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color);
-        padding: 8px;
-        font-weight: 500;
+        padding: 10px 12px;
+        font-weight: 550;
         border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         transition: .2s;
     }

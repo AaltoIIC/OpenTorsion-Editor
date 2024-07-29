@@ -1,7 +1,12 @@
 <script lang="ts">
+    import { currentJSON } from '../../../stores';
+    import { editElement, removeParam } from '../componentHelpers';
+
     export let isEditing: boolean;
+    export let elementName: string;
     export let paramName: string;
     export let paramValue: string | number | undefined;
+
     let isUndef = typeof paramValue === 'undefined';
     let onHover = false;
 
@@ -10,6 +15,36 @@
             paramValue = 0;
             isUndef = false;
         }
+
+        currentJSON.update(value => {
+            return {
+                ...value,
+                elements: value.elements ? editElement(value.elements, elementName, {[paramName]: paramValue}) : []
+            }
+        });
+    }
+
+    const makeUndef = () => {
+        paramValue = undefined;
+        isUndef = true;
+
+        currentJSON.update(value => {
+            return {
+                ...value,
+                elements: value.elements ? removeParam(value.elements, elementName, paramName) : []
+            }
+        });
+    }
+
+    const handleBlur = (event: any) => {
+        const newValue = event.target.textContent;
+
+        currentJSON.update(value => {
+            return {
+                ...value,
+                elements: value.elements ? editElement(value.elements, elementName, {[paramName]: newValue}) : []
+            }
+        });
     }
 
     // helper function to convert large numbers to engineering notation
@@ -23,8 +58,9 @@
 
         return `${mantissa}e${exponent}`
     };
+
 </script>
-<p class="{isUndef ? 'undef-cont' : 'def-cont'} {isEditing ? "active" : ""} {onHover ? "hover" : ""}"
+<p class="main-prop-cont {isUndef ? 'undef-cont' : 'def-cont'} {isEditing ? "active" : ""} {onHover ? "hover" : ""}"
     on:mouseenter={() => {onHover = true}}
     on:mouseleave={() => {onHover = false}}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -38,6 +74,7 @@
     </span>
     <span class="param-val-outer">
         <span
+            on:blur={handleBlur}
             class="param-val" 
             contenteditable="{paramName != "type"}">
                 {typeof paramValue === 'number' ? toEngineeringNotation(paramValue) : paramValue}
@@ -45,7 +82,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <svg
-            on:click={() => {paramValue = undefined; isUndef = true}}
+            on:click={() => {makeUndef()}}
             class="icon-close {isEditing && !(['type', 'damping'].includes(paramName)) ? 'active' : ''}"
             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -53,9 +90,15 @@
     </span>
 </p>
 <style>
+    .main-prop-cont {
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
     .def-cont .param-val {
-        position: relative;
-        bottom: -4px;
+        line-height: 28px;
     }
     .def-cont .param-name {
         padding: 4px;
@@ -66,7 +109,6 @@
     }
     .def-cont:hover {
         background-color: rgba(0, 0, 0, 0.04);
-        border-radius: 5px;
     }
     .undef-cont .param-val-outer, .undef-cont .param-colon {
         display: none;
@@ -114,12 +156,13 @@
         font-family: "Roboto Mono", monospace;
     }
     .icon-close {
-        width: 15px;
-        height: 15px;
+        width: 12px;
+        height: 12px;
         cursor: pointer;
         color: rgba(0, 0, 0, 0.4);
-        margin-bottom: -6px;
+        margin-bottom: -1px;
         margin-left: -2px;
+        margin-right: 2px;
         opacity: 0;
         pointer-events: none;
     }

@@ -15,7 +15,6 @@
         background-color: var(--main-color-tr);
         transition: .2s;
         cursor: pointer;
-        border-radius: 5px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -40,6 +39,6 @@
         border-radius: 50%;
     }
     p {
-        font-family: "Roboto Mono", monospace;
+        font-family: "Inter", sans-serif;
     }
 </style>

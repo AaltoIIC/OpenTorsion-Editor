@@ -41,10 +41,10 @@
         background-color: var(--main-color);
         background-image: repeating-linear-gradient(
             0deg,
-            rgba(0, 0, 0, 0.1) 0%,
-            rgba(0, 0, 0, 0.1) 7%,
-            transparent 7%,
-            transparent 14%
+            transparent 0%,
+            transparent 9.09%,
+            rgba(0,0,0,0.1) 9.09%,
+            rgba(0,0,0,0.1) 18.18%
         );
         transition: .3s;
         cursor: pointer;

@@ -1,8 +1,8 @@
 :root {
-    --main-color: rgb(118, 208, 235);
-    --main-color-dark: rgb(9, 182, 235);
-    --main-color-tr: rgba(118, 208, 235, 0.04);
-    --main-color-2tr: rgba(118, 208, 235, 0.16);
+    --main-color: rgb(72, 229, 194);
+    --main-color-dark: rgb(68, 220, 187);
+    --main-color-tr: rgba(72, 229, 194, 0.04);
+    --main-color-2tr: rgba(72, 229, 194, 0.16);
 }
 body {
     background: white;

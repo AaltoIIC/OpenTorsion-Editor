@@ -2,6 +2,7 @@
     import FlowEditor from "$lib/editor/FlowEditor.svelte";
     import Sidebar from "$lib/editor/Sidebar.svelte";
     import { JSONEditor } from 'svelte-jsoneditor'
+    import Notification from "$lib/Notification.svelte";
 
     let content = {
         text: undefined, // can be used to pass a stringified JSON document instead
@@ -87,6 +88,7 @@
     </div>
     <Sidebar mode="main-editor" />
 </div>
+<Notification />
 
 <style>
     .resize-slider {
