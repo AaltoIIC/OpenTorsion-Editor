@@ -2,10 +2,17 @@ import type { ElementType } from '$lib/types/types';
 import _ from 'lodash';
 
 // edit an element in the list of elements
-export const editElement = (elements: ElementType[], elementName: string, newValues: Partial<ElementType> ): ElementType[] => {
-    console.log("editElement called");
-    console.log(newValues);
-    
+export const editElement = (elements: ElementType[] | undefined,
+    elementName: string,
+    newValues: Partial<ElementType>,
+    removeUndefined=false ): ElementType[] => {
+
+    if (!elements) {elements = []};
+
+    if (removeUndefined) {
+        newValues = _.omitBy(newValues, _.isUndefined);
+    }
+
     let newElements = [...elements];
     newElements.forEach((el, index) => {
         if (el.name === elementName) {

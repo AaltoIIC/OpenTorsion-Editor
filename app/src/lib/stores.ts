@@ -1,4 +1,5 @@
 import type { ComponentType, NotificationType } from './types/types';
+import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
 
 

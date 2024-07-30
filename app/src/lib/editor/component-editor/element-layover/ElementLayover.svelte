@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import Portal from "svelte-portal";
     import type { ElementType } from '$lib/types/types';
+    import { editElement } from '../componentHelpers';
     import { currentJSON } from '../../../stores';
     import LayoverPropery from './LayoverPropery.svelte';
     
@@ -20,8 +21,20 @@
         })
     }
 
+    // handle parameter change
+    const undefinedParams = possibleParams
+        .filter(item => !(item in params))
+        .reduce((acc, key) => {
+            acc[key] = undefined;
+            return acc;
+        }, {} as { [key: string]: undefined });
+
+    let allProperties: ElementType = {...params, ...undefinedParams};
+    const handleParamChange = (key: string, value: any) => {
+        allProperties = {...allProperties, [key]: value};
+    }
+
     // handle layover behavior (position, visibility, etc.)
-    
     let onHover = false;
     let isOpen = false;
     let isEditing = false;
@@ -38,35 +51,51 @@
         x = event.clientX;
         y = event.clientY;
     };
+
+    const closeLayover = () => {
+        if (true) {
+            console.log(allProperties)
+
+            // update the element with the new properties
+            if (isEditing) {
+                currentJSON.update(value => {
+                return {
+                        ...value,
+                        elements: editElement(value.elements, params.name, allProperties, true)
+                    }
+                })
+            }
+        }
+
+        isOpen = false;
+        isEditing = false;
+    }
     
     const handleClickOutside = (event: any) => {
         if (onHover || nodeOnHover) return;
-        isOpen = false;
-        isEditing = false;
+        closeLayover();
     };
 
     const handleKeydown = (event: any) => {
         if (event.key === 'Escape') {
-            isOpen = false;
-            isEditing = false;
+            closeLayover();
         }
     };
-
-    const handleScrollandMove = () => {
-        isOpen = false;
-        isEditing = false;
-    }
 
     onMount(() => {
         window.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('pointerdown', handleClickOutside);
         document.addEventListener('keydown', handleKeydown);
-        window.addEventListener('wheel', handleScrollandMove);
+
+        const flowEditor = document.querySelector('.svelte-flow__pane');
+        if (flowEditor) {
+            flowEditor.addEventListener('wheel', closeLayover);
+        }
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('pointerdown', handleClickOutside);
             document.removeEventListener('keydown', handleKeydown);
-            window.removeEventListener('wheel', handleScrollandMove);
+            flowEditor?.removeEventListener('wheel', closeLayover);
         };
     });
 
@@ -87,27 +116,19 @@
             </svg>              
         </div>
         <div class="params-cont">
-            {#each Object.entries(params) as [paramName, paramVal]}
+            {#each Object.entries(allProperties) as [paramName, paramValue]}
                 {#if paramName != 'name'}
                     <LayoverPropery
-                        elementName={params.name}
                         paramName={paramName}
-                        paramValue={paramVal}
+                        paramValue={paramValue}
                         isEditing={isEditing}
+                        onChange={handleParamChange}
                     />
                 {/if}
             {/each}
-            {#each possibleParams.filter(item => !(item in params)) as undefinedParam}
-                    <LayoverPropery
-                        elementName={params.name}
-                        paramName={undefinedParam}
-                        paramValue={undefined}
-                        isEditing={isEditing}
-                    />
-            {/each}
         </div>
         <button class="close-btn"
-            on:click={() => {isOpen = false; isEditing = false}}
+            on:click={() => {closeLayover()}}
             style="display: {isEditing ? 'block' : 'none'};">
             Done
         </button>

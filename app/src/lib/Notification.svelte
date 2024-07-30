@@ -21,6 +21,7 @@
             setTimeout(() => {
                 currentText = '';
                 currentType = '';
+                notification.set(null);
             }, value.duration + 300);
         } else {
             isShown = false;
@@ -76,6 +77,9 @@
         background-color: var(--main-color-dark);
         margin-right: 10px;
     }
+    .is-error .icon-cont {
+        background-color: var(--main-error-color-dark);
+    }
     .close-cont svg {
         width: 15px;
         height: 15px;
@@ -95,6 +99,9 @@
         vertical-align: middle;
         border: solid 1px rgba(0, 0, 0, 0.1);
         transition: .3s;
+    }
+    .main-notification-cont.is-error {
+        background-color: var(--main-error-color);
     }
     .main-notification-cont.active {
         opacity: 1;

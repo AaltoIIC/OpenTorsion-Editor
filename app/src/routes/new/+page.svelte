@@ -1,8 +1,11 @@
 <script lang="ts">
     import FlowEditor from "$lib/editor/FlowEditor.svelte";
-    import Sidebar from "$lib/editor/Sidebar.svelte";
+    import Sidebar from "$lib/sidebar/Sidebar.svelte";
+    import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
     import { JSONEditor } from 'svelte-jsoneditor'
     import Notification from "$lib/Notification.svelte";
+    import Button from "$lib/Button.svelte";
+    import NameField from "$lib/NameField.svelte";
 
     let content = {
         text: undefined, // can be used to pass a stringified JSON document instead
@@ -74,19 +77,26 @@
                 Analysis
             </a>
         </div>
+        <NameField text="System" value="New System" onInput={(event) => console.log(event)} />
         <div class="buttons">
-            <button>
+            <Button
+                isActive={true}
+                icon={'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>'}>
                 Export
-                <svg class="icon-dropdown" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <svg class="icon-dropdown" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg>              
-            </button>
-            <button>
+                  </svg> 
+            </Button>
+            <Button
+                isActive={true}
+                icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
                 Save
-            </button>
+            </Button>
         </div>
     </div>
-    <Sidebar mode="main-editor" />
+    <Sidebar>
+        <ComponentsList />
+    </Sidebar>
 </div>
 <Notification />
 
@@ -112,7 +122,7 @@
         margin: 0 0 -5px 0;
         fill: none;
         stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2.4px;
+        stroke-width: 2px;
         stroke-linejoin: round;
     }
     .analyze-button {
@@ -120,13 +130,13 @@
         bottom: 32px;
         right: 32px;
         z-index: 10;
-        font-size: 16px;
+        font-size: 14px;
         border: solid 2px rgba(255, 255, 255, 0.3);
         background-color: var(--main-color);
         box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
-        padding: 9px 12px 10px 12px;
+        padding: 9px 14px 10px 16px;
         font-weight: 500;
-        font-family: "Roboto Mono", monospace;
+        border-radius: 50px;
     }
     .analyze-button:hover {
         border: solid 2px rgba(255, 255, 255, 0.6);

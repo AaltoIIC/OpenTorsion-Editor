@@ -3,9 +3,9 @@
     import { editElement, removeParam } from '../componentHelpers';
 
     export let isEditing: boolean;
-    export let elementName: string;
     export let paramName: string;
     export let paramValue: string | number | undefined;
+    export let onChange: (key: string, value: any) => void;
 
     let isUndef = typeof paramValue === 'undefined';
     let onHover = false;
@@ -14,37 +14,19 @@
         if (isUndef) {
             paramValue = 0;
             isUndef = false;
+            onChange(paramName, paramValue);
         }
-
-        currentJSON.update(value => {
-            return {
-                ...value,
-                elements: value.elements ? editElement(value.elements, elementName, {[paramName]: paramValue}) : []
-            }
-        });
     }
 
     const makeUndef = () => {
         paramValue = undefined;
         isUndef = true;
-
-        currentJSON.update(value => {
-            return {
-                ...value,
-                elements: value.elements ? removeParam(value.elements, elementName, paramName) : []
-            }
-        });
+        onChange(paramName, paramValue);
     }
 
-    const handleBlur = (event: any) => {
-        const newValue = event.target.textContent;
-
-        currentJSON.update(value => {
-            return {
-                ...value,
-                elements: value.elements ? editElement(value.elements, elementName, {[paramName]: newValue}) : []
-            }
-        });
+    const handleChange = (event: any) => {
+        paramValue = event.target.textContent;
+        onChange(paramName, paramValue);
     }
 
     // helper function to convert large numbers to engineering notation
@@ -74,7 +56,7 @@
     </span>
     <span class="param-val-outer">
         <span
-            on:blur={handleBlur}
+            on:input={handleChange}
             class="param-val" 
             contenteditable="{paramName != "type"}">
                 {typeof paramValue === 'number' ? toEngineeringNotation(paramValue) : paramValue}

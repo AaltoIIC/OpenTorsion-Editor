@@ -3,11 +3,14 @@
       SvelteFlowProvider
     } from '@xyflow/svelte';
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
-    import Sidebar from "$lib/editor/Sidebar.svelte";
+    import Sidebar from "$lib/sidebar/Sidebar.svelte";
+    import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import { JSONEditor } from 'svelte-jsoneditor';
     import { currentJSON, allComponents, notification } from '../../lib/stores';
     import { goto } from '$app/navigation';
     import Notification from '$lib/Notification.svelte';
+    import Button from '$lib/Button.svelte';
+    import NameField from '$lib/NameField.svelte';
 
     let componentEditor: any;
 
@@ -123,49 +126,23 @@
                 Back to System Editor
             </a>
         </div>
-        <div class="component-name-cont">
-            Component:
-            <span
-            class="input"
-            role="textbox" 
-            bind:innerText={$currentJSON.name}
-            on:input={handleTitleChange}
-            contenteditable>Untitled Component</span>
-        </div>
+        <NameField text="Component" bind:value={$currentJSON.name} onInput={handleTitleChange} />
         <div class="buttons">
-            <button class="save-btn" on:click={saveComponent}>
-                <svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>                  
-                <span>Save Component</span>
-            </button>
+            <Button
+                onClick={saveComponent}
+                isActive={true}
+                icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
+                Save Component
+            </Button>
         </div>
     </div>
-    <Sidebar mode="component-editor" onAddElement={(value) => {componentEditor ? componentEditor.addElement(value) : ''}} />
+    <Sidebar>
+        <ElementsList />
+    </Sidebar>
 </div>
 <Notification />
 
 <style>
-    .save-btn {
-        padding: 0;
-        display: flex;
-    }
-    .save-btn span {
-        color: rgba(255, 255, 255, 0.9);
-        padding: 9px 10px 9px 12px;
-        font-weight: 500;
-    }
-    .icon-save {
-        width: 18px;
-        height: 18px;
-        stroke: rgba(255, 255, 255, 0.9);
-        stroke-width: 2px;
-        stroke-linejoin: round;
-        padding: 8px 6px 13px 8px;
-        border-right: solid 1px rgba(0, 0, 0, 0.1);
-        margin: 0 -2px -5px 0;
-    }
-
     /* Resizing JSON editor */
     .resize-slider {
         width: 100%;
@@ -183,27 +160,6 @@
         height: var(--json-editor-height);
     }
 
-    /* component name field */
-    .component-name-cont {
-        color: rgba(255, 255, 255, 0.9);
-        display: inline-block;
-        font-family: 'Inter', sans-serif;
-        font-size: 14px;
-        height: fit-content;
-        margin-left: -82px;
-    }
-    .component-name-cont .input {
-        line-height: 1;
-        padding: 8px;
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 5px;
-        border: solid 2px rgba(255, 255, 255, 0.1);
-        color:rgba(255, 255, 255, 0.9);
-        font-family: 'Inter', sans-serif;
-        width: fit-content;
-        font-weight: 600;
-        margin-left: 8px;
-    }
 
     .main-editor-area {
         position: absolute;
@@ -213,20 +169,6 @@
         height: calc(100vh - 68px);
         overflow: hidden;
         background-color: rgb(255, 255, 255);
-    }
-
-    button {
-        color: rgba(255, 255, 255, 0.9);
-        background-color: var(--main-color);
-        padding: 10px 12px;
-        font-weight: 550;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 50px;
-        cursor: pointer;
-        transition: .2s;
-    }
-    button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.4);
     }
     .icon-back {
         width: 20px;
@@ -252,14 +194,13 @@
         justify-content: space-between;
         vertical-align: middle;
     }
-    .top-menu .buttons, .top-menu .links, .top-menu .component-name-cont {
+    .top-menu .buttons, .top-menu .links {
         height: fit-content;
         align-self: center;
     }
     .top-menu .buttons {
         margin-right: 16px;
     }
-
 
     .main-screen {
         position: fixed;
