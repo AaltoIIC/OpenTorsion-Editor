@@ -1,13 +1,14 @@
 <script lang="ts">
     export let icon: string = '';
-    export let isActive: boolean;
+    export let isActive: boolean = true;
     export let lightMode: boolean = false;
     export let onClick: () => void = () => {};
 </script>
 
 <button
     on:click={onClick}
-    class="btn" style="{lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''}">
+    class="btn"
+    style={`${lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''} ${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2);'}`}>
     {#if icon}
         <span class="main-icon">
                 {@html icon} 

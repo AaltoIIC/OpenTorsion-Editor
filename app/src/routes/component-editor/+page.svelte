@@ -11,12 +11,17 @@
     import Notification from '$lib/Notification.svelte';
     import Button from '$lib/Button.svelte';
     import NameField from '$lib/NameField.svelte';
+    import { nameComponent } from '$lib/editor/component-editor/componentHelpers';
+    import type { ComponentType } from '$lib/types/types';
+    import { isElementType } from '$lib/types/typeguards';
 
     let componentEditor: any;
+    let isNameError = false;
+    let isSaveActive = true;
 
     // Initialize JSON Content
     currentJSON.set({
-        name: "Untitled Component",
+        name: nameComponent($allComponents),
         elements: []
     });
 
@@ -31,20 +36,74 @@
             text: undefined,
             json: value
         };
+
+        // check component validity
+        if (value.name === "") {
+            // check if name is empty
+            isNameError = true;
+            isSaveActive = false;
+            notification.set({
+                message: "Component name cannot be empty.",
+                type: "error",
+                duration: 3600000
+            });
+        } else if ($allComponents.find(component => component.name.toUpperCase().replace(/\s/g,'') === value.name.toUpperCase().replace(/\s/g,''))) {
+            // check if name is unique
+
+            isNameError = true;
+            isSaveActive = false;
+            notification.set({
+                message: "Component name must be unique.",
+                type: "error",
+                duration: 3600000
+            });
+        } else if (value.elements.length === 0) {
+            // check if elements are empty
+            isSaveActive = false;
+            notification.set({
+                message: "Component must have at least one element.",
+                type: "info",
+                duration: 3600000
+            });
+        } else {
+            isNameError = false;
+            isSaveActive = true;
+            notification.set(null);
+        }
+
+
     });
     // make sure the JSON content is updated when the JSON editor changes
     $: {
         if (content.json) {
-            currentJSON.set(content.json);
+            // don't let maformed JSON through
+            if (!('elements' in content.json) || !Array.isArray(content.json.elements)) {
+                content.json = {
+                    ...content.json,
+                    elements: []
+                }
+            }
+            if (!('name' in content.json) || typeof content.json.name !== 'string') {
+                content.json = {
+                    ...content.json,
+                    name: ""
+                }
+            }
+
+            // update the current JSON
+            currentJSON.set(content.json as ComponentType);
         }
     }
 
+    // handle title changes
     const handleTitleChange = (event: Event) => {
+        // remove illegal characters from field
         const illegalChars = /['"\n]/g;
         if (illegalChars.test((event.target as HTMLElement).innerText)) {
             (event.target as HTMLElement).innerText = (event.target as HTMLElement).innerText.replace(illegalChars, '');
         }
 
+        // update the current JSON
         currentJSON.update(value => {
             return {
                 ...value,
@@ -57,7 +116,7 @@
         allComponents.update(value => {
             return [
                 ...value,
-                content.json
+                (content.json as ComponentType)
             ]
         });
 
@@ -119,18 +178,18 @@
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href="/new">
+            <a href="/new" on:click={() => {notification.set(null)}}>
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
                 Back to System Editor
             </a>
         </div>
-        <NameField text="Component" bind:value={$currentJSON.name} onInput={handleTitleChange} />
+        <NameField isError={isNameError} text="Component" bind:value={$currentJSON.name} onInput={handleTitleChange} />
         <div class="buttons">
             <Button
                 onClick={saveComponent}
-                isActive={true}
+                isActive={isSaveActive}
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
                 Save Component
             </Button>

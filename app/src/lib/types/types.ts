@@ -13,9 +13,11 @@ export interface ElementType {
     stiffness?: number;
     diameter?: number;
     teeth?: number;
+    [key: string]: any;
 }
 
 export interface ComponentType {
-    name?: string;
-    elements?: ElementType[];
+    name: string;
+    elements: ElementType[];
+    [key: string]: any;
 }

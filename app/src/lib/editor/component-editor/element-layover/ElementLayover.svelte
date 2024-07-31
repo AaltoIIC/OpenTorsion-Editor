@@ -54,8 +54,6 @@
 
     const closeLayover = () => {
         if (true) {
-            console.log(allProperties)
-
             // update the element with the new properties
             if (isEditing) {
                 currentJSON.update(value => {

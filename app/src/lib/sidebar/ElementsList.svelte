@@ -156,7 +156,7 @@
     .main-illustration-cont {
         height: 108px;
         width: 108px;
-        background-color: var(--main-color-2tr);
+        background-color: var(--main-color-tr-2);
         border-right: solid 1px rgba(0, 0, 0, 0.1);
     }
     .element-list-item {

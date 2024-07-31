@@ -54,7 +54,7 @@
                 {/if}
             </div>
             <div class="notification-inner">
-                <p>Component saved succesfully.</p>
+                <p>{currentText}</p>
             </div>
             <div class="close-cont">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -76,6 +76,7 @@
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color-dark);
         margin-right: 10px;
+        transition: .3s;
     }
     .is-error .icon-cont {
         background-color: var(--main-error-color-dark);

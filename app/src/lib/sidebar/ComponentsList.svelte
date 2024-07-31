@@ -2,6 +2,7 @@
     import Button from "$lib/Button.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
+    import { allComponents } from "$lib/stores";
 </script>
 
 <div class="component-cont">
@@ -19,6 +20,9 @@
         </a>
     </div>
     <div class="component-list">
+        {#each [ ...$allComponents].reverse() as component}
+            <ComponentListItem name={component.name} isUnique={true} />
+        {/each}
         {#each basicComponents as component}
             <ComponentListItem src={component.icon} name={component.name} isUnique={false} />
         {/each}
@@ -46,6 +50,23 @@
     }
     .component-list {
         width: 100%;
+        height: calc(100vh - 150px);
+        overflow-y: scroll;
         border-top: solid 2px rgba(0, 0, 0, 0.1);
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border: solid 1px rgba(0, 0, 0, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.15);
     }
 </style>

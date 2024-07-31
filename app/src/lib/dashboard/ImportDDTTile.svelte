@@ -35,7 +35,7 @@
         height: 45px;
         padding: 15px;
         color: var(--main-color);
-        background-color: var(--main-color-2tr);
+        background-color: var(--main-color-tr-2);
         border-radius: 50%;
     }
     p {

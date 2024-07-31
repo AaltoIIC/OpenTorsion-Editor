@@ -1,4 +1,4 @@
-import type { ElementType } from '$lib/types/types';
+import type { ElementType, ComponentType } from '$lib/types/types';
 import _ from 'lodash';
 
 // edit an element in the list of elements
@@ -37,6 +37,25 @@ export const removeParam = (elements: ElementType[], elementName: string, paramN
     return newElements;
 }
 
+// function to automatically give a unique name to a new component
+export const nameComponent = (components: ComponentType[]) => {
+    let largestNum = 0;
+
+    // check if there is a component with the name "New Component"
+    if (components.map(component => component.name).includes('New Component')) {
+        largestNum = 1;
+    }
+
+    // check if there are components with the name "New Component (n)"
+    const regex = new RegExp(/^New Component \(\d+\)$/);
+    if (components.filter(component => regex.test(component.name)).length > 0) {
+        largestNum = (components.filter(component => regex.test(component.name))
+                    .map(component => parseInt(component.name.split(" (")[1].replace(')',''))).sort().at(-1) as number)
+    }
+    
+    return `New Component${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
+}
+
 // function to automatically give a unique name to a new element
 const nameElement = (type: string, elements: ElementType[]) => {
     const typeToName: { [key: string]: string } = {
@@ -46,8 +65,9 @@ const nameElement = (type: string, elements: ElementType[]) => {
     }
     // Get the maximum number
     const regex = new RegExp(`^${typeToName[type]} \\d+$`);
-    const largestNum = elements.filter(el => el.type === type && regex.test(el.name)).map(el => parseInt(el.name.split(" ")[1])).sort().at(-1)
-    return (largestNum ? largestNum + 1 : 1);
+    const largestNum = elements.filter(el => el.type === type && regex.test(el.name))
+                                .map(el => parseInt(el.name.split(" ")[1])).sort().at(-1)
+    return `${typeToName[type]} ${largestNum ? largestNum + 1 : 1}`;
 }
 
 // function to add nodes to the list of elements
@@ -55,7 +75,7 @@ const nameElement = (type: string, elements: ElementType[]) => {
 export const addElement = (elements: ElementType[], elementName: string): ElementType[] => {
     if (elementName === "disk") {
         const newElement = {
-            name: `Disk ${nameElement('Disk', elements)}`,
+            name: nameElement('Disk', elements),
             type: "Disk",
             damping: 0,
             inertia: 8.35e+06
@@ -63,7 +83,7 @@ export const addElement = (elements: ElementType[], elementName: string): Elemen
         return [...elements, newElement];
     } else if (elementName === "shaft") {
         const newElement = {
-            name: `Shaft ${nameElement('ShaftDiscrete', elements)}`,
+            name: `${nameElement('ShaftDiscrete', elements)}`,
             type: "ShaftDiscrete",
             damping: 0,
             stiffness: 4.49e+09
@@ -71,7 +91,7 @@ export const addElement = (elements: ElementType[], elementName: string): Elemen
         return [...elements, newElement];
     } else if (elementName === "gear") {
         const newElement = {
-            name: `Gear ${nameElement('Gear', elements)}`,
+            name: `${nameElement('Gear', elements)}`,
             type: "Gear",
             damping: 0
         }

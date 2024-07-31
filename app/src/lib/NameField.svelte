@@ -1,6 +1,7 @@
 <script lang="ts">
     export let text: string;
     export let value: string | undefined;
+    export let isError: boolean = false;
     export let onInput: (event: Event) => void;
 
 </script>
@@ -11,6 +12,7 @@
     role="textbox" 
     bind:innerText={value}
     on:input={onInput}
+    style={isError ? "outline: solid 2px var(--main-error-color-dark);" : ""}
     contenteditable>{value}</span>
 </div>
 <style>

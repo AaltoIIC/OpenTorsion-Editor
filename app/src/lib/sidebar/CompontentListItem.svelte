@@ -1,14 +1,24 @@
 <script lang="ts">
-    export let src: string = "electric-motor.png";
+    export let src: string = "default-custom.png";
     export let name: string;
     export let isUnique: boolean = true;
+
+    let hover = false;
 </script>
-<div class="component-list-item">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="component-list-item {hover ? 'hover' : ''}"
+    on:mouseenter={() => {hover = true}}
+    on:mouseleave={() => {hover = false}}>
     <img class="main-img" src={`./components/${src}`} alt={name} />
     <div class="component-info">
         <div>
-            <h4>{name}</h4>
-            <p>{isUnique ? "Custom component" : "Generic component"}</p>
+            <h4>
+                <span>{name}</span>
+                <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                </svg>                  
+            </h4>
+            <p>{isUnique ? "Custom Component" : "Generic Component"}</p>
         </div>
         <div>
             <button>Add
@@ -20,6 +30,17 @@
     </div>
 </div>
 <style>
+    .hover .icon-menu {
+        display: block;
+    }
+    .icon-menu {
+        width: 20px;
+        height: 20px;
+        margin: 0 -2px -5px 0;
+        display: none;
+        stroke: rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+    }
     p {
         font-size: 14px;
         color: rgba(0, 0, 0, 0.6);
@@ -27,6 +48,9 @@
     }
     h4 {
         margin: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
     }
     .add-icon {
         width: 18px;
@@ -37,6 +61,7 @@
         stroke-linejoin: round;
     }
     .component-info {
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;

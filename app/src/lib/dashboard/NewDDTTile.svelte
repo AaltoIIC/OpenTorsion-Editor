@@ -32,7 +32,7 @@
         width: 75px;
         height: 75px;
         color: var(--main-color);
-        background-color: var(--main-color-2tr);
+        background-color: var(--main-color-tr-2);
         border-radius: 50%;
     }
     p {
