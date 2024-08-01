@@ -57,6 +57,14 @@
                 type: "error",
                 duration: 3600000
             });
+        } else if (!value.elements.every(isElementType)) {
+            // check if elements are valid
+            isSaveActive = false;
+            notification.set({
+                message: "Some elements are invalid. Please check the element properties.",
+                type: "info",
+                duration: 3600000
+            });
         } else if (value.elements.length === 0) {
             // check if elements are empty
             isSaveActive = false;
@@ -89,7 +97,6 @@
                     name: ""
                 }
             }
-
             // update the current JSON
             currentJSON.set(content.json as ComponentType);
         }
@@ -99,15 +106,15 @@
     const handleTitleChange = (event: Event) => {
         // remove illegal characters from field
         const illegalChars = /['"\n]/g;
-        if (illegalChars.test((event.target as HTMLElement).innerText)) {
-            (event.target as HTMLElement).innerText = (event.target as HTMLElement).innerText.replace(illegalChars, '');
+        if (illegalChars.test((event.target as HTMLInputElement).value)) {
+            (event.target as HTMLInputElement).value = (event.target as HTMLInputElement).value.replace(illegalChars, '');
         }
 
         // update the current JSON
         currentJSON.update(value => {
             return {
                 ...value,
-                name: (event.target as HTMLElement).innerText
+                name: (event.target as HTMLInputElement).value
             }
         });
     }

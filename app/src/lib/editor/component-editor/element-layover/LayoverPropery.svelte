@@ -25,7 +25,16 @@
     }
 
     const handleChange = (event: any) => {
-        paramValue = event.target.textContent;
+        let newParamValue = event.target.value;
+        
+        // remove illegal characters
+        const illegalChars = /['"\n]/g;
+        if (illegalChars.test(newParamValue)) {
+            newParamValue = newParamValue.replace(illegalChars, '');
+        }
+
+        paramValue = newParamValue;
+        //event.target.value = newParamValue;
         onChange(paramName, paramValue);
     }
 
@@ -33,12 +42,14 @@
     const toEngineeringNotation = (num: number)=> {
         if (num <= 10000000) {
             return num.toString();
+        } else if (num === Infinity) {
+            return "Infinity";
         }
 
         const exponent = Math.floor(Math.log10(num) / 3) * 3;
         const mantissa = num / Math.pow(10, exponent);
 
-        return `${mantissa}e${exponent}`
+        return `${mantissa}e+${exponent}`
     };
 
 </script>
@@ -55,12 +66,13 @@
         {paramName}<span class="param-colon">:</span>
     </span>
     <span class="param-val-outer">
-        <span
+        <input type="text"
             on:input={handleChange}
             class="param-val" 
-            contenteditable="{paramName != "type"}">
-                {typeof paramValue === 'number' ? toEngineeringNotation(paramValue) : paramValue}
-        </span>
+            readonly="{paramName === "type"}"
+            value={typeof paramValue === 'number' ? toEngineeringNotation(paramValue) : paramValue}
+            style={`width: ${typeof paramValue !== 'undefined' ? paramValue.toString().length : "4"}ch;`}
+            />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <svg
@@ -78,9 +90,6 @@
         -webkit-user-select: none;
         -ms-user-select: none;
         user-select: none;
-    }
-    .def-cont .param-val {
-        line-height: 28px;
     }
     .def-cont .param-name {
         padding: 4px;
@@ -127,11 +136,19 @@
         border: solid 2px rgba(0, 0, 0, 0);
         font-weight: 600;
         font-family: "Roboto Mono", monospace;
+        line-height: 1;
+        background-color: transparent;
+        max-width: 15ch;
+        margin-top: 0.5px;
     }
-    .param-val[contenteditable="true"] {
+    .param-val:read-only:focus {
+        outline: none;
+    }
+    .param-val:not([readonly]) {
         border: solid 2px rgba(0, 0, 0, 0.1);
         background-color: white;
         font-weight: 400;
+        max-width: 7ch;
     }
     .param-name {
         padding: 2px;

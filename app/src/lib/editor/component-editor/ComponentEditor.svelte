@@ -7,7 +7,10 @@
       Controls,
       Background,
       BackgroundVariant,
-      useSvelteFlow
+      useSvelteFlow,
+
+      type NodeTypes
+
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
 
@@ -22,7 +25,7 @@
       'shaft': ShaftNode,
       'gear': GearNode,
       'empty': EmptyNode
-    };   
+    } as NodeTypes;   
   
     const nodes = writable([
       {

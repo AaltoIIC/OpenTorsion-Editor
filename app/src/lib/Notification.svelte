@@ -4,6 +4,7 @@
     let isShown = false;
     let currentText = '';
     let currentType = '';
+    let currentTimeout: any;
 
     notification.subscribe(value => {
         if (value) {
@@ -15,17 +16,14 @@
                 isShown = true;
             }, 1);
 
-            setTimeout(() => {
+            clearTimeout(currentTimeout);
+            currentTimeout = setTimeout(() => {
                 isShown = false;
             }, value.duration);
-            setTimeout(() => {
-                currentText = '';
-                currentType = '';
-                notification.set(null);
-            }, value.duration + 300);
         } else {
             isShown = false;
-            setTimeout(() => {
+            clearTimeout(currentTimeout);
+            currentTimeout = setTimeout(() => {
                 currentText = '';
                 currentType = '';
             }, 300);

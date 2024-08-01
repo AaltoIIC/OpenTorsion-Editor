@@ -1,6 +1,7 @@
 <script lang="ts">
     import { currentJSON } from "$lib/stores";
     import { addElement } from "../editor/component-editor/componentHelpers";
+    import NewElementPopup from "$lib/editor/component-editor/NewElementPopup.svelte";
 
     
     const addEl = (type: string) => {
@@ -85,6 +86,7 @@
         </div>
     </div>
 </div>
+<NewElementPopup params={{name:"MyElem", type: "Disk", damping: 0}} />
 <style>
     .element-cont {
         -moz-user-select: -moz-none;

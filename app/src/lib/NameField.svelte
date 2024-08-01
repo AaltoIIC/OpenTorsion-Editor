@@ -7,13 +7,14 @@
 </script>
 <div class="component-name-cont">
     {text}:
-    <span
-    class="input"
-    role="textbox" 
-    bind:innerText={value}
-    on:input={onInput}
-    style={isError ? "outline: solid 2px var(--main-error-color-dark);" : ""}
-    contenteditable>{value}</span>
+    <input
+        class="input"
+        type="text"
+        bind:value={value}
+        on:input={onInput}
+        style={
+            `${isError ? "outline: solid 2px var(--main-error-color-dark);" : ""} width: ${value?.length}ch;`
+        } />
 </div>
 <style>
     /* component name field */
@@ -38,5 +39,6 @@
         width: fit-content;
         font-weight: 600;
         margin-left: 8px;
+        max-width: 24ch;
     }
 </style>

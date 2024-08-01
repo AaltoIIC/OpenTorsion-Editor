@@ -8,7 +8,7 @@
 <button
     on:click={onClick}
     class="btn"
-    style={`${lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''} ${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2);'}`}>
+    style={`${lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''} ${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}>
     {#if icon}
         <span class="main-icon">
                 {@html icon} 

@@ -2,6 +2,7 @@ import type { ElementType, ComponentType } from '$lib/types/types';
 import _ from 'lodash';
 
 // edit an element in the list of elements
+// removeUndefined: if true, undefined values in newValues are removed even if they were previously defined
 export const editElement = (elements: ElementType[] | undefined,
     elementName: string,
     newValues: Partial<ElementType>,
@@ -9,14 +10,17 @@ export const editElement = (elements: ElementType[] | undefined,
 
     if (!elements) {elements = []};
 
-    if (removeUndefined) {
-        newValues = _.omitBy(newValues, _.isUndefined);
-    }
-
     let newElements = [...elements];
     newElements.forEach((el, index) => {
         if (el.name === elementName) {
-            newElements[index] = {...el, ...newValues};
+            let newEl: ElementType = {...el, ...newValues};
+            
+            if (removeUndefined) {
+                const undefinedKeys = Object.keys(newValues).filter(key => newValues[key] === undefined);
+                newEl = _.omit(newEl, undefinedKeys) as ElementType;
+            }
+
+            newElements[index] = newEl;
         }
     });
 
@@ -100,7 +104,6 @@ export const addElement = (elements: ElementType[], elementName: string): Elemen
         return elements;
     }
 }
-
 
 // function to render nodes based on JSON list of elements
 // returns a list of nodes 

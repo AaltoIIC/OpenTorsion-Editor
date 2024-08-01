@@ -4,7 +4,8 @@
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
    
-    type $$Props = NodeProps;
+    // NodeProps used by Svelte Flow
+    export let id, selected, selectable, deletable, sourcePosition, targetPosition, zIndex, dragging, draggable, dragHandle, parentId, type, isConnectable, positionAbsoluteX, positionAbsoluteY, width, height;
    
     let layoverElement: any;
     export let data: ElementType;
