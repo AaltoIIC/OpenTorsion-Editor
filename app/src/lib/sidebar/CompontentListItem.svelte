@@ -3,12 +3,22 @@
     export let name: string;
     export let isUnique: boolean = true;
 
+    const onDragStart = (event: DragEvent) => {
+        if (!event.dataTransfer) {
+        return null;
+        }
+        event.dataTransfer.setData('application/svelteflow', JSON.stringify({label:name, img:src}));
+        event.dataTransfer.effectAllowed = 'move';
+    };
+
     let hover = false;
 </script>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="component-list-item {hover ? 'hover' : ''}"
     on:mouseenter={() => {hover = true}}
-    on:mouseleave={() => {hover = false}}>
+    on:mouseleave={() => {hover = false}}
+    on:dragstart={(event) => onDragStart(event)}
+    draggable={true}>
     <img class="main-img" src={`./components/${src}`} alt={name} />
     <div class="component-info">
         <div>

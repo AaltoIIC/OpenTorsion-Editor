@@ -1,17 +1,8 @@
 <script lang="ts">
     import { currentJSON } from "$lib/stores";
-    import { addElement } from "../editor/component-editor/componentHelpers";
-    import NewElementPopup from "$lib/editor/component-editor/NewElementPopup.svelte";
+    import NewElementPopup from "$lib/editor/component-editor/new-element-popup/NewElementPopup.svelte";
 
-    
-    const addEl = (type: string) => {
-        currentJSON.update(value => {
-            return {
-                ...value,
-                elements: addElement((value.elements ? value.elements : []), type)
-            }
-        });
-    }
+    let newElemPopup: any;
 </script>
 <div class="element-cont">
     <div class="element-upper">
@@ -21,7 +12,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => addEl('disk')}>
+            on:click={() => (newElemPopup ? newElemPopup.open("disk") : '')}>
             <div class="main-illustration-cont">
                 <div class="disk">
                 </div>
@@ -43,7 +34,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => addEl('shaft')}>
+            on:click={() => (newElemPopup ? newElemPopup.open("shaft") : '')}>
             <div class="main-illustration-cont">
                 <div class="shaft">
                 </div>
@@ -65,7 +56,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => addEl('gear')}>
+            on:click={() => (newElemPopup ? newElemPopup.open("gear") : '')}>
             <div class="main-illustration-cont">
                 <div class="gear">
                 </div>
@@ -86,7 +77,7 @@
         </div>
     </div>
 </div>
-<NewElementPopup params={{name:"MyElem", type: "Disk", damping: 0}} />
+<NewElementPopup bind:this={newElemPopup} />
 <style>
     .element-cont {
         -moz-user-select: -moz-none;

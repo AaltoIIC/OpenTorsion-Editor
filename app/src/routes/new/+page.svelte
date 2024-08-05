@@ -1,5 +1,8 @@
 <script lang="ts">
-    import FlowEditor from "$lib/editor/FlowEditor.svelte";
+    import {
+      SvelteFlowProvider
+    } from '@xyflow/svelte';
+    import FlowEditor from "$lib/editor/system-editor/SystemEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
     import { JSONEditor } from 'svelte-jsoneditor'
@@ -46,7 +49,9 @@
         }}
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
-            <FlowEditor />
+            <SvelteFlowProvider>
+                <FlowEditor />
+            </SvelteFlowProvider>
         </div>
         <div class="json-editor"
             bind:this={editorElement}>

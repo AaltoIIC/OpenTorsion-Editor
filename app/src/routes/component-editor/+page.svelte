@@ -14,6 +14,7 @@
     import { nameComponent } from '$lib/editor/component-editor/componentHelpers';
     import type { ComponentType } from '$lib/types/types';
     import { isElementType } from '$lib/types/typeguards';
+    import { basicComponents } from '$lib/editor/basicComponents';
 
     let componentEditor: any;
     let isNameError = false;
@@ -47,7 +48,11 @@
                 type: "error",
                 duration: 3600000
             });
-        } else if ($allComponents.find(component => component.name.toUpperCase().replace(/\s/g,'') === value.name.toUpperCase().replace(/\s/g,''))) {
+        } else if (
+            $allComponents
+                .find(component => component.name.toUpperCase().replace(/\s/g,'') === value.name.toUpperCase().replace(/\s/g,''))
+            || basicComponents.map(component => component.name.toUpperCase().replace(/\s/g,'')).includes(value.name.toUpperCase().replace(/\s/g,''))
+            )   {
             // check if name is unique
 
             isNameError = true;

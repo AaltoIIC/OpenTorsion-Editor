@@ -1,0 +1,8 @@
+.svelte-flow__edge {
+    --xy-edge-stroke-default: var(--main-color);
+    --xy-connectionline-stroke-default: var(--main-color);
+    --xy-connectionline-stroke-hover: var(--main-color);
+    --xy-edge-stroke-selected-default: var(--main-color);
+    --xy-connectionline-stroke-default: var(--main-color);
+    --xy-edge-stroke-width-default: 1.5;
+}

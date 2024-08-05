@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { currentJSON } from '../../../stores';
-    import { editElement, removeParam } from '../componentHelpers';
-
     export let isEditing: boolean;
     export let paramName: string;
     export let paramValue: string | number | undefined;
     export let onChange: (key: string, value: any) => void;
 
-    let isUndef = typeof paramValue === 'undefined';
+    let isUndef: boolean;
+    $: isUndef = typeof paramValue === 'undefined';
     let onHover = false;
 
     const makeDef = () => {

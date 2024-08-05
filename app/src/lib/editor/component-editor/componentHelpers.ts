@@ -74,34 +74,37 @@ const nameElement = (type: string, elements: ElementType[]) => {
     return `${typeToName[type]} ${largestNum ? largestNum + 1 : 1}`;
 }
 
-// function to add nodes to the list of elements
-// returns the new list of elements
-export const addElement = (elements: ElementType[], elementName: string): ElementType[] => {
-    if (elementName === "disk") {
-        const newElement = {
+// object with possible parameters for each element type
+export const possibleParams: { [key: string]: string[] } = {
+    disk: ["name", "type", "damping", "excitation", "inertia"],
+    shaft: ["name", "type", "damping", "excitation", "stiffness"],
+    gear: ["name", "type", "damping", "excitation", "inertia", "diameter", "teeth"]
+}
+
+// function to construct a default element based on the type
+export const defaultElement = (elements: ElementType[], type: string): ElementType => {
+    if (type === "disk") {
+        return {
             name: nameElement('Disk', elements),
             type: "Disk",
             damping: 0,
             inertia: 8.35e+06
         }
-        return [...elements, newElement];
-    } else if (elementName === "shaft") {
-        const newElement = {
-            name: `${nameElement('ShaftDiscrete', elements)}`,
+    } else if (type === "shaft") {
+        return {
+            name: nameElement('ShaftDiscrete', elements),
             type: "ShaftDiscrete",
             damping: 0,
             stiffness: 4.49e+09
         }
-        return [...elements, newElement];
-    } else if (elementName === "gear") {
-        const newElement = {
-            name: `${nameElement('Gear', elements)}`,
+    } else if (type === "gear") {
+        return {
+            name: nameElement('Gear', elements),
             type: "Gear",
             damping: 0
         }
-        return [...elements, newElement];
     } else {
-        return elements;
+        throw new Error("Invalid element type");
     }
 }
 
@@ -125,38 +128,34 @@ export const renderNodes = (elements: any) => {
     // loop through elements and create nodes
     elements.forEach((el: ElementType, index: number) => {    
         if (el.type === "Disk") {
-            // pass only valid parameters to the node
-            const possibleParams = ['name', 'type', 'damping', 'excitation', 'inertia']
             
             nodes.push({
                 id: `${index + 1}`,
                 type: 'disk',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams),
+                data: _.pick(el, possibleParams['disk']),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 21;
 
         } else if (el.type === "ShaftDiscrete") {
-            const possibleParams = ['name', 'type', 'damping', 'excitation', 'stiffness']
 
             nodes.push({
                 id: `${index + 1}`,
                 type: 'shaft',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams),
+                data: _.pick(el, possibleParams['shaft']),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 72;
 
         } else if (el.type === "Gear") {
-            const possibleParams = ['name', 'type', 'damping', 'excitation', 'inertia', 'diameter', 'teeth']
 
             nodes.push({
                 id: `${index + 1}`,
                 type: 'gear',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams),
+                data: _.pick(el, possibleParams['gear']),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 21;
