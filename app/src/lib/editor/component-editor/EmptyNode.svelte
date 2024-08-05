@@ -2,10 +2,8 @@
     import { type NodeProps } from '@xyflow/svelte';
     import type { Writable } from 'svelte/store';
    
-    // NodeProps used by Svelte Flow
-    export let data, id, selected, selectable, deletable, sourcePosition, targetPosition, zIndex, dragging, draggable, dragHandle, parentId, type, isConnectable, positionAbsoluteX, positionAbsoluteY, width, height;
-    
     type $$Props = NodeProps;
+    $$restProps
 </script>
 
 <div class="node-cont">

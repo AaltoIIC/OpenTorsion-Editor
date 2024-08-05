@@ -3,12 +3,12 @@
     import type { Writable } from 'svelte/store';
     
     // NodeProps used by Svelte Flow
-    export let id, selected, selectable, deletable, sourcePosition, targetPosition, zIndex, dragging, draggable, dragHandle, parentId, type, isConnectable, positionAbsoluteX, positionAbsoluteY, width, height;
-
+    $$restProps
 
     export let data: { img: string; label: string };
-   
+
     const { img, label } = data;
+
 </script>
     <div class="main-component-node">
         <div class="img-cont">
@@ -17,10 +17,10 @@
         <p>{label}</p>
     </div>
 <div class="handle-wrapper left">
-    <Handle type="target" position={Position.Left} />
+    <Handle type="target" position={Position.Left} isConnectable={false} />
 </div>
 <div class="handle-wrapper right">
-    <Handle type="source" position={Position.Right} />
+    <Handle type="source" position={Position.Right} isConnectable={false} />
 </div>
 
 <style>

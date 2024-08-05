@@ -5,7 +5,7 @@
     import FlowEditor from "$lib/editor/system-editor/SystemEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
-    import { JSONEditor } from 'svelte-jsoneditor'
+    import JSONEditor from "$lib/editor/JSONEditor.svelte";
     import Notification from "$lib/Notification.svelte";
     import Button from "$lib/Button.svelte";
     import NameField from "$lib/NameField.svelte";
@@ -59,9 +59,7 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor bind:content
-            mainMenuBar={false}
-            navigationBar={false} />
+            <JSONEditor />
         </div>
         <button class="analyze-button">
             Analyze DDT
