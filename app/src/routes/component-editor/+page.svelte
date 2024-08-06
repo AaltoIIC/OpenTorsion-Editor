@@ -6,7 +6,7 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import { JSONEditor } from 'svelte-jsoneditor';
-    import { currentJSON, allComponents, notification } from '../../lib/stores';
+    import { currentComponentJSON, allComponents, notification } from '../../lib/stores';
     import { goto } from '$app/navigation';
     import Notification from '$lib/Notification.svelte';
     import Button from '$lib/Button.svelte';
@@ -21,7 +21,7 @@
     let isSaveActive = true;
 
     // Initialize JSON Content
-    currentJSON.set({
+    currentComponentJSON.set({
         name: nameComponent($allComponents),
         elements: []
     });
@@ -32,7 +32,7 @@
         json: {}
     }
     // make sure the JSON editor is updated when the JSON content changes
-    currentJSON.subscribe(value => {
+    currentComponentJSON.subscribe(value => {
         content = {
             text: undefined,
             json: value
@@ -103,7 +103,7 @@
                 }
             }
             // update the current JSON
-            currentJSON.set(content.json as ComponentType);
+            currentComponentJSON.set(content.json as ComponentType);
         }
     }
 
@@ -116,7 +116,7 @@
         }
 
         // update the current JSON
-        currentJSON.update(value => {
+        currentComponentJSON.update(value => {
             return {
                 ...value,
                 name: (event.target as HTMLInputElement).value
@@ -137,7 +137,7 @@
             type: "success",
             duration: 3000
         });
-        goto('/new');
+        goto('/system-editor');
     }
 
 
@@ -190,14 +190,14 @@
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href="/new" on:click={() => {notification.set(null)}}>
+            <a href="/system-editor" on:click={() => {notification.set(null)}}>
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
                 Back to System Editor
             </a>
         </div>
-        <NameField isError={isNameError} text="Component" bind:value={$currentJSON.name} onInput={handleTitleChange} />
+        <NameField isError={isNameError} text="Component" bind:value={$currentComponentJSON.name} onInput={handleTitleChange} />
         <div class="buttons">
             <Button
                 onClick={saveComponent}

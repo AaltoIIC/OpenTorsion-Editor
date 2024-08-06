@@ -1,8 +1,16 @@
 <script lang="ts">
-    import { currentJSON } from "$lib/stores";
-    import NewElementPopup from "$lib/editor/component-editor/new-element-popup/NewElementPopup.svelte";
+    import { currentComponentJSON } from "$lib/stores";
+    import { addElement } from "../editor/component-editor/componentHelpers";
 
-    let newElemPopup: any;
+    
+    const addEl = (type: string) => {
+        currentComponentJSON.update(value => {
+            return {
+                ...value,
+                elements: addElement((value.elements ? value.elements : []), type)
+            }
+        });
+    }
 </script>
 <div class="element-cont">
     <div class="element-upper">
@@ -12,7 +20,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => (newElemPopup ? newElemPopup.open("disk") : '')}>
+        on:click={() => addEl('disk')}>
             <div class="main-illustration-cont">
                 <div class="disk">
                 </div>
@@ -34,7 +42,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => (newElemPopup ? newElemPopup.open("shaft") : '')}>
+            on:click={() => addEl('shaft')}>
             <div class="main-illustration-cont">
                 <div class="shaft">
                 </div>
@@ -56,7 +64,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => (newElemPopup ? newElemPopup.open("gear") : '')}>
+            on:click={() => addEl('gear')}>
             <div class="main-illustration-cont">
                 <div class="gear">
                 </div>
@@ -77,7 +85,6 @@
         </div>
     </div>
 </div>
-<NewElementPopup bind:this={newElemPopup} />
 <style>
     .element-cont {
         -moz-user-select: -moz-none;

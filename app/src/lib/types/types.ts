@@ -21,3 +21,10 @@ export interface ComponentType {
     elements: ElementType[];
     [key: string]: any;
 }
+
+export interface SystemType {
+    name: string;
+    date: string;
+    components: ComponentType[];
+    structure: string[][];
+}

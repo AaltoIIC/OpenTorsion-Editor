@@ -2,20 +2,24 @@
     import {
       SvelteFlowProvider
     } from '@xyflow/svelte';
-    import FlowEditor from "$lib/editor/system-editor/SystemEditor.svelte";
+    import SystemEditor from "$lib/editor/system-editor/SystemEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
     import Notification from "$lib/Notification.svelte";
     import Button from "$lib/Button.svelte";
     import NameField from "$lib/NameField.svelte";
+    import { currentSystemJSON } from '$lib/stores';
+    import type { SystemType } from '$lib/types/types';
 
-    let content = {
-        text: undefined, // can be used to pass a stringified JSON document instead
-        json: {
-            hello: "world"
-        }
-    }
+    currentSystemJSON.set({
+        name: "New System",
+        date: new Date().toISOString(),
+        components: [],
+        structure: []
+    } as SystemType);
+    let JSONEditorText = '';
+    $: JSONEditorText = JSON.stringify($currentSystemJSON, null, 2);
 
     // resize editor
     let editorElement: HTMLElement;
@@ -50,7 +54,7 @@
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
             <SvelteFlowProvider>
-                <FlowEditor />
+                <SystemEditor />
             </SvelteFlowProvider>
         </div>
         <div class="json-editor"
@@ -59,7 +63,7 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor />
+            <JSONEditor bind:text={JSONEditorText} />
         </div>
         <button class="analyze-button">
             Analyze DDT
@@ -137,8 +141,9 @@
         border: solid 2px rgba(255, 255, 255, 0.3);
         background-color: var(--main-color);
         box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
-        padding: 9px 14px 10px 16px;
-        font-weight: 500;
+        padding: 8px 14px 11px 16px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 550;
         border-radius: 50px;
     }
     .analyze-button:hover {
@@ -207,8 +212,6 @@
     .top-menu .buttons {
         margin-right: 16px;
     }
-
-
     .main-screen {
         position: fixed;
         top: 0;

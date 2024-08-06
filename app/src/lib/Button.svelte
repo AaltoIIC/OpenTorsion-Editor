@@ -45,6 +45,7 @@
         cursor: pointer;
         transition: .2s;
         overflow: hidden;
+        font-family: 'Inter', sans-serif;
     }
     button:hover {
         border: 1px solid rgba(255, 255, 255, 0.5);
