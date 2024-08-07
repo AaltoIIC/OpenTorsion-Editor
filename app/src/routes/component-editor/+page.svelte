@@ -6,12 +6,12 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import { JSONEditor } from 'svelte-jsoneditor';
-    import { currentComponentJSON, allComponents, notification } from '../../lib/stores';
+    import { currentComponentJSON, customComponents, notification } from '../../lib/stores';
     import { goto } from '$app/navigation';
     import Notification from '$lib/Notification.svelte';
     import Button from '$lib/Button.svelte';
     import NameField from '$lib/NameField.svelte';
-    import { nameComponent } from '$lib/editor/component-editor/componentHelpers';
+    import { nameComponentDesign } from '$lib/editor/component-editor/componentHelpers';
     import type { ComponentType } from '$lib/types/types';
     import { isElementType } from '$lib/types/typeguards';
     import { basicComponents } from '$lib/editor/basicComponents';
@@ -22,7 +22,7 @@
 
     // Initialize JSON Content
     currentComponentJSON.set({
-        name: nameComponent($allComponents),
+        name: nameComponentDesign($customComponents),
         elements: []
     });
 
@@ -49,7 +49,7 @@
                 duration: 3600000
             });
         } else if (
-            $allComponents
+            $customComponents
                 .find(component => component.name.toUpperCase().replace(/\s/g,'') === value.name.toUpperCase().replace(/\s/g,''))
             || basicComponents.map(component => component.name.toUpperCase().replace(/\s/g,'')).includes(value.name.toUpperCase().replace(/\s/g,''))
             )   {
@@ -125,7 +125,7 @@
     }
 
     const saveComponent = () => {
-        allComponents.update(value => {
+        customComponents.update(value => {
             return [
                 ...value,
                 (content.json as ComponentType)

@@ -8,6 +8,7 @@
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
     import Notification from "$lib/Notification.svelte";
     import Button from "$lib/Button.svelte";
+    import DropdownButton from '$lib/DropdownButton.svelte';
     import NameField from "$lib/NameField.svelte";
     import { currentSystemJSON } from '$lib/stores';
     import type { SystemType } from '$lib/types/types';
@@ -18,8 +19,11 @@
         components: [],
         structure: []
     } as SystemType);
+    
     let JSONEditorText = '';
-    $: JSONEditorText = JSON.stringify($currentSystemJSON, null, 2);
+    currentSystemJSON.subscribe((value) => {
+        JSONEditorText = JSON.stringify(value, null, 2);
+    });
 
     // resize editor
     let editorElement: HTMLElement;
@@ -34,6 +38,19 @@
         jsonEditorHeight = parentRect.bottom - event.clientY + 8;
     }
 
+    const exportJSON = () => {
+        const jsonString = JSON.stringify($currentSystemJSON, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = $currentSystemJSON.name + '.json';
+        document.body.appendChild(a);
+        a.click();
+
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
 
 </script>
 <svelte:head>
@@ -63,7 +80,7 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor bind:text={JSONEditorText} />
+            <JSONEditor bind:textContent={JSONEditorText} />
         </div>
         <button class="analyze-button">
             Analyze DDT
@@ -86,14 +103,15 @@
         </div>
         <NameField text="System" value="New System" onInput={(event) => console.log(event)} />
         <div class="buttons">
-            <Button
+            <DropdownButton
                 isActive={true}
-                icon={'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>'}>
+                onClick={exportJSON}
+                icon={'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>'}
+                options={["Download JSON"]}
+                optionIcons={['<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
+                ]}>
                 Export
-                <svg class="icon-dropdown" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg> 
-            </Button>
+            </DropdownButton>
             <Button
                 isActive={true}
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
@@ -157,16 +175,6 @@
         height: calc(100vh - 68px);
         overflow: hidden;
         background-color: rgb(255, 255, 255);
-    }
-
-    .icon-dropdown {
-        width: 15px;
-        height: 15px;
-        margin: 0 0 -3px 0;
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2px;
-        stroke-linejoin: round;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

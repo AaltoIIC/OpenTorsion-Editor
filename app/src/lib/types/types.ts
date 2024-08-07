@@ -9,7 +9,7 @@ export interface ElementType {
     type: string;
     damping: number;
     inertia?: number;
-    excitation?: number;
+    excitation?: number[][];
     stiffness?: number;
     diameter?: number;
     teeth?: number;

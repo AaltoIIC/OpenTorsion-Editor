@@ -10,14 +10,15 @@
       type EdgeTypes,
       type Node,
       type Edge,
-      useHandleConnections
-
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
-    import { get } from 'svelte/store';
     import ComponentNode from './ComponentNode.svelte';
     import RemovableEdge from './RemovableEdge.svelte';
+    import { currentComponentJSON, currentSystemJSON, customComponents } from '$lib/stores';
+    import type { ComponentType } from '$lib/types/types';
+    import { basicComponents } from "$lib/editor/basicComponents";
+    import { nameComponentInstance } from './systemHelpers';
 
     const nodeTypes: NodeTypes = {
       'component': ComponentNode
@@ -54,13 +55,32 @@
         y: event.clientY
       });
 
+      let newCompName = nameComponentInstance(JSON.parse(data).label, $currentSystemJSON.components)
       const newNode = {
-        id: `${Math.random()}`,
+        id: newCompName,
         type: 'component',
         position,
         data: JSON.parse(data),
         origin: [0.5, 0.0]
       } satisfies Node;
+
+      // add new component to system JSON
+      currentSystemJSON.update((system) => {
+        if (basicComponents.map(comp => comp.name).includes(JSON.parse(data).label)) {
+          let newComponent = {...basicComponents.find(comp => comp.name === JSON.parse(data).label)?.json}
+          if (newComponent) {
+            newComponent.name = newCompName;
+            system.components.push(newComponent as {} as ComponentType);
+          }
+        } else {
+          let newComponent = {...$customComponents.find(comp => comp.name === JSON.parse(data).label)}
+          if (newComponent) {
+            newComponent.name = newCompName;
+            system.components.push(newComponent as {} as ComponentType);
+          }
+        }
+        return system;
+      });
 
       $nodes.push(newNode);
       $nodes = $nodes;
@@ -203,10 +223,16 @@
     }
 
     function onNodeDragStop() {
-      console.log($edges);
       $edges.forEach((edge) => {
         if (edge.class === 'temp') {
           edge.class = '';
+          currentSystemJSON.update((system) => {
+            system.structure.push([
+              `${edge.source}.${system.components.find(comp => comp.name === edge.source)?.elements.at(-1)?.name}`,
+              `${edge.target}.${system.components.find(comp => comp.name === edge.target)?.elements.at(0)?.name}`
+            ]);
+            return system;
+          });
         }
       });
       $edges = $edges;

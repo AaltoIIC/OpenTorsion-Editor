@@ -4,7 +4,7 @@
     import _ from 'lodash';
     import type { ElementType } from '$lib/types/types';
     import { defaultElement, possibleParams } from '../componentHelpers';
-    import { currentJSON } from '../../../stores';
+    import { currentComponentJSON } from '../../../stores';
     import LayoverPropery from '../element-layover/LayoverPropery.svelte';
     import PrevElementListItem from './PrevElementListItem.svelte';
     
@@ -14,7 +14,7 @@
     let onHover = false;
 
     export const open = (type: string) => {
-        params = defaultElement($currentJSON.elements, type);
+        params = defaultElement($currentComponentJSON.elements, type);
         possibleParameters = possibleParams[type];
         isOpen = true;
     }
@@ -42,7 +42,7 @@
 
     // create list of previous elements
     let possibleElements: ElementType[];
-    $: possibleElements = $currentJSON.elements
+    $: possibleElements = $currentComponentJSON.elements
                                             .filter((el: any) => el.type === params.type)
                                             .reverse()
                                             .slice(0, 5)
@@ -69,7 +69,7 @@
         }
 
         // check if the name is already taken or empty
-        const nameExists = $currentJSON.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
+        const nameExists = $currentComponentJSON.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
         if (nameExists || event.target.value === '') {
             isNameError = true;
 
@@ -90,7 +90,7 @@
         }
 
         // update the element with the new properties
-        currentJSON.update(value => {
+        currentComponentJSON.update(value => {
             return {
                 ...value,
                 elements: [...value.elements, _.omitBy(allProperties, _.isUndefined) as ElementType]

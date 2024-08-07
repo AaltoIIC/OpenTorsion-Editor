@@ -1,6 +1,37 @@
 import type { ElementType, ComponentType } from '$lib/types/types';
 import _ from 'lodash';
 
+// function to add nodes to the list of elements
+// returns the new list of elements
+export const addElement = (elements: ElementType[], elementName: string): ElementType[] => {
+    if (elementName === "disk") {
+        const newElement = {
+            name: nameElement('Disk', elements),
+            type: "Disk",
+            damping: 0,
+            inertia: 8.35e+06
+        }
+        return [...elements, newElement];
+    } else if (elementName === "shaft") {
+        const newElement = {
+            name: `${nameElement('ShaftDiscrete', elements)}`,
+            type: "ShaftDiscrete",
+            damping: 0,
+            stiffness: 4.49e+09
+        }
+        return [...elements, newElement];
+    } else if (elementName === "gear") {
+        const newElement = {
+            name: `${nameElement('Gear', elements)}`,
+            type: "Gear",
+            damping: 0
+        }
+        return [...elements, newElement];
+    } else {
+        return elements;
+    }
+}
+
 // edit an element in the list of elements
 // removeUndefined: if true, undefined values in newValues are removed even if they were previously defined
 export const editElement = (elements: ElementType[] | undefined,
@@ -42,7 +73,7 @@ export const removeParam = (elements: ElementType[], elementName: string, paramN
 }
 
 // function to automatically give a unique name to a new component
-export const nameComponent = (components: ComponentType[]) => {
+export const nameComponentDesign = (components: ComponentType[]) => {
     let largestNum = 0;
 
     // check if there is a component with the name "New Component"

@@ -3,7 +3,7 @@
     import Portal from "svelte-portal";
     import type { ElementType } from '$lib/types/types';
     import { editElement } from '../componentHelpers';
-    import { currentJSON } from '../../../stores';
+    import { currentComponentJSON } from '../../../stores';
     import LayoverPropery from './LayoverPropery.svelte';
     
     export let params: ElementType;
@@ -13,7 +13,7 @@
     const deleteElement = () => {
         isOpen = false;
         isEditing = false;
-        currentJSON.update(value => {
+        currentComponentJSON.update(value => {
             return {
                 ...value,
                 elements: value.elements ? value.elements.filter((el: any) => el.name !== params.name) : []
@@ -35,7 +35,6 @@
         const isValidNumber = /^-?\d+(\.\d+)?$/.test(value);
         allProperties = {...allProperties, [key]: isValidNumber ? Number(value) : value};
     }
-    $: console.log(allProperties);
 
     // handle element name change
     let isNameError = false;
@@ -48,7 +47,7 @@
         }
 
         // check if the name is already taken or empty
-        const nameExists = $currentJSON.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
+        const nameExists = $currentComponentJSON.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
         if (nameExists || event.target.value === '') {
             isNameError = true;
 
@@ -88,7 +87,7 @@
 
             // update the element with the new properties
             if (isEditing) {
-                currentJSON.update(value => {
+                currentComponentJSON.update(value => {
                 return {
                         ...value,
                         elements: editElement(value.elements, params.name, allProperties, true)

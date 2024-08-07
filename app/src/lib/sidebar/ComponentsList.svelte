@@ -2,7 +2,7 @@
     import Button from "$lib/Button.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
-    import { allComponents } from "$lib/stores";
+    import { customComponents } from "$lib/stores";
 </script>
 
 <div class="component-cont">
@@ -20,7 +20,7 @@
         </a>
     </div>
     <div class="component-list">
-        {#each [ ...$allComponents].reverse() as component}
+        {#each [ ...$customComponents].reverse() as component}
             <ComponentListItem name={component.name} isUnique={true} />
         {/each}
         {#each basicComponents as component}

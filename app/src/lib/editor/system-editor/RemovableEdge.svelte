@@ -6,11 +6,15 @@
       EdgeLabelRenderer,
       useEdges
     } from '@xyflow/svelte';
+    import { currentSystemJSON } from '$lib/stores';
+    import _ from 'lodash';
   
     type $$Props = EdgeProps;
     $$restProps
   
     export let id: $$Props['id'];
+    export let source: string;
+    export let target: string;
     export let sourceX: $$Props['sourceX'];
     export let sourceY: $$Props['sourceY'];
     export let sourcePosition: $$Props['sourcePosition'];
@@ -31,7 +35,26 @@
   
     const edges = useEdges();
   
-    const onEdgeClick = () => edges.update((eds) => eds.filter((edge) => edge.id !== id));
+    const onEdgeClick = () => {
+      edges.update((eds) => eds.filter((edge) => edge.id !== id));
+      currentSystemJSON.update((json) => {
+        const newJson = { ...json };
+
+        let sourceEndElem = newJson.components
+                                .find(component => component.name === source)
+                                ?.elements.at(-1)?.name;
+        let targetStartElem = newJson.components
+                                .find(component => component.name === target)
+                                ?.elements.at(0)?.name;
+
+        newJson.structure = newJson.structure
+                              .filter((connection) => 
+                              !_.isEqual(connection,
+                                [`${source}.${sourceEndElem}`, `${target}.${targetStartElem}`])
+                              );
+        return newJson;
+      });
+    }
 
     let hover = false;
   </script>
@@ -89,6 +112,7 @@
     }
     .edgeButton.hover {
         opacity: 1;
+        border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
     .edgeButton svg {
@@ -101,9 +125,5 @@
         stroke-width: 2px;
         stroke-linejoin: round;
         color: rgba(255, 255, 255, 0.9);
-    }
-  
-    .edgeButton:hover {
-        border: 1px solid rgba(255, 255, 255, 0.8);
     }
   </style>

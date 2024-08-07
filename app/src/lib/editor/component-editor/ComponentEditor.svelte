@@ -1,6 +1,6 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { currentJSON } from '../../stores';
+    import { currentComponentJSON } from '../../stores';
     import { renderNodes } from './componentHelpers';
     import {
       SvelteFlow,
@@ -40,7 +40,7 @@
 
     const edges = writable([]);
 
-    currentJSON.subscribe(value => {
+    currentComponentJSON.subscribe(value => {
       if (!value.elements) {
         alert('Malformed JSON');
       } else {

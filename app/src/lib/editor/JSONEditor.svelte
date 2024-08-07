@@ -4,11 +4,19 @@
     import 'prismjs/components/prism-json';
     import './prism-duotone-sea.css';
 
-    export let text = '';
+    export let textContent = '';
+
+    // ha lenne a fuggveny amivel setelni lehet akkor mukodne
+    // de igy el van baszva
+    // miert? van egy textunk, highlightedTextunk, es a textarea valueja
+
     export let onInput: (text: string) => void = () => {};
     let highlightedText = '';
     let pre: HTMLPreElement;
     let textarea: HTMLTextAreaElement;
+    let text = '';
+    let isUserInput = false;
+
 
     let nofLines = 0;
     $: nofLines = text.split("\n").length;
@@ -18,7 +26,7 @@
     }
 
     // handle active line
-    let activeLine = 0;
+    let activeLine = -1;
     const handleCursor = () => {
         setTimeout(() => {
             if (textarea.selectionStart === textarea.selectionEnd && textarea.selectionStart !== 0) {
@@ -30,6 +38,7 @@
 
     let unIndented = false;
     const handleInput = (event: Event) => {
+        isUserInput = true;
         let e = event as InputEvent;
         text = (e.target as HTMLTextAreaElement).value as string;
 
@@ -59,7 +68,6 @@
 
         // handle tabs
         if (e.inputType && e.inputType === "insertLineBreak") {
-
             let lines = text.slice(0, textarea.selectionStart).split("\n");
             let lastLine = lines[lines.length - 2];
             let tabs = lastLine?.split("\t").findIndex((char) => char !== "");
@@ -100,6 +108,8 @@
         updateHighlighting();
         handleScroll();
         onInput(text);
+        isUserInput = false;
+        textContent = text;
     }
 
     const handleTab = (e: KeyboardEvent) => {
@@ -116,18 +126,34 @@
 
             updateHighlighting();
             handleScroll();
+            textContent = text;
         }
     }
 
     let scrollTop = 0;
     const handleScroll = () => {
+        if (!textarea || !pre) return;
         pre.scrollTop = textarea.scrollTop;
         pre.scrollLeft = textarea.scrollLeft;
         scrollTop = textarea.scrollTop;
     }
 
+    const changeSpacesToTabs = (txt: string) => {
+        txt = txt.replace(/    /g, "\t").replace(/  /g, "\t");
+        return txt;
+    }
+
+    $: if (textContent !== text && textarea) {
+        textContent = changeSpacesToTabs(textContent);
+        text = textContent;
+        textarea.value = text;
+        updateHighlighting();
+    }
 
     onMount(() => {
+        textContent = changeSpacesToTabs(textContent);
+        text = textContent;
+        textarea.value = text;
         updateHighlighting();
     });
 </script>
