@@ -1,9 +1,20 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     export let text: string;
     export let value: string | undefined;
     export let isError: boolean = false;
     export let onInput: (event: Event) => void;
+    let spanWidth = 0;
+    let inputElement: HTMLInputElement;
 
+    const measureWidth = () => {
+        if (!inputElement) return;
+        value = inputElement.value;
+        spanWidth = (inputElement.nextElementSibling as HTMLSpanElement).offsetWidth;
+    }
+    onMount(() => {
+        measureWidth();
+    });
 </script>
 <div class="component-name-cont">
     {text}:
@@ -11,12 +22,21 @@
         class="input"
         type="text"
         bind:value={value}
-        on:input={onInput}
+        bind:this={inputElement}
+        on:input={event => {onInput(event); measureWidth()}}
         style={
-            `${isError ? "outline: solid 2px var(--main-error-color-dark);" : ""} width: ${value?.length}ch;`
+            `${isError ? "outline: solid 2px var(--main-error-color-dark);" : ""} width: ${spanWidth}px;`
         } />
+    <span class="hidden-span">{value}</span>
 </div>
 <style>
+    .hidden-span {
+        visibility: hidden;
+        white-space: pre;
+        position: absolute;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;  
+    }
     /* component name field */
     .component-name-cont {
         color: rgba(255, 255, 255, 0.9);

@@ -52,6 +52,14 @@
         document.body.removeChild(a);
     }
 
+    const handleNameChange = (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        currentSystemJSON.update((json) => {
+            json.name = target.value;
+            return json;
+        });
+    }
+
 </script>
 <svelte:head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,12 +90,14 @@
             </div>
             <JSONEditor bind:textContent={JSONEditorText} />
         </div>
-        <button class="analyze-button">
-            Analyze DDT
-            <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>              
-        </button>
+        <a href="/analysis">
+            <button class="analyze-button">
+                Analyze DDT
+                <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>              
+            </button>
+        </a>
     </div>
     <div class="top-menu">
         <div class="links">
@@ -97,11 +107,11 @@
                   </svg>              
                 Back
             </a>
-            <a href="/analyze">
+            <a href="/analysis">
                 Analysis
             </a>
         </div>
-        <NameField text="System" value="New System" onInput={(event) => console.log(event)} />
+        <NameField text="System" value="New System" onInput={handleNameChange} />
         <div class="buttons">
             <DropdownButton
                 isActive={true}

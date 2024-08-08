@@ -5,10 +5,10 @@
     import type { ElementType } from '$lib/types/types';
     import { defaultElement, possibleParams } from '../componentHelpers';
     import { currentComponentJSON } from '../../../stores';
-    import LayoverPropery from '../element-layover/LayoverPropery.svelte';
+    import LayoverPropery from '../element-layover/LayoverProperty.svelte';
     import PrevElementListItem from './PrevElementListItem.svelte';
     
-    let params: ElementType = {name: '', type: '', damping: 0, excitation: 0};
+    let params: ElementType = {name: '', type: '', damping: 0};
     let possibleParameters: string[] = possibleParams['disk'];
     let isOpen: boolean = false;
     let onHover = false;
@@ -22,7 +22,7 @@
     const types: {[key: string]: string;} = {
         Disk: 'Disk',
         ShaftDiscrete: 'Shaft',
-        Gear: 'Gear'
+        GearElement: 'Gear'
     }
 
     // handle parameter change
@@ -277,7 +277,7 @@
         border-radius: 2.5px;
         box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
     }
-    .element-icon.Gear {
+    .element-icon.GearElement {
         height: 90px;
         width: 30px;
         border-radius: 2.5px;

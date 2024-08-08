@@ -3,6 +3,7 @@
     export let paramName: string;
     export let paramValue: string | number | undefined;
     export let onChange: (key: string, value: any) => void;
+    export let isOptional: boolean = false;
 
     let isUndef: boolean;
     $: isUndef = typeof paramValue === 'undefined';
@@ -68,14 +69,14 @@
             on:input={handleChange}
             class="param-val" 
             readonly="{paramName === "type"}"
-            value={typeof paramValue === 'number' ? toEngineeringNotation(paramValue) : paramValue}
+            value={paramValue}
             style={`width: ${typeof paramValue !== 'undefined' ? paramValue.toString().length : "4"}ch;`}
             />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <svg
             on:click={() => {makeUndef()}}
-            class="icon-close {isEditing && !(['type', 'damping'].includes(paramName)) ? 'active' : ''}"
+            class="icon-close {isEditing && isOptional ? 'active' : ''}"
             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>

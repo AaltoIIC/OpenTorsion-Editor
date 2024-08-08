@@ -13,8 +13,8 @@
     $$restProps
   
     export let id: $$Props['id'];
-    export let source: string;
-    export let target: string;
+    export let source:  $$Props['source'];
+    export let target:  $$Props['target'];
     export let sourceX: $$Props['sourceX'];
     export let sourceY: $$Props['sourceY'];
     export let sourcePosition: $$Props['sourcePosition'];

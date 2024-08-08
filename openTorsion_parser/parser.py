@@ -41,10 +41,9 @@ def find_component(component_name, components):
         if component["name"] == component_name:
             return component
 
-def parse(file_path):
-    with open(file_path) as input_json:
-        input_data = json.load(input_json)
-    
+# returns an OpenTorsion assembly object of the system in the JSON file
+def parse(input_data):
+        
     # changing structure data to list of components
     first_component= input_data['structure'][0][0].split('.')[0]
     list_of_components = [first_component]
@@ -66,15 +65,22 @@ def parse(file_path):
     else:
         assembly = ot.Assembly(shaft_list, disk_elements=disk_list)
     
-    # plotting assembly 
+    return assembly
+
+def plot_assembly(assembly):
     plot_tools = ot.Plots(assembly)
     plot_tools.plot_assembly()
 
-if __name__=='__main__':
+def main():
     arg_parser = argparse.ArgumentParser(description="Process a JSON file path.")
     arg_parser.add_argument('json_file', type=str, help='Path to the JSON file')
     json_path = arg_parser.parse_args().json_file
 
     assert json_path
 
-    parse(json_path)
+    with open(json_path) as input_json:
+        input_data = json.load(input_json)
+        plot_assembly(parse(input_data))
+
+if __name__=='__main__':
+    main()

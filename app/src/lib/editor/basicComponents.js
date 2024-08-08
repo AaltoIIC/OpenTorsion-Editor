@@ -8,7 +8,7 @@ export const basicComponents = [
                 {
                     name: "Disk 1",
                     type: "Disk",
-                    inertia: "9.20e+06",
+                    inertia: 9.20e+06,
                     damping: 0
                 }
             ]
@@ -23,19 +23,19 @@ export const basicComponents = [
                 {
                     name: "Disk 1",
                     type: "Disk",
-                    inertia: "3.43e+03",
+                    inertia: 3.43e+03,
                     damping: 1
                 },
                 {
                     name: "Shaft 1",
                     type: "ShaftDiscrete",
-                    stiffness: "5.55e+09",
+                    stiffness: 5.55e+09,
                     damping: 0
                 },
                 {
                     name: "Disk 2",
                     type: "Disk",
-                    inertia: "9.52e+04",
+                    inertia: 9.52e+04,
                     damping: 0,
                     excitation: [[
                         4,
@@ -79,7 +79,7 @@ export const basicComponents = [
                     name: "Shaft 1",
                     type: "ShaftDiscrete",
                     damping: 0,
-                    stiffness: "3.68e+08"
+                    stiffness: 3.68e+08
                 }
             ]
         }

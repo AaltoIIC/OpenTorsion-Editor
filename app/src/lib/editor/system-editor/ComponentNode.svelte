@@ -1,17 +1,30 @@
 <script lang="ts">
-    import { Handle, Position, type NodeProps } from '@xyflow/svelte';
-    import type { Writable } from 'svelte/store';
-    
+    import { Handle, Position, useEdges, useNodes } from '@xyflow/svelte';
+    import { currentSystemJSON } from '$lib/stores';
+
     // NodeProps used by Svelte Flow
     $$restProps
 
     export let data: { img: string; label: string };
+    export let id: string;
 
     const { img, label } = data;
     let hover = false;
 
+    const nodes = useNodes();
+    const edges = useEdges();
     const remove = () => {
-        console.log('remove');
+        // torolje ki magat nodesbol, edgesbol, jsonbol
+        nodes.update((nds) => nds.filter((node) => node.id !== id));
+        edges.update((eds) => eds.filter((edge) => edge.source !== id && edge.target !== id));
+        currentSystemJSON.update((json) => {
+            const newJson = { ...json };
+            newJson.components = newJson.components.filter((component) => component.name !== id);
+            newJson.structure = newJson.structure.filter(
+                (connection) => !connection.some(elem => elem.startsWith(id))
+            );
+            return newJson;
+        });
     };
 
 </script>

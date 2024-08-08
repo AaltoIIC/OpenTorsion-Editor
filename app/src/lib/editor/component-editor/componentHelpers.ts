@@ -22,8 +22,8 @@ export const addElement = (elements: ElementType[], elementName: string): Elemen
         return [...elements, newElement];
     } else if (elementName === "gear") {
         const newElement = {
-            name: `${nameElement('Gear', elements)}`,
-            type: "Gear",
+            name: `${nameElement('GearElement', elements)}`,
+            type: "GearElement",
             damping: 0
         }
         return [...elements, newElement];
@@ -96,7 +96,7 @@ const nameElement = (type: string, elements: ElementType[]) => {
     const typeToName: { [key: string]: string } = {
         "Disk": "Disk",
         "ShaftDiscrete": "Shaft",
-        "Gear": "Gear"
+        "GearElement": "Gear"
     }
     // Get the maximum number
     const regex = new RegExp(`^${typeToName[type]} \\d+$`);
@@ -130,8 +130,8 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
         }
     } else if (type === "gear") {
         return {
-            name: nameElement('Gear', elements),
-            type: "Gear",
+            name: nameElement('GearElement', elements),
+            type: "GearElement",
             damping: 0
         }
     } else {
@@ -180,7 +180,7 @@ export const renderNodes = (elements: any) => {
             });
             currentPosition += 72;
 
-        } else if (el.type === "Gear") {
+        } else if (el.type === "GearElement") {
 
             nodes.push({
                 id: `${index + 1}`,

@@ -4,7 +4,7 @@
     import type { ElementType } from '$lib/types/types';
     import { editElement } from '../componentHelpers';
     import { currentComponentJSON } from '../../../stores';
-    import LayoverPropery from './LayoverPropery.svelte';
+    import LayoverProperty from './LayoverProperty.svelte';
     
     export let params: ElementType;
     export let possibleParams: string[] = ['name', 'type', 'damping', 'excitation'];
@@ -32,7 +32,8 @@
     let allProperties: ElementType;
     $: allProperties = {...params, ...undefinedParams};
     const handleParamChange = (key: string, value: any) => {
-        const isValidNumber = /^-?\d+(\.\d+)?$/.test(value);
+        const isValidNumber = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value);
+
         allProperties = {...allProperties, [key]: isValidNumber ? Number(value) : value};
     }
 
@@ -157,7 +158,7 @@
         <div class="params-cont">
             {#each Object.entries(allProperties) as [paramName, paramValue]}
                 {#if paramName != 'name'}
-                    <LayoverPropery
+                    <LayoverProperty
                         paramName={paramName}
                         paramValue={paramValue}
                         isEditing={isEditing}
