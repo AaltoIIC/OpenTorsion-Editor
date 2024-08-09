@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { Handle, Position, useEdges, useNodes } from '@xyflow/svelte';
-    import { currentSystemJSON } from '$lib/stores';
+    import { Handle, Position, } from '@xyflow/svelte';
+    import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
+    import { onMount } from 'svelte';
 
     // NodeProps used by Svelte Flow
     $$restProps
@@ -10,13 +11,10 @@
 
     const { img, label } = data;
     let hover = false;
+    let isSelected = false;
 
-    const nodes = useNodes();
-    const edges = useEdges();
+
     const remove = () => {
-        // torolje ki magat nodesbol, edgesbol, jsonbol
-        nodes.update((nds) => nds.filter((node) => node.id !== id));
-        edges.update((eds) => eds.filter((edge) => edge.source !== id && edge.target !== id));
         currentSystemJSON.update((json) => {
             const newJson = { ...json };
             newJson.components = newJson.components.filter((component) => component.name !== id);
@@ -27,11 +25,29 @@
         });
     };
 
+    const handleSelect = () => {
+        isSelected = true;
+        if (highlightLinesInEditor) {
+            //highlightLinesInEditor();
+        }
+    }
+
+    const handleClickOut = () => {
+        if (!hover) {
+            isSelected = false;
+        }
+    }
+
+    onMount(() => {
+        document.addEventListener('pointerdown',handleClickOut)
+    })
 </script>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="main-component-node {hover ? "hover" : ""}"
+<div class="main-component-node {hover ? "hover" : ""} {isSelected ? "selected" : ""}"
     on:mouseenter={() => {hover = true}}
-    on:mouseleave={() => {hover = false}}>
+    on:mouseleave={() => {hover = false}}
+    on:click={handleSelect}>
         <div class="img-cont">
             <img src={`./components/${img}`} alt={label} />
         </div>
@@ -108,6 +124,11 @@
     }
     .hover img {
         background-color: rgba(255, 255, 255, 0.5);
+    }
+    .selected  img {
+        background-image: linear-gradient(var(--main-color-tr-2), var(--main-color-tr-2));
+        background-blend-mode: overlay;
+        outline: 2px solid var(--main-color);
     }
     .main-component-node p {
         margin: 0 4px 4px 4px;

@@ -12,9 +12,12 @@
     import NameField from "$lib/NameField.svelte";
     import { currentSystemJSON } from '$lib/stores';
     import type { SystemType } from '$lib/types/types';
+    import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
+
+    let systemName = "New System";
 
     currentSystemJSON.set({
-        name: "New System",
+        name: systemName,
         date: new Date().toISOString(),
         components: [],
         structure: []
@@ -23,6 +26,7 @@
     let JSONEditorText = '';
     currentSystemJSON.subscribe((value) => {
         JSONEditorText = JSON.stringify(value, null, 2);
+        systemName = value.name;
     });
 
     // resize editor
@@ -58,6 +62,7 @@
             json.name = target.value;
             return json;
         });
+        systemName = target.value;
     }
 
 </script>
@@ -88,7 +93,7 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor bind:textContent={JSONEditorText} />
+            <JSONEditor bind:textContent={JSONEditorText} onInput={handleJSONEditing} />
         </div>
         <a href="/analysis">
             <button class="analyze-button">
@@ -111,7 +116,7 @@
                 Analysis
             </a>
         </div>
-        <NameField text="System" value="New System" onInput={handleNameChange} />
+        <NameField text="System" value={systemName} onInput={handleNameChange} />
         <div class="buttons">
             <DropdownButton
                 isActive={true}

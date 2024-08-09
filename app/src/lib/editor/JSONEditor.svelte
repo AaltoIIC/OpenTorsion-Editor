@@ -6,16 +6,26 @@
 
     export let textContent = '';
 
-    // ha lenne a fuggveny amivel setelni lehet akkor mukodne
-    // de igy el van baszva
-    // miert? van egy textunk, highlightedTextunk, es a textarea valueja
-
     export let onInput: (text: string) => void = () => {};
     let highlightedText = '';
     let pre: HTMLPreElement;
     let textarea: HTMLTextAreaElement;
     let text = '';
     let isUserInput = false;
+
+    // vagy egy key value pairt kell highlightolni
+    // vagy egy elementet egy arrayban
+    export const jumpToLine = (lineNo: number) => {
+        let lineDiv = document.querySelector(`.line-${lineNo}`);
+        if (lineDiv) {
+            lineDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+    }
+
+    export const highlightLines = (start: number, end: number) => {
+        jumpToLine(start);
+    }
 
 
     let nofLines = 0;
@@ -62,8 +72,11 @@
             }, 300);
         } else if (unIndented && e.data && Object.values(closingChars).includes(e.data)) {
             unIndented = false;
+            let initialCursorPos = textarea.selectionStart;
             text = text.slice(0, textarea.selectionStart - 1) + text.slice(textarea.selectionEnd, text.length);
             textarea.value = text;
+            textarea.selectionStart = initialCursorPos;
+            textarea.selectionEnd = textarea.selectionStart;
         }
 
         // handle tabs
@@ -170,7 +183,7 @@
 <div class="main-line-cont">
     <div class="line-cont-inner" style="transform: translateY({-scrollTop}px);">
         {#each Array.from({ length: nofLines }, (_, i) => i) as i}
-            <div class="code-line {activeLine === i ? "active" : ""}">
+            <div class="code-line {activeLine === i ? "active" : ""} line-{i}">
                 <div class="line-number">
                     {i + 1}
                 </div>

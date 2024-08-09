@@ -3,8 +3,7 @@
       getSmoothStepPath,
       BaseEdge,
       type EdgeProps,
-      EdgeLabelRenderer,
-      useEdges
+      EdgeLabelRenderer
     } from '@xyflow/svelte';
     import { currentSystemJSON } from '$lib/stores';
     import _ from 'lodash';
@@ -33,10 +32,7 @@
       targetPosition
     });
   
-    const edges = useEdges();
-  
     const onEdgeClick = () => {
-      edges.update((eds) => eds.filter((edge) => edge.id !== id));
       currentSystemJSON.update((json) => {
         const newJson = { ...json };
 

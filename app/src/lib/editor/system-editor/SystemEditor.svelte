@@ -15,10 +15,13 @@
     import './system-editor.css';
     import ComponentNode from './ComponentNode.svelte';
     import RemovableEdge from './RemovableEdge.svelte';
-    import { currentComponentJSON, currentSystemJSON, customComponents } from '$lib/stores';
+    import { currentSystemJSON, customComponents } from '$lib/stores';
     import type { ComponentType } from '$lib/types/types';
     import { basicComponents } from "$lib/editor/basicComponents";
-    import { nameComponentInstance } from './systemHelpers';
+    import {
+      nameComponentInstance,
+      updateSystemEditor
+     } from './systemHelpers';
 
     const nodeTypes: NodeTypes = {
       'component': ComponentNode
@@ -30,6 +33,11 @@
 
     const nodes = writable<Node[]>([]);
     const edges = writable<Edge[]>([]);
+
+    currentSystemJSON.subscribe(value => {
+      updateSystemEditor(nodes, edges)
+    })
+    $: console.log($nodes);
 
     // drag and drop logic
     const { screenToFlowPosition } = useSvelteFlow();

@@ -2,6 +2,7 @@
     export let isEditing: boolean;
     export let paramName: string;
     export let paramValue: string | number | undefined;
+    let displayValue: string | number | undefined = paramValue;
     export let onChange: (key: string, value: any) => void;
     export let isOptional: boolean = false;
 
@@ -15,6 +16,7 @@
             isUndef = false;
             onChange(paramName, paramValue);
         }
+        displayValue = paramValue;
     }
 
     const makeUndef = () => {
@@ -23,8 +25,17 @@
         onChange(paramName, paramValue);
     }
 
+    // handle input
+    let inFocus = false;
     const handleChange = (event: any) => {
         let newParamValue = event.target.value;
+
+        // convert large numbers to engineering notation
+        const isNormalNumber = /^-?\d+(\.\d+)?$/.test(newParamValue);
+        if (isNormalNumber && Number(newParamValue) > 10000000) {
+            newParamValue = toEngineeringNotation(Number(newParamValue));
+            displayValue = newParamValue;
+        }
         
         // remove illegal characters
         const illegalChars = /['"\n]/g;
@@ -32,16 +43,21 @@
             newParamValue = newParamValue.replace(illegalChars, '');
         }
 
-        paramValue = newParamValue;
-        //event.target.value = newParamValue;
-        onChange(paramName, paramValue);
+        onChange(paramName, newParamValue);
+    }
+    // When JSON editing happens, update display value
+    $: if (!inFocus && paramValue) {
+        const isNormalNumber = /^-?\d+(\.\d+)?$/.test(paramValue.toString());
+        if (isNormalNumber && Number(paramValue) > 10000000) {
+            displayValue = toEngineeringNotation(Number(paramValue));
+        } else {
+            displayValue = paramValue;
+        }
     }
 
     // helper function to convert large numbers to engineering notation
     const toEngineeringNotation = (num: number)=> {
-        if (num <= 10000000) {
-            return num.toString();
-        } else if (num === Infinity) {
+        if (num === Infinity) {
             return "Infinity";
         }
 
@@ -67,10 +83,12 @@
     <span class="param-val-outer">
         <input type="text"
             on:input={handleChange}
+            on:focus={() => {inFocus = true}}
+            on:focusout={() => {inFocus = false}}
             class="param-val" 
             readonly="{paramName === "type"}"
-            value={paramValue}
-            style={`width: ${typeof paramValue !== 'undefined' ? paramValue.toString().length : "4"}ch;`}
+            value={displayValue}
+            style={`width: ${typeof paramValue !== 'undefined' ? displayValue?.toString().length : "4"}ch;`}
             />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
