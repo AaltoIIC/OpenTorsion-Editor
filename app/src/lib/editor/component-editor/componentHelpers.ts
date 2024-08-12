@@ -1,5 +1,113 @@
 import type { ElementType, ComponentType } from '$lib/types/types';
+import { currentComponentJSON, notification, customComponents } from '$lib/stores';
+import { isNameValid, isNameUnique } from '$lib/utils';
+import { get } from 'svelte/store';
+import { isElementType } from '$lib/types/typeguards';
 import _ from 'lodash';
+
+export const handleNameChange = (name: string) => {
+    if (name === undefined) {
+        notification.set(
+        {
+            message: "Name field is missing.",
+            type: "error",
+            duration: 3600000
+        });
+        return false
+    } else if (typeof name !== 'string') {
+        notification.set(
+        {
+            message: "Name field has to be a string.",
+            type: "error",
+            duration: 3600000
+        });
+        return false
+    } else if (!isNameValid(name)) {
+        notification.set(
+        {
+            message: "Name field is invalid.",
+            type: "error",
+            duration: 3600000
+        });
+        return false
+    } else if (!isNameUnique(name, get(customComponents))) {
+        notification.set(
+        {
+            message: "Component name has to be unique.",
+            type: "error",
+            duration: 3600000
+        });
+        return false
+    } else {
+        currentComponentJSON.update(json => ({...json, name: name}));
+        notification.set(null);
+        return true
+    }
+}
+
+export const handleJSONEditing = (text: string) => {
+    try {
+        const json = JSON.parse(text);
+        
+        // Check name and set if it is valid
+        if (!handleNameChange(json.name)) {
+            return false
+        }
+
+        const newJson = {...get(currentComponentJSON)}
+
+        // Check elements and set if valid
+        if (!json.elements) {
+            notification.set(
+            {
+                message: "Elements field is missing from JSON.",
+                type: "error",
+                duration: 3600000
+            });
+            return false
+        } else if (!Array.isArray(json.elements)) {
+            notification.set(
+            {
+                message: "Elements field in JSON has to be an array.",
+                type: "error",
+                duration: 3600000
+            });
+            return false
+        } else if (!json.elements.every(isElementType)) {
+            notification.set({
+                message: "Some elements are invalid. Please check the element properties.",
+                type: "info",
+                duration: 3600000
+            });
+            return false
+
+        } else if (json.elements.length === 0) {
+            notification.set(
+            {
+                message: "Component must have at least one element.",
+                type: "info",
+                duration: 3600000
+            });
+            return false
+
+        } else {
+            newJson.elements = json.elements;
+        }
+
+        currentComponentJSON.set(newJson);
+        notification.set(null);
+        return true
+    } catch (e) {
+        notification.set(
+            {
+                message: "Component JSON is not valid.",
+                type: "info",
+                duration: 3600000
+            }
+        );
+        return false
+    } 
+}
 
 // function to add nodes to the list of elements
 // returns the new list of elements

@@ -25,7 +25,7 @@
       'shaft': ShaftNode,
       'gear': GearNode,
       'empty': EmptyNode
-    } as NodeTypes;   
+    } as {} as NodeTypes;   
   
     const nodes = writable([
       {

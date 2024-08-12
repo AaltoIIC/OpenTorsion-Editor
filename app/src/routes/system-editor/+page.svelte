@@ -63,13 +63,12 @@
         document.body.removeChild(a);
     }
 
-    const handleNameChange = (event: Event) => {
-        const target = event.target as HTMLInputElement;
+    const handleNameChange = (text: string) => {
         currentSystemJSON.update((json) => {
-            json.name = target.value;
+            json.name = text;
             return json;
         });
-        systemName = target.value;
+        systemName = text;
     }
 
 </script>

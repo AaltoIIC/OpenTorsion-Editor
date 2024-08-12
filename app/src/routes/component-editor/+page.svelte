@@ -1,134 +1,54 @@
 <script lang="ts">
+    import { onMount, type SvelteComponent } from 'svelte';
     import {
       SvelteFlowProvider
     } from '@xyflow/svelte';
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
-    import { JSONEditor } from 'svelte-jsoneditor';
-    import { currentComponentJSON, customComponents, notification } from '../../lib/stores';
+    import JSONEditor from "$lib/editor/JSONEditor.svelte";
+    import { currentComponentJSON, customComponents, notification, highlightLinesInEditor } from '../../lib/stores';
     import { goto } from '$app/navigation';
     import Notification from '$lib/Notification.svelte';
     import Button from '$lib/Button.svelte';
     import NameField from '$lib/NameField.svelte';
-    import { nameComponentDesign } from '$lib/editor/component-editor/componentHelpers';
-    import type { ComponentType } from '$lib/types/types';
-    import { isElementType } from '$lib/types/typeguards';
-    import { basicComponents } from '$lib/editor/basicComponents';
+    import {
+        nameComponentDesign,
+        handleJSONEditing,
+        handleNameChange
+    } from '$lib/editor/component-editor/componentHelpers';
 
     let componentEditor: any;
     let isNameError = false;
-    let isSaveActive = true;
+    let isError = false;
+    let componentName = nameComponentDesign($customComponents);
+    let JSONEditorComponent: SvelteComponent;
+    onMount(() => {
+        highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
+        isError = !handleJSONEditing(JSONEditorText)
+    });
 
     // Initialize JSON Content
     currentComponentJSON.set({
-        name: nameComponentDesign($customComponents),
+        name: componentName,
         elements: []
     });
-
-    // JSON editor content
-    let content = {
-        text: undefined,
-        json: {}
-    }
-    // make sure the JSON editor is updated when the JSON content changes
-    currentComponentJSON.subscribe(value => {
-        content = {
-            text: undefined,
-            json: value
-        };
-
-        // check component validity
-        if (value.name === "") {
-            // check if name is empty
-            isNameError = true;
-            isSaveActive = false;
-            notification.set({
-                message: "Component name cannot be empty.",
-                type: "error",
-                duration: 3600000
-            });
-        } else if (
-            $customComponents
-                .find(component => component.name.toUpperCase().replace(/\s/g,'') === value.name.toUpperCase().replace(/\s/g,''))
-            || basicComponents.map(component => component.name.toUpperCase().replace(/\s/g,'')).includes(value.name.toUpperCase().replace(/\s/g,''))
-            )   {
-            // check if name is unique
-
-            isNameError = true;
-            isSaveActive = false;
-            notification.set({
-                message: "Component name must be unique.",
-                type: "error",
-                duration: 3600000
-            });
-        } else if (!value.elements.every(isElementType)) {
-            // check if elements are valid
-            isSaveActive = false;
-            notification.set({
-                message: "Some elements are invalid. Please check the element properties.",
-                type: "info",
-                duration: 3600000
-            });
-        } else if (value.elements.length === 0) {
-            // check if elements are empty
-            isSaveActive = false;
-            notification.set({
-                message: "Component must have at least one element.",
-                type: "info",
-                duration: 3600000
-            });
-        } else {
-            isNameError = false;
-            isSaveActive = true;
-            notification.set(null);
-        }
-
-
+ 
+    let JSONEditorText = '';
+    currentComponentJSON.subscribe((value) => {
+        notification.set(null);
+        JSONEditorText = JSON.stringify(value, null, 2);
+        isError = false;
+        isNameError = false;
+        console.log(value.name);
+        componentName = value.name;
     });
-    // make sure the JSON content is updated when the JSON editor changes
-    $: {
-        if (content.json) {
-            // don't let maformed JSON through
-            if (!('elements' in content.json) || !Array.isArray(content.json.elements)) {
-                content.json = {
-                    ...content.json,
-                    elements: []
-                }
-            }
-            if (!('name' in content.json) || typeof content.json.name !== 'string') {
-                content.json = {
-                    ...content.json,
-                    name: ""
-                }
-            }
-            // update the current JSON
-            currentComponentJSON.set(content.json as ComponentType);
-        }
-    }
-
-    // handle title changes
-    const handleTitleChange = (event: Event) => {
-        // remove illegal characters from field
-        const illegalChars = /['"\n]/g;
-        if (illegalChars.test((event.target as HTMLInputElement).value)) {
-            (event.target as HTMLInputElement).value = (event.target as HTMLInputElement).value.replace(illegalChars, '');
-        }
-
-        // update the current JSON
-        currentComponentJSON.update(value => {
-            return {
-                ...value,
-                name: (event.target as HTMLInputElement).value
-            }
-        });
-    }
 
     const saveComponent = () => {
         customComponents.update(value => {
             return [
                 ...value,
-                (content.json as ComponentType)
+                $currentComponentJSON
             ]
         });
 
@@ -139,8 +59,6 @@
         });
         goto('/system-editor');
     }
-
-
     
     let editorElement: HTMLElement;
     let jsonEditorHeight = 200;
@@ -153,7 +71,6 @@
         const parentRect = editorElement.getBoundingClientRect();
         jsonEditorHeight = parentRect.bottom - event.clientY + 8;
     }
-
 
 </script>
 <svelte:head>
@@ -183,9 +100,10 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor bind:content
-            mainMenuBar={false}
-            navigationBar={false} />
+            <JSONEditor
+                bind:this={JSONEditorComponent}
+                bind:textContent={JSONEditorText}
+                onInput={(text) => {isError = !handleJSONEditing(text)}} />
         </div>
     </div>
     <div class="top-menu">
@@ -197,11 +115,14 @@
                 Back to System Editor
             </a>
         </div>
-        <NameField isError={isNameError} text="Component" bind:value={$currentComponentJSON.name} onInput={handleTitleChange} />
+        <NameField text="Component"
+                isError={isNameError} 
+                bind:value={componentName}
+                onInput={text => {isNameError = !handleNameChange(text)}} />
         <div class="buttons">
             <Button
                 onClick={saveComponent}
-                isActive={isSaveActive}
+                isActive={!isError}
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
                 Save Component
             </Button>

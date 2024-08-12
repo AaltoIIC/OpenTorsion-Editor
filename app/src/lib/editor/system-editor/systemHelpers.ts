@@ -3,6 +3,7 @@ import { currentSystemJSON, notification } from '$lib/stores';
 import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
+import { isNameValid } from "$lib/utils";
 
 // Update nodes and edges of the System Editor based on currentSystemJSON 
 export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge[]>) => {
@@ -71,7 +72,7 @@ export const handleJSONEditing = (text: string) => {
         const newJson = {...get(currentSystemJSON)}
         
         // Check name and set if it is valid
-        if (!json.name) {
+        if (json.name === undefined) {
             notification.set(
             {
                 message: "Name field is missing from JSON.",
@@ -182,15 +183,6 @@ export const handleJSONEditing = (text: string) => {
             }
         );
     }
-}
-
-const isNameValid = (name: string) => {
-    // TODO check if name is unique
-    return (
-        (name !== "") && (!name.includes("'")) && (!name.includes('"')) &&
-        (!name.includes("`")) && (!name.includes("\\")) && (!name.includes("/")) &&
-        (!name.includes("\n")) && (!name.includes("\t"))
-    )
 }
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {

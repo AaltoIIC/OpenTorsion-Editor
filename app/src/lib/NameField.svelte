@@ -3,15 +3,19 @@
     export let text: string;
     export let value: string | undefined;
     export let isError: boolean = false;
-    export let onInput: (event: Event) => void;
+    export let onInput: (text: string) => void;
     let spanWidth = 0;
     let inputElement: HTMLInputElement;
 
     const measureWidth = () => {
         if (!inputElement) return;
-        value = inputElement.value;
         spanWidth = (inputElement.nextElementSibling as HTMLSpanElement).offsetWidth;
     }
+
+    $: if (value) {
+        measureWidth();
+    }
+
     onMount(() => {
         measureWidth();
     });
@@ -23,7 +27,7 @@
         type="text"
         bind:value={value}
         bind:this={inputElement}
-        on:input={event => {onInput(event); measureWidth()}}
+        on:input={() => {onInput(value || '');}}
         style={
             `${isError ? "outline: solid 2px var(--main-error-color-dark);" : ""} width: ${spanWidth}px;`
         } />

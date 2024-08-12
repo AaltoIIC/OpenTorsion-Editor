@@ -3,7 +3,7 @@
     import Portal from "svelte-portal";
     import type { ElementType } from '$lib/types/types';
     import { editElement } from '../componentHelpers';
-    import { currentComponentJSON } from '../../../stores';
+    import { currentComponentJSON, highlightLinesInEditor } from '../../../stores';
     import LayoverProperty from './LayoverProperty.svelte';
     
     export let params: ElementType;
@@ -68,6 +68,13 @@
     export let nodeOnHover = false;
     export const nodeClick = () =>{
         isEditing = true;
+        
+        // highligt JSON corresponding to the element in the JSON editor
+        if (highlightLinesInEditor) {
+            
+
+            //highlightLinesInEditor();
+        }
     }
     let x = 0;
     let y = 0;
