@@ -27,14 +27,28 @@
 
     const handleSelect = () => {
         isSelected = true;
+
+        // Highlight lines in JSON editor corresponding to this component
         if (highlightLinesInEditor) {
-            //highlightLinesInEditor();
+            const json: any = { ...$currentSystemJSON};
+            
+            const componentIndex = json.components
+                                .findIndex((component: any) => component.name === id);
+
+            const componentJsonLength = JSON.stringify(json.components[componentIndex], null, 2)
+                                            .split('\n').length;
+            json.components = json.components.slice(0, componentIndex);
+            const toAdd = json.components.length === 0 ? 1 : 0;
+            delete json.structure;
+            const lineNo = JSON.stringify(json, null, 2).split('\n').length + toAdd;
+            $highlightLinesInEditor(lineNo, lineNo + componentJsonLength - 2);
         }
     }
 
     const handleClickOut = () => {
         if (!hover) {
             isSelected = false;
+            $highlightLinesInEditor(-1, -1);
         }
     }
 

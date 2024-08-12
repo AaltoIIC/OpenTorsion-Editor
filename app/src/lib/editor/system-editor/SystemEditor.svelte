@@ -37,7 +37,6 @@
     currentSystemJSON.subscribe(value => {
       updateSystemEditor(nodes, edges)
     })
-    $: console.log($nodes);
 
     // drag and drop logic
     const { screenToFlowPosition } = useSvelteFlow();
@@ -69,8 +68,12 @@
         type: 'component',
         position,
         data: JSON.parse(data),
-        origin: [0.5, 0.0]
+        origin: [0.5, 0.5],
       } satisfies Node;
+
+      // update nodes
+      $nodes.push(newNode);
+      $nodes = $nodes;
 
       // add new component to system JSON
       currentSystemJSON.update((system) => {
@@ -89,9 +92,6 @@
         }
         return system;
       });
-
-      $nodes.push(newNode);
-      $nodes = $nodes;
     };
 
     // proximity connection logic
@@ -153,6 +153,8 @@
         return distanceA - distanceB;
       });
 
+      console.log(nodes)
+
       // check if node already has source or target
       // and making sure nodes have maximum one source and one target
       let nodeHasSource = edges.find(e => e.target === node.id && e.class !== 'temp');
@@ -160,7 +162,6 @@
 
       for (let n of nodesByDistance) {
         const nodeIsSource = n.position.x < node.position.x;
-
         if (nodeIsSource) {
           const edge = edges.find(e => e.source === n.id && e.class !== 'temp');
 
@@ -231,19 +232,22 @@
     }
 
     function onNodeDragStop() {
+      let newJson = { ...$currentSystemJSON};
       $edges.forEach((edge) => {
         if (edge.class === 'temp') {
           edge.class = '';
-          currentSystemJSON.update((system) => {
-            system.structure.push([
-              `${edge.source}.${system.components.find(comp => comp.name === edge.source)?.elements.at(-1)?.name}`,
-              `${edge.target}.${system.components.find(comp => comp.name === edge.target)?.elements.at(0)?.name}`
+          newJson.structure.push([
+              `${edge.source}.${newJson.components.find(comp => comp.name === edge.source)?.elements.at(-1)?.name}`,
+              `${edge.target}.${newJson.components.find(comp => comp.name === edge.target)?.elements.at(0)?.name}`
             ]);
-            return system;
-          });
         }
       });
+
+      // update edges
       $edges = $edges;
+
+      // update JSON
+      currentSystemJSON.set(newJson);
     }
 </script>
 

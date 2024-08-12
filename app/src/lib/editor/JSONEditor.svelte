@@ -17,14 +17,23 @@
     // vagy egy elementet egy arrayban
     export const jumpToLine = (lineNo: number) => {
         let lineDiv = document.querySelector(`.line-${lineNo}`);
-        if (lineDiv) {
-            lineDiv.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
+        if (!lineDiv || !textarea) return;
 
+        let topPos = (lineDiv.getBoundingClientRect().top
+                        - textarea.getBoundingClientRect().top
+                        + scrollTop
+                        -20)        
+        scrollTop = topPos;
+        textarea.scrollTop = topPos;
     }
 
+    let highlightedLines: {start: number, end: number} = {start: -1, end: -1};
     export const highlightLines = (start: number, end: number) => {
-        jumpToLine(start);
+        if (start >= 0) {
+            jumpToLine(start);
+        };
+
+        highlightedLines = {start, end};
     }
 
 
@@ -145,7 +154,7 @@
 
     let scrollTop = 0;
     const handleScroll = () => {
-        if (!textarea || !pre) return;
+        if (!textarea) return;
         pre.scrollTop = textarea.scrollTop;
         pre.scrollLeft = textarea.scrollLeft;
         scrollTop = textarea.scrollTop;
@@ -184,7 +193,7 @@
     <div class="line-cont-inner" style="transform: translateY({-scrollTop}px);">
         {#each Array.from({ length: nofLines }, (_, i) => i) as i}
             <div class="code-line {activeLine === i ? "active" : ""} line-{i}">
-                <div class="line-number">
+                <div class="line-number {i+1 >= highlightedLines.start && i+1 < highlightedLines.end ? "highlighted" : ""}">
                     {i + 1}
                 </div>
             </div>
@@ -198,12 +207,17 @@
     .line-number {
         height: 18px;
         width: 26px;
-        background-color: rgba(0, 0, 0, 0.08);
+        background-color: rgb(235, 235, 235);
         color: rgba(0, 0, 0, 0.5);
         font-size: 14px;
         text-align: right;
         padding: 0 4px;
         font-family: 'Roboto Mono', monospace;
+    }
+    .line-number.highlighted {
+        background-color: var(--main-color-dark);
+        color: rgba(255, 255, 255, 0.9);
+        opacity: 0.8;
     }
     .code-line {
         height: 18px;
@@ -227,7 +241,7 @@
         position: relative;
         width:100%;
         height: 100%;
-        padding: 0;
+        padding: 0 10px 0 52px;
         margin: 0;
         overflow: hidden;
         border: none;
@@ -257,14 +271,14 @@
         z-index: 0;
     }
     textarea, pre {
-        padding: 10px 10px 10px 52px;
+        padding: 10px 0 0 0;
         border: 0;
-        width: calc(100% - 62px);
-        height: calc(100% - 20px);
+        width: calc(100% - 116px);
+        height: calc(100% - 18px);
         word-wrap: break-word;
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 0px;
+        left: 52px;
         overflow: auto;
         white-space: pre;
         margin: 0;
@@ -279,13 +293,14 @@
 
     ::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: rgb(242, 242, 242);
-        border: solid 1px rgb(229, 229, 229);
+        background: transparent;
     }
     ::-webkit-scrollbar-thumb {
         background: rgb(217, 217, 217);
+        border: solid 1px rgb(205, 205, 205);
         cursor: pointer;
     }
     ::-webkit-scrollbar-thumb:hover {

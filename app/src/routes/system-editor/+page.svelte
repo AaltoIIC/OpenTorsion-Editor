@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount, type SvelteComponent } from 'svelte';
     import {
       SvelteFlowProvider
     } from '@xyflow/svelte';
@@ -10,9 +11,14 @@
     import Button from "$lib/Button.svelte";
     import DropdownButton from '$lib/DropdownButton.svelte';
     import NameField from "$lib/NameField.svelte";
-    import { currentSystemJSON } from '$lib/stores';
+    import { notification, currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
     import type { SystemType } from '$lib/types/types';
     import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
+
+    let JSONEditorComponent: SvelteComponent;
+    onMount(() => {
+        highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
+    });
 
     let systemName = "New System";
 
@@ -25,6 +31,7 @@
     
     let JSONEditorText = '';
     currentSystemJSON.subscribe((value) => {
+        notification.set(null);
         JSONEditorText = JSON.stringify(value, null, 2);
         systemName = value.name;
     });
@@ -93,7 +100,10 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor bind:textContent={JSONEditorText} onInput={handleJSONEditing} />
+            <JSONEditor
+                bind:this={JSONEditorComponent}
+                bind:textContent={JSONEditorText}
+                onInput={handleJSONEditing} />
         </div>
         <a href="/analysis">
             <button class="analyze-button">
