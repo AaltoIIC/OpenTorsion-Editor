@@ -1,26 +1,36 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores";
-    import { addElement } from "../editor/component-editor/componentHelpers";
+    import { defaultElement } from "../editor/component-editor/componentHelpers";
 
     
     const addEl = (type: string) => {
         currentComponentJSON.update(value => {
             return {
                 ...value,
-                elements: addElement((value.elements ? value.elements : []), type)
+                elements: [...value.elements,
+                    defaultElement((value.elements ? value.elements : []), type)]
             }
         });
     }
+
+    const onDragStart = (event: DragEvent, type: string) => {
+        if (!event.dataTransfer) {
+        return null;
+        }
+
+        event.dataTransfer.setData('application/svelteflow', type);
+        event.dataTransfer.effectAllowed = 'move';
+    };
 </script>
 <div class="element-cont">
     <div class="element-upper">
         <h3>Elements:</h3>
     </div>
     <div class="element-list">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-        on:click={() => addEl('disk')}>
+            on:dragstart={(e) => onDragStart(e, 'disk')}
+            draggable={true}>
             <div class="main-illustration-cont">
                 <div class="disk">
                 </div>
@@ -31,7 +41,7 @@
                     <p>Parameters: name, damping, excitation, inertia</p>
                 </div>
                 <div>
-                    <button>Add to Component
+                    <button on:click={() => addEl('disk')}>Add to Component
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>                                           
@@ -39,10 +49,10 @@
                 </div>
             </div>
         </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => addEl('shaft')}>
+            on:dragstart={(e) => onDragStart(e, 'shaft')}
+            draggable={true}>
             <div class="main-illustration-cont">
                 <div class="shaft">
                 </div>
@@ -53,7 +63,7 @@
                     <p>Parameters: name, damping, excitation, stiffness</p>
                 </div>
                 <div>
-                    <button>Add to Component
+                    <button on:click={() => addEl('shaft')}>Add to Component
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>              
@@ -61,10 +71,10 @@
                 </div>
             </div>
         </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:click={() => addEl('gear')}>
+            on:dragstart={(e) => onDragStart(e, 'gear')}
+            draggable={true}>
             <div class="main-illustration-cont">
                 <div class="gear">
                 </div>
@@ -75,7 +85,7 @@
                     <p>Parameters: name, damping, excitation, inertia, diameter, teeth</p>
                 </div>
                 <div>
-                    <button>Add to Component
+                    <button on:click={() => addEl('gear')}>Add to Component
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>                 
@@ -92,7 +102,6 @@
         -webkit-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        cursor: pointer;
     }
     .icon-add-to-component {
         width: 16px;
@@ -167,6 +176,10 @@
         height: 108px;
         overflow: hidden;
         transition: .2s;
+        cursor: grab;
+    }
+    .element-list-item:active {
+        cursor: grabbing;
     }
     .element-list-item:hover {
         border: solid 1px rgba(0, 0, 0, 0.4);

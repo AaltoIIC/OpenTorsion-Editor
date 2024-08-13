@@ -40,7 +40,6 @@
         JSONEditorText = JSON.stringify(value, null, 2);
         isError = false;
         isNameError = false;
-        console.log(value.name);
         componentName = value.name;
     });
 

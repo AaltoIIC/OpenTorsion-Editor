@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Handle, Position, } from '@xyflow/svelte';
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
+    import { nthLinesInJSON } from '$lib/utils';
     import { onMount } from 'svelte';
 
     // NodeProps used by Svelte Flow
@@ -30,18 +31,8 @@
 
         // Highlight lines in JSON editor corresponding to this component
         if (highlightLinesInEditor) {
-            const json: any = { ...$currentSystemJSON};
-            
-            const componentIndex = json.components
-                                .findIndex((component: any) => component.name === id);
-
-            const componentJsonLength = JSON.stringify(json.components[componentIndex], null, 2)
-                                            .split('\n').length;
-            json.components = json.components.slice(0, componentIndex);
-            const toAdd = json.components.length === 0 ? 1 : 0;
-            delete json.structure;
-            const lineNo = JSON.stringify(json, null, 2).split('\n').length + toAdd;
-            $highlightLinesInEditor(lineNo, lineNo + componentJsonLength - 2);
+            let [startIndex, endIndex] = nthLinesInJSON($currentSystemJSON, 'components', 'name', id);
+            $highlightLinesInEditor(startIndex, endIndex);
         }
     }
 

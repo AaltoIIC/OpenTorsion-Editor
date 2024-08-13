@@ -109,37 +109,6 @@ export const handleJSONEditing = (text: string) => {
     } 
 }
 
-// function to add nodes to the list of elements
-// returns the new list of elements
-export const addElement = (elements: ElementType[], elementName: string): ElementType[] => {
-    if (elementName === "disk") {
-        const newElement = {
-            name: nameElement('Disk', elements),
-            type: "Disk",
-            damping: 0,
-            inertia: 8.35e+06
-        }
-        return [...elements, newElement];
-    } else if (elementName === "shaft") {
-        const newElement = {
-            name: `${nameElement('ShaftDiscrete', elements)}`,
-            type: "ShaftDiscrete",
-            damping: 0,
-            stiffness: 4.49e+09
-        }
-        return [...elements, newElement];
-    } else if (elementName === "gear") {
-        const newElement = {
-            name: `${nameElement('GearElement', elements)}`,
-            type: "GearElement",
-            damping: 0
-        }
-        return [...elements, newElement];
-    } else {
-        return elements;
-    }
-}
-
 // edit an element in the list of elements
 // removeUndefined: if true, undefined values in newValues are removed even if they were previously defined
 export const editElement = (elements: ElementType[] | undefined,
@@ -152,10 +121,10 @@ export const editElement = (elements: ElementType[] | undefined,
     let newElements = [...elements];
     newElements.forEach((el, index) => {
         if (el.name === elementName) {
-            let newEl: ElementType = {...el, ...newValues};
+            let newEl: ElementType = {...el, ...newValues} as ElementType;
             
             if (removeUndefined) {
-                const undefinedKeys = Object.keys(newValues).filter(key => newValues[key] === undefined);
+                const undefinedKeys = Object.keys(newValues).filter(key => (newValues as any)[key] === undefined);
                 newEl = _.omit(newEl, undefinedKeys) as ElementType;
             }
 
@@ -214,10 +183,19 @@ const nameElement = (type: string, elements: ElementType[]) => {
 }
 
 // object with possible parameters for each element type
-export const possibleParams: { [key: string]: string[] } = {
-    disk: ["name", "type", "damping", "excitation", "inertia"],
-    shaft: ["name", "type", "damping", "excitation", "stiffness"],
-    gear: ["name", "type", "damping", "excitation", "inertia", "diameter", "teeth"]
+export const possibleParams = {
+    disk: {
+        required: ["name", "type", "damping", "inertia"],
+        optional: ["excitation"]
+    },
+    shaft: {
+        required: ["name", "type", "damping", "stiffness"],
+        optional: ["excitation"]
+    },
+    gear: {
+        required: ["name", "type", "damping", "inertia", "diameter"],
+        optional: ["excitation", "teeth"]
+    }
 }
 
 // function to construct a default element based on the type
@@ -227,7 +205,7 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
             name: nameElement('Disk', elements),
             type: "Disk",
             damping: 0,
-            inertia: 8.35e+06
+            inertia: 5.72e+03
         }
     } else if (type === "shaft") {
         return {
@@ -240,7 +218,9 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
         return {
             name: nameElement('GearElement', elements),
             type: "GearElement",
-            damping: 0
+            damping: 0,
+            inertia: 5.72e+03,
+            diameter: 0.23
         }
     } else {
         throw new Error("Invalid element type");
@@ -272,7 +252,10 @@ export const renderNodes = (elements: any) => {
                 id: `${index + 1}`,
                 type: 'disk',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams['disk']),
+                data: _.pick(el, [
+                    ...possibleParams['disk'].required,
+                    ...possibleParams['disk'].optional
+                ] ),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 21;
@@ -283,7 +266,10 @@ export const renderNodes = (elements: any) => {
                 id: `${index + 1}`,
                 type: 'shaft',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams['shaft']),
+                data: _.pick(el, [
+                    ...possibleParams['shaft'].required,
+                    ...possibleParams['shaft'].optional
+                ] ),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 72;
@@ -294,7 +280,10 @@ export const renderNodes = (elements: any) => {
                 id: `${index + 1}`,
                 type: 'gear',
                 dragHandle: '.none',
-                data: _.pick(el, possibleParams['gear']),
+                data: _.pick(el, [
+                    ...possibleParams['gear'].required,
+                    ...possibleParams['gear'].optional
+                ] ),
                 position: { x: currentPosition, y: 150 }
             });
             currentPosition += 21;

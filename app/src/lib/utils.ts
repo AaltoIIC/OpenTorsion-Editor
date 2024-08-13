@@ -13,8 +13,8 @@ export const nthLinesInJSON = (jsonObj: any, topKey: string, searchKey: string, 
     json[topKey] = json[topKey].slice(0, itemIndex);
     const toAdd = json[topKey].length === 0 ? 1 : 0;
     deleteKeysAfter(json, topKey);
-    const lineNo = JSON.stringify(json, null, 2).split('\n').length + toAdd;
-    return (lineNo, lineNo + itemJsonLength - 2);
+    const lineNo = JSON.stringify(json, null, 2).split('\n').length + toAdd - 1;
+    return [lineNo, lineNo + itemJsonLength];
 }
 
 const deleteKeysAfter = (json: { [key: string]: any }, key: string): void => {

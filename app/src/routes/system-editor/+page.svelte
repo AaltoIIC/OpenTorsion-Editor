@@ -21,13 +21,6 @@
     });
 
     let systemName = "New System";
-
-    currentSystemJSON.set({
-        name: systemName,
-        date: new Date().toISOString(),
-        components: [],
-        structure: []
-    } as SystemType);
     
     let JSONEditorText = '';
     currentSystemJSON.subscribe((value) => {

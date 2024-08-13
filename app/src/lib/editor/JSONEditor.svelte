@@ -13,20 +13,27 @@
     let text = '';
     let isUserInput = false;
 
-    // vagy egy key value pairt kell highlightolni
-    // vagy egy elementet egy arrayban
+    // jump to line in editor
     export const jumpToLine = (lineNo: number) => {
         let lineDiv = document.querySelector(`.line-${lineNo}`);
         if (!lineDiv || !textarea) return;
 
-        let topPos = (lineDiv.getBoundingClientRect().top
+        let lineFromTextareaTop = (lineDiv.getBoundingClientRect().top
                         - textarea.getBoundingClientRect().top
                         + scrollTop
-                        -20)        
-        scrollTop = topPos;
-        textarea.scrollTop = topPos;
+                        -20)
+
+        let topPos = Math.min(lineFromTextareaTop, textarea.scrollHeight - textarea.clientHeight);
+
+        // if textarea is not scrollable, do not scroll
+        const isTextareaScrollable = textarea.scrollHeight > textarea.clientHeight;
+        if (isTextareaScrollable) {
+            scrollTop = topPos;
+            textarea.scrollTop = topPos;
+        }
     }
 
+    // export function to highlight lines in editor
     let highlightedLines: {start: number, end: number} = {start: -1, end: -1};
     export const highlightLines = (start: number, end: number) => {
         if (start >= 0) {

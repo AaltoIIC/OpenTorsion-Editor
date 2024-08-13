@@ -113,7 +113,7 @@
         margin: 0 0 -3px 0;
         fill: none;
         stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2px;
+        stroke-width: 2.4px;
         stroke-linejoin: round;
     }
     .open .icon-dropdown {

@@ -13,7 +13,9 @@
     }
 
     $: if (value) {
-        measureWidth();
+        setTimeout(() => {
+            measureWidth();
+        }, 0);
     }
 
     onMount(() => {

@@ -4,12 +4,13 @@
     import type { ElementType } from '$lib/types/types';
     import { editElement } from '../componentHelpers';
     import { currentComponentJSON, highlightLinesInEditor } from '../../../stores';
+    import { nthLinesInJSON } from '$lib/utils';
     import LayoverProperty from './LayoverProperty.svelte';
     
     export let params: ElementType;
-    export let possibleParams: string[] = ['name', 'type', 'damping', 'excitation'];
+    export let possibleParams: {required: string[], optional: string[]};
 
-    // handle name change and deletion
+    // handle deletion
     const deleteElement = () => {
         isOpen = false;
         isEditing = false;
@@ -22,7 +23,7 @@
     }
 
     // handle parameter change
-    $: undefinedParams = possibleParams
+    $: undefinedParams = possibleParams.optional
         .filter(item => !(item in params))
         .reduce((acc, key) => {
             acc[key] = undefined;
@@ -71,9 +72,8 @@
         
         // highligt JSON corresponding to the element in the JSON editor
         if (highlightLinesInEditor) {
-            
-
-            //highlightLinesInEditor();
+            let [startIndex, endIndex] = nthLinesInJSON($currentComponentJSON, 'elements', 'name', params.name);
+            $highlightLinesInEditor(startIndex, endIndex);
         }
     }
     let x = 0;
@@ -106,6 +106,7 @@
 
         isOpen = false;
         isEditing = false;
+        $highlightLinesInEditor(-1, -1);
     }
     
     const handleClickOutside = (event: any) => {
@@ -169,6 +170,7 @@
                         paramName={paramName}
                         paramValue={paramValue}
                         isEditing={isEditing}
+                        required={possibleParams.required.includes(paramName)}
                         onChange={handleParamChange}
                     />
                 {/if}

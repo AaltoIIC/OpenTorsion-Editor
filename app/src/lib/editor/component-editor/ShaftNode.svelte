@@ -1,7 +1,7 @@
 <script lang="ts">
-    import {type NodeProps } from '@xyflow/svelte';
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
+    import { possibleParams } from './componentHelpers';
    
     $$restProps
 
@@ -23,7 +23,7 @@
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data}
-        possibleParams={['name', 'type', 'damping', 'excitation', 'stiffness']} />
+        possibleParams={possibleParams.shaft} />
 </div>
 <style>
     .shaft {

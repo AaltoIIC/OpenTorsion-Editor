@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { type NodeProps } from '@xyflow/svelte';
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
+    import { possibleParams } from './componentHelpers';
     
     $$restProps
     
@@ -9,6 +9,7 @@
 
     let layoverElement: any;
     let onHover = false;
+
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -23,7 +24,7 @@
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data}
-        possibleParams={['name', 'type', 'damping', 'excitation', 'inertia']} />
+        possibleParams={possibleParams.disk} />
 </div>
 <style>
     .disk {

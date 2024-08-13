@@ -14,6 +14,7 @@
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
     import ComponentNode from './ComponentNode.svelte';
+    import EmptySystemNode from './EmptySystemNode.svelte';
     import RemovableEdge from './RemovableEdge.svelte';
     import { currentSystemJSON, customComponents } from '$lib/stores';
     import type { ComponentType } from '$lib/types/types';
@@ -24,7 +25,8 @@
      } from './systemHelpers';
 
     const nodeTypes: NodeTypes = {
-      'component': ComponentNode
+      'component': ComponentNode,
+      'empty': EmptySystemNode
     } as {} as NodeTypes;
 
     const edgeTypes: EdgeTypes = {
@@ -153,8 +155,6 @@
         return distanceA - distanceB;
       });
 
-      console.log(nodes)
-
       // check if node already has source or target
       // and making sure nodes have maximum one source and one target
       let nodeHasSource = edges.find(e => e.target === node.id && e.class !== 'temp');
@@ -249,6 +249,22 @@
       // update JSON
       currentSystemJSON.set(newJson);
     }
+
+    // add empty system node if there are no nodes
+    nodes.subscribe(value => {
+      if (value.length === 0) {
+        nodes.set([{
+          id: '1',
+          type: 'empty',
+          dragHandle: '.none',
+          position: { x: 0, y: 150 },
+          data: {},
+          origin: [0.5, 0.5],
+        }]);
+      } else if (value.some(node => node.type === 'empty') && value.length > 1) {
+        nodes.set(value.filter(node => node.type !== 'empty'));
+      }
+    });
 </script>
 
 <SvelteFlow
