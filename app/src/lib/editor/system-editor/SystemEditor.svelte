@@ -57,19 +57,19 @@
         return null;
       }
 
-      const data = event.dataTransfer.getData('application/svelteflow');
+      const componentType = event.dataTransfer.getData('application/svelteflow');
 
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY
       });
 
-      let newCompName = nameComponentInstance(JSON.parse(data).label, $currentSystemJSON.components)
+      let newCompName = nameComponentInstance(componentType, $currentSystemJSON.components)
       const newNode = {
         id: newCompName,
         type: 'component',
         position,
-        data: JSON.parse(data),
+        data: {name: newCompName, type: componentType},
         origin: [0.5, 0.5],
       } satisfies Node;
 
@@ -79,14 +79,14 @@
 
       // add new component to system JSON
       currentSystemJSON.update((system) => {
-        if (basicComponents.map(comp => comp.name).includes(JSON.parse(data).label)) {
-          let newComponent = {...basicComponents.find(comp => comp.name === JSON.parse(data).label)?.json}
+        if (basicComponents.map(comp => comp.name).includes(componentType)) {
+          let newComponent = {...basicComponents.find(comp => comp.name === componentType)?.json}
           if (newComponent) {
             newComponent.name = newCompName;
             system.components.push(newComponent as {} as ComponentType);
           }
         } else {
-          let newComponent = {...$customComponents.find(comp => comp.name === JSON.parse(data).label)}
+          let newComponent = {...$customComponents.find(comp => comp.name === componentType)}
           if (newComponent) {
             newComponent.name = newCompName;
             system.components.push(newComponent as {} as ComponentType);

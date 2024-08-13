@@ -7,7 +7,7 @@
         if (!event.dataTransfer) {
         return null;
         }
-        event.dataTransfer.setData('application/svelteflow', JSON.stringify({label:name, img:src}));
+        event.dataTransfer.setData('application/svelteflow', name);
         event.dataTransfer.effectAllowed = 'move';
     };
 

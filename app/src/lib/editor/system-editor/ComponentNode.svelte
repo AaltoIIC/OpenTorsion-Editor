@@ -3,14 +3,15 @@
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
     import { nthLinesInJSON } from '$lib/utils';
     import { onMount } from 'svelte';
+    import Component3dModel from './Component3dModel.svelte';
 
     // NodeProps used by Svelte Flow
     $$restProps
 
-    export let data: { img: string; label: string };
+    export let data: { type: string; name: string };
     export let id: string;
 
-    const { img, label } = data;
+    const { type, name } = data;
     let hover = false;
     let isSelected = false;
 
@@ -54,9 +55,10 @@
     on:mouseleave={() => {hover = false}}
     on:click={handleSelect}>
         <div class="img-cont">
-            <img src={`./components/${img}`} alt={label} />
+            <Component3dModel
+                data={$currentSystemJSON.components.find(comp => comp.name === name)} />
         </div>
-        <p>{label}</p>
+        <p>{name}</p>
         <button class="remove-button"
             on:click={remove}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -78,8 +80,8 @@
         top: 50%;
         left: 50%;
         transform: translate(-52%, -55%);
-        width: 10px;
-        height: 10px;
+        width: 20px;
+        height: 20px;
         margin: 0 0 0 0;
         stroke-width: 2px;
         stroke-linejoin: round;
@@ -87,11 +89,11 @@
     }
     .remove-button {
         position: absolute;
-        top: 4px;
-        right: 4px;
-        width: 20px;
-        height: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        top: 8px;
+        right: 8px;
+        width: 40px;
+        height: 40px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
         background-color: rgb(30, 30, 30);
         color: rgba(255, 255, 255, 0.9);
         cursor: pointer;
@@ -104,7 +106,7 @@
         opacity: 1;
     }
     .remove-button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.8);
     }
     .handle-wrapper {
         position: absolute;
@@ -113,33 +115,33 @@
     .handle-wrapper.right {
         position: absolute;
         top: 50%;
-        right: 1px;
+        right: 2px;
     }
     .main-component-node {
         z-index: -1;
         position: relative;
     }
-    .main-component-node img {
-        width: 100px;
-        height: 100px;
-        padding: 4px;
+    .main-component-node .img-cont {
+        width: 200px;
+        height: 200px;
+        padding: 8px;
         background-color: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(0, 0, 0, 0.15);
+        border: 2px solid rgba(0, 0, 0, 0.15);
         backdrop-filter: blur(8px) brightness(0.8);
     }
-    .hover img {
+    .hover .img-cont {
         background-color: rgba(255, 255, 255, 0.5);
     }
-    .selected  img {
+    .selected  .img-cont {
         background-image: linear-gradient(var(--main-color-tr-2), var(--main-color-tr-2));
         background-blend-mode: overlay;
-        outline: 2px solid var(--main-color);
+        outline: 4px solid var(--main-color);
     }
     .main-component-node p {
-        margin: 0 4px 4px 4px;
+        margin: 0 8px 8px 8px;
         padding: 0;
         font-family: 'Roboto Mono', monospace;
-        font-size: 8px;
+        font-size: 16px;
         font-weight: 550;
         position: absolute;
         color: rgba(0, 0, 0, 0.9);

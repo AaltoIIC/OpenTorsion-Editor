@@ -36,6 +36,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
+	export const EFC_16804: string;
 	export const FNM_ARCH: string;
 	export const FNM_COREPACK_ENABLED: string;
 	export const FNM_DIR: string;
@@ -99,9 +100,6 @@ declare module '$env/static/private' {
 	export const USERNAME: string;
 	export const USERPROFILE: string;
 	export const windir: string;
-	export const WSLENV: string;
-	export const WT_PROFILE_ID: string;
-	export const WT_SESSION: string;
 }
 
 /**
@@ -143,6 +141,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
+		EFC_16804: string;
 		FNM_ARCH: string;
 		FNM_COREPACK_ENABLED: string;
 		FNM_DIR: string;
@@ -206,9 +205,6 @@ declare module '$env/dynamic/private' {
 		USERNAME: string;
 		USERPROFILE: string;
 		windir: string;
-		WSLENV: string;
-		WT_PROFILE_ID: string;
-		WT_SESSION: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}
