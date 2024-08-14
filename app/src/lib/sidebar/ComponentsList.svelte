@@ -1,8 +1,11 @@
-<script>
+<script lang="ts">
+    import type { ComponentType } from "$lib/types/types";
     import Button from "$lib/Button.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
     import { customComponents } from "$lib/stores";
+
+    const toComponentType = (json: any) => json as ComponentType;
 </script>
 
 <div class="component-cont">
@@ -21,10 +24,10 @@
     </div>
     <div class="component-list">
         {#each [ ...$customComponents].reverse() as component}
-            <ComponentListItem name={component.name} isUnique={true} />
+            <ComponentListItem data={component} isUnique={true} />
         {/each}
         {#each basicComponents as component}
-            <ComponentListItem src={component.icon} name={component.name} isUnique={false} />
+            <ComponentListItem data={toComponentType(component.json)} src={component.icon} isUnique={false} />
         {/each}
     </div>
 </div>

@@ -268,6 +268,8 @@
 </script>
 
 <SvelteFlow
+    minZoom={0.3}
+    maxZoom={1}
     nodeTypes={nodeTypes}
     edgeTypes={edgeTypes}
     {nodes}

@@ -1,13 +1,16 @@
 <script lang="ts">
+    import type { ComponentType } from "$lib/types/types";
+    import Component3dModel from "$lib/editor/system-editor/Component3dModel.svelte";
+
     export let src: string = "default-custom.png";
-    export let name: string;
+    export let data: ComponentType;
     export let isUnique: boolean = true;
 
     const onDragStart = (event: DragEvent) => {
         if (!event.dataTransfer) {
         return null;
         }
-        event.dataTransfer.setData('application/svelteflow', name);
+        event.dataTransfer.setData('application/svelteflow', data.name);
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -19,11 +22,17 @@
     on:mouseleave={() => {hover = false}}
     on:dragstart={(event) => onDragStart(event)}
     draggable={true}>
-    <img class="main-img" src={`./components/${src}`} alt={name} />
+    <div class="illustration-cont">
+    {#if isUnique}
+        <Component3dModel data={data} hoverable={false} />
+    {:else}
+        <img src={`./components/${src}`} alt={data.name} />
+    {/if}
+    </div>
     <div class="component-info">
         <div>
             <h4>
-                <span>{name}</span>
+                <span>{data.name}</span>
                 <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
                 </svg>                  
@@ -71,7 +80,7 @@
         stroke-linejoin: round;
     }
     .component-info {
-        width: 100%;
+        width: fit-content;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -98,10 +107,15 @@
     .component-list-item:hover {
         border: solid 1px rgba(0, 0, 0, 0.4);
     }
-    .main-img {
+    .illustration-cont {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    .illustration-cont img {
         height: 100%;
         width: auto;
-        background-color: rgba(0, 0, 0, 0.1);
     }
     button {
         color: rgba(255, 255, 255, 0.9);

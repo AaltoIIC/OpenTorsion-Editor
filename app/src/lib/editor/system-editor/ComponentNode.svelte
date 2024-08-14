@@ -56,7 +56,8 @@
     on:click={handleSelect}>
         <div class="img-cont">
             <Component3dModel
-                data={$currentSystemJSON.components.find(comp => comp.name === name)} />
+                data={$currentSystemJSON.components.find(comp => comp.name === name)}
+                hoverable={isSelected} />
         </div>
         <p>{name}</p>
         <button class="remove-button"
@@ -79,7 +80,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-52%, -55%);
+        transform: translate(-50%, -50%);
         width: 20px;
         height: 20px;
         margin: 0 0 0 0;
@@ -121,10 +122,12 @@
         z-index: -1;
         position: relative;
     }
+    .main-component-node.selected {
+        cursor: ew-resize;
+    }
     .main-component-node .img-cont {
         width: 200px;
         height: 200px;
-        padding: 8px;
         background-color: rgba(255, 255, 255, 0.6);
         border: 2px solid rgba(0, 0, 0, 0.15);
         backdrop-filter: blur(8px) brightness(0.8);

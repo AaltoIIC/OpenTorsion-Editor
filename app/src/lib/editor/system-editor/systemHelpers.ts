@@ -21,8 +21,8 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
                 id: comp.name,
                 type: 'component',
                 data: {
-                    img: "default-custom.png",
-                    label: comp.name
+                    name: comp.name,
+                    type: comp.type,
                 },
                 position: { x: 0, y: 0 },
                 origin: [0.5, 0.0]

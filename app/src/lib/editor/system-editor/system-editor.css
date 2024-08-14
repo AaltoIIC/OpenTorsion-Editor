@@ -4,5 +4,16 @@
     --xy-connectionline-stroke-hover: var(--main-color);
     --xy-edge-stroke-selected-default: var(--main-color);
     --xy-connectionline-stroke-default: var(--main-color);
-    --xy-edge-stroke-width-default: 1.5;
+    --xy-edge-stroke-width-default: 3;
+}
+
+.svelte-flow__edge.animated path {
+    stroke-dasharray: 10;
+    animation: dashdraw 0.5s linear infinite;
+}
+
+@keyframes dashdraw {
+    to {
+        stroke-dashoffset: -20;
+    }
 }

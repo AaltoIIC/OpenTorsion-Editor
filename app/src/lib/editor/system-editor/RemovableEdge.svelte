@@ -83,20 +83,20 @@
   <style>
     .hover-helper {
         pointer-events: all;
-        padding: 16px;
+        padding: 32px;
         position: absolute;
     }
 
     .edgeButtonContainer {
       position: absolute;
-      top: 1px;
+      top: 2px;
       pointer-events: all;
     }
   
     .edgeButton {
-      width: 20px;
-      height: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
       background-color: rgb(30, 30, 30);
       color: rgba(255, 255, 255, 0.9);
       cursor: pointer;
@@ -108,16 +108,16 @@
     }
     .edgeButton.hover {
         opacity: 1;
-        border: 1px solid rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.8);
     }
 
     .edgeButton svg {
-        width: 11px;
-        height: 11px;
+        width: 22px;
+        height: 22px;
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-54%, -54%);
+        transform: translate(-50%, -50%);
         stroke-width: 2px;
         stroke-linejoin: round;
         color: rgba(255, 255, 255, 0.9);
