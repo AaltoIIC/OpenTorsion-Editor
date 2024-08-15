@@ -56,9 +56,19 @@
         } else {
             isNameError = false;
         }
-        
+
         allProperties.name = event.target.value;
+
+        // set width of the input field
+        setNameFieldWidth();
     }
+
+    const setNameFieldWidth = () => {
+        const span = nameField.nextElementSibling as HTMLSpanElement;
+        span.textContent = allProperties.name;
+        nameField.style.width = `${span.offsetWidth}px`;
+    }
+    
 
     // handle layover behavior (position, visibility, etc.)
     let onHover = false;
@@ -129,6 +139,7 @@
         if (flowEditor) {
             flowEditor.addEventListener('wheel', closeLayover);
         }
+
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('pointerdown', handleClickOutside);
@@ -151,8 +162,8 @@
                 on:input={handleNameChange}
                 bind:this={nameField}
                 class="main-name-field {(isNameError ? "name-error" : "")}"
-                style="width: {allProperties.name.length}ch;"
             />
+            <span class="hidden-span"></span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <svg
                 on:click={deleteElement}
@@ -184,6 +195,13 @@
     </div>
 </Portal>
 <style>
+    .hidden-span {
+        visibility: hidden;
+        white-space: pre;
+        position: absolute;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;  
+    }
     .name-cont.editing svg {
         display: block;
     }

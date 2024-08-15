@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Handle, Position, } from '@xyflow/svelte';
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
+    import type { ComponentType } from '$lib/types/types';
     import { nthLinesInJSON } from '$lib/utils';
     import { onMount } from 'svelte';
     import Component3dModel from './Component3dModel.svelte';
@@ -8,10 +9,9 @@
     // NodeProps used by Svelte Flow
     $$restProps
 
-    export let data: { type: string; name: string };
+    export let data: ComponentType;
     export let id: string;
 
-    const { type, name } = data;
     let hover = false;
     let isSelected = false;
 
@@ -56,10 +56,10 @@
     on:click={handleSelect}>
         <div class="img-cont">
             <Component3dModel
-                data={$currentSystemJSON.components.find(comp => comp.name === name)}
+                data={data}
                 hoverable={isSelected} />
         </div>
-        <p>{name}</p>
+        <p>{data.name}</p>
         <button class="remove-button"
             on:click={remove}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -68,7 +68,7 @@
         </button>
     </div>
 <div class="handle-wrapper left">
-    <Handle type="target" position={Position.Left} isConnectable={false} />
+    <Handle type="target" position={Position.Left} isConnectable={false}  />
 </div>
 <div class="handle-wrapper right">
     <Handle type="source" position={Position.Right} isConnectable={false} />
@@ -121,6 +121,7 @@
     .main-component-node {
         z-index: -1;
         position: relative;
+        cursor: pointer;
     }
     .main-component-node.selected {
         cursor: ew-resize;
@@ -141,7 +142,7 @@
         outline: 4px solid var(--main-color);
     }
     .main-component-node p {
-        margin: 0 8px 8px 8px;
+        margin: 4px 8px 0 8px;
         padding: 0;
         font-family: 'Roboto Mono', monospace;
         font-size: 16px;

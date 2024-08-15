@@ -7,6 +7,12 @@
     --xy-edge-stroke-width-default: 3;
 }
 
+.svelte-flow__handle {
+    width: 10px;
+    height: 10px;
+    border-width: 2px;
+}
+
 .svelte-flow__edge.animated path {
     stroke-dasharray: 10;
     animation: dashdraw 0.5s linear infinite;

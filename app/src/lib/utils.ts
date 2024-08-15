@@ -1,5 +1,32 @@
+import { currentSystemJSON, notification } from "./stores";
+import { goto } from "$app/navigation";
 import type { ElementType, ComponentType, SystemType } from "./types/types";
 import _ from 'lodash';
+
+// Function to import a JSON file into the system editor
+// to be used as an event handler for an input element
+export const importSystem = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const newJSON = JSON.parse(e.target?.result as string);
+                currentSystemJSON.set(newJSON);
+                goto("/system-editor");
+            } catch (error) {
+                notification.set({
+                    message: "Imported JSON file is invalid. Please check the file and try again.",
+                    type: "error",
+                    duration: 3000
+                });
+            }
+        };
+        reader.readAsText(file);
+    }
+}
 
 // Finds the line numbers where an object with a specific key-value pair is located in a JSON string
 export const nthLinesInJSON = (jsonObj: any, topKey: string, searchKey: string, searchValue: string) => {

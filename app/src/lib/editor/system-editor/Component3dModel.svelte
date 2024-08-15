@@ -5,13 +5,15 @@
 
     export let data: ComponentType = {name: "",elements: []};
     export let hoverable = true;
+
     let el: HTMLCanvasElement;
 
+    // creating THREE.js scene
     const scene = new THREE.Scene();
-
     const ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
     scene.add( ambientLight );
     
+    // function to add light scource to scene
     const addLight = (scene: THREE.Scene, x: number, y: number, z: number, shadows=false) => {
         const light = new THREE.DirectionalLight( 0xffffff, 1 );
         light.position.set( x, y, z );
@@ -33,7 +35,12 @@
     addLight(scene, 100, 200, 200);
     addLight(scene, -100, -200, -100);
 
+
+    // functions to create elements
+
+    // keep track of z position of last element
     let currentZ = 0;
+
     const createDisk = () => {
         currentZ += 3;
         const geometry = new THREE.CylinderGeometry( 20, 20, 6, 32 );
@@ -42,7 +49,6 @@
         disk.castShadow = true;
         disk.rotateX(Math.PI*(90/180));
         disk.position.z = currentZ;
-        // add half of real width to currentZ
         currentZ += 3;
         scene.add(disk);
     }
@@ -84,14 +90,12 @@
         currentZ += 3.5;
         scene.add(gear);
     }
-    
+
+    // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
     let renderer: THREE.WebGLRenderer;
-
     onMount(() => {
-        //camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
         camera = new THREE.OrthographicCamera(-50, 50, 50, -50, 0.1, 1000);
-
         renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -106,7 +110,7 @@
             }
         });
 
-
+        // add shadow plane
         const planeGeometry = new THREE.PlaneGeometry(200, 200);
         const planeMaterial = new THREE.ShadowMaterial({
             opacity: 0.15
@@ -118,18 +122,8 @@
         plane.position.z = currentZ/2;
 
         scene.add(plane);
-
-        // Ensure the renderer is set up to handle shadows
         renderer.shadowMap.enabled = true;
 
-        const animate = () => {
-
-            requestAnimationFrame( animate );
-
-            renderer.render( scene, camera );
-
-        }
-        animate();
         resize();
         setCameraPosition();
         window.addEventListener('resize', resize);
@@ -140,28 +134,25 @@
 
         const width = el.clientWidth;
         const height = el.clientHeight;
-        renderer.setSize(width, height, false); // Set renderer size to canvas size
+        renderer.setSize(width, height, false);
         camera.updateProjectionMatrix();
     };
 
-
+    // function to (re)set camera position
     const setCameraPosition = () => {
         camera.position.set( 70, 85, 88 + currentZ/2 );
         camera.lookAt( 0, 0, currentZ/2 );
         renderer.render(scene, camera);
     }   
 
+    // animation on hover
     const handleMouseMove = (event: MouseEvent) => {
         const width = el.clientWidth;
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
+        const currentCamZ = (x / width) * (currentZ+320) * 2
 
-        const grad = (x / width)
-        const changeInDirection = 0.2
-        const currentCamZ = grad * (currentZ+320) * 2
-        const currentCamY = 0
-
-        camera.position.set( 70, 85 + currentCamY, -160 + currentCamZ );
+        camera.position.set( 70, 85, -160 + currentCamZ );
         camera.lookAt( 0, 0, currentZ/2 );
 
         renderer.render(scene, camera);

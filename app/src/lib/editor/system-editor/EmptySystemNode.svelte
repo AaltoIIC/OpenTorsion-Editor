@@ -12,18 +12,21 @@
 </div>
 <style>
     h1 {
-        font-size: 20px;
+        font-size: 40px;
         color: rgba(0, 0, 0, 0.3);
         text-align: center;
         font-family: 'Inter', sans-serif;
         font-weight: 650;
-        margin: 6px;
+        margin: 12px;
     }
     p {
-        font-size: 10px;
+        font-size: 20px;
         color: rgba(0, 0, 0, 0.3);
         text-align: center;
         font-family: 'Inter', sans-serif;
         margin: 0;
+    }
+    .node-cont {
+        cursor: auto;
     }
 </style>

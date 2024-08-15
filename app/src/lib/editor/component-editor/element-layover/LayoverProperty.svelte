@@ -34,7 +34,6 @@
         const isNormalNumber = /^-?\d+(\.\d+)?$/.test(newParamValue);
         if (isNormalNumber && Number(newParamValue) > 10000000) {
             newParamValue = toEngineeringNotation(Number(newParamValue));
-            displayValue = newParamValue;
         }
         
         // remove illegal characters
@@ -44,6 +43,7 @@
         }
 
         onChange(paramName, newParamValue);
+        displayValue = newParamValue;
     }
     // When JSON editing happens, update display value
     $: if (!inFocus && paramValue) {
@@ -66,7 +66,6 @@
 
         return `${mantissa}e+${exponent}`
     };
-
 </script>
 <p class="main-prop-cont {isUndef ? 'undef-cont' : 'def-cont'} {isEditing ? "active" : ""} {onHover ? "hover" : ""}"
     on:mouseenter={() => {onHover = true}}

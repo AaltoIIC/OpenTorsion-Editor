@@ -1,8 +1,5 @@
 <script lang="ts">
     import { onMount, type SvelteComponent } from 'svelte';
-    import {
-      SvelteFlowProvider
-    } from '@xyflow/svelte';
     import SystemEditor from "$lib/editor/system-editor/SystemEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
@@ -12,9 +9,10 @@
     import DropdownButton from '$lib/DropdownButton.svelte';
     import NameField from "$lib/NameField.svelte";
     import { notification, currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
-    import type { SystemType } from '$lib/types/types';
     import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
+    import { importSystem } from "$lib/utils";
 
+    let fileInput: HTMLInputElement;
     let JSONEditorComponent: SvelteComponent;
     onMount(() => {
         highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
@@ -82,9 +80,7 @@
         }}
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
-            <SvelteFlowProvider>
-                <SystemEditor />
-            </SvelteFlowProvider>
+            <SystemEditor />
         </div>
         <div class="json-editor"
             bind:this={editorElement}>
@@ -114,6 +110,15 @@
                   </svg>              
                 Back
             </a>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span on:click={() => fileInput.click()}>
+                Import
+            </span>
+            <input type="file" class="hidden"
+                bind:this={fileInput}
+                on:change={importSystem}
+                accept=".json">
             <a href="/analysis">
                 Analysis
             </a>
@@ -143,6 +148,9 @@
 <Notification />
 
 <style>
+    .hidden {
+        display: none;
+    }
     .resize-slider {
         width: 100%;
         height: 6px;
@@ -211,13 +219,14 @@
         height: 20px;
         margin: 0 -2px -5px 0;
     }
-    .top-menu a {
+    .top-menu a, .top-menu span {
         color: rgba(255, 255, 255, 0.9);
         font-size: 14px;
         font-weight: 400;
         text-decoration: none;
         display: inline-block;
         margin: 0 16px;
+        cursor: pointer;
     }
     .top-menu {
         position: absolute;

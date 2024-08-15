@@ -5,6 +5,33 @@ import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
 import { isNameValid } from "$lib/utils";
 
+// Update the currentSystemJSON with the given component being connected
+// to the last component in the structure
+export const addConnectionTolastComponent = (component: ComponentType) => {
+    let currentJSON = get(currentSystemJSON)
+
+    // If there are no components, don't add connection
+    if (currentJSON.components.length === 1) return;
+
+    let componentObj: Record<string, string> = {}
+    currentJSON.structure.forEach((connection: string[]) => {
+        componentObj[connection[0].split(".")[0]] = connection[1].split(".")[0]
+    })
+    let endComponent = currentJSON.components.map(c => c.name).find(cName => !Object.keys(componentObj).includes(cName))
+    if (endComponent) {
+        const endElement = currentJSON.components.find(comp => comp.name === endComponent)?.elements.at(-1)?.name
+        currentJSON.structure.push([`${endComponent}.${endElement}`, `${component.name}.${component.elements[0].name}`])
+        currentSystemJSON.set(currentJSON)
+    } else {
+        notification.set(
+            {
+                message: "Components are connected in a loop.",
+                type: "error",
+                duration: 8000
+            });
+    }
+}
+
 // Update nodes and edges of the System Editor based on currentSystemJSON 
 export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge[]>) => {
     // Go through nodes
@@ -20,10 +47,8 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
             let newNode = {
                 id: comp.name,
                 type: 'component',
-                data: {
-                    name: comp.name,
-                    type: comp.type,
-                },
+                draggable: false,
+                data: comp,
                 position: { x: 0, y: 0 },
                 origin: [0.5, 0.0]
             } as Node
@@ -57,6 +82,38 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
         connection => `${connection[0].split('.')[0]}-${connection[1].split('.')[0]}`
     )
     edges.update(edges => edges.filter(edge => connectionIds.includes(edge.id)))
+
+
+    // Update position of nodes
+    let newNodes = get(nodes)
+
+    const connections = new Map<Node, Node>();
+    get(edges).forEach(edge => {
+        let sourceNode = newNodes.find(node => node.id === edge.source)
+        let targetNode = newNodes.find(node => node.id === edge.target)
+        if (sourceNode && targetNode) connections.set(sourceNode, targetNode)
+    })
+    
+    const values = Array.from(connections.values());
+    let startingComponents: Node[] = newNodes.filter(node => !values.includes(node))
+    
+    let currentY = 0
+    startingComponents.forEach(comp => {
+        let currentX = 0;
+        let currentComp: Node | undefined = comp;
+
+        while (currentComp) {
+            const nextComp = connections.get(currentComp)
+            currentComp.position = { x: currentX, y: currentY }
+            currentComp = nextComp;
+
+            currentX += 280;
+        }
+
+        currentY += 280;
+    })
+
+    nodes.set(newNodes)
 }
 
 const hasDuplicates = (array: any[]) => {
@@ -167,6 +224,14 @@ export const handleJSONEditing = (text: string) => {
                 duration: 3600000
             });
             return
+        } else if (!checkConnections(json.structure)) {
+            notification.set(
+            {
+                message: "Structure defined in JSON is invalid.",
+                type: "error",
+                duration: 3600000
+            });
+            return
         } else {
             newJson.structure = json.structure;
         }
@@ -183,6 +248,39 @@ export const handleJSONEditing = (text: string) => {
             }
         );
     }
+}
+
+// Check if the connections in the structure are valid
+// i.e. if they form a valid path (no loops or multiple connections)
+export const checkConnections = (structure: string[][]) => {
+
+    let connections: Record<string, string> = {}
+    structure.forEach((connection: string[]) => {
+        connections[connection[0].split(".")[0]] = connection[1].split(".")[0]
+    })
+
+    let startingComponents = Object.keys(connections).filter(key => !Object.values(connections).includes(key))
+    startingComponents.forEach((key: string) => {
+        let currentKey = key
+        while (connections[currentKey]) {
+            const nextKey = connections[currentKey]
+            delete connections[currentKey]
+            currentKey = nextKey
+        }
+    })
+    const isLoop = Object.keys(connections).length > 0
+
+    
+    // Check if there are any multiple connections
+    const sources = structure.map(connection => connection[0].split(".")[0])
+    const targets = structure.map(connection => connection[1].split(".")[0])
+    let areMultiples = (new Set(sources)).size !== sources.length || (new Set(targets)).size !== targets.length
+
+    // Check if all components exist in the components array
+    const components = get(currentSystemJSON).components.map(comp => comp.name)
+    const allComponentsExist = sources.every(comp => components.includes(comp)) && targets.every(comp => components.includes(comp))
+
+    return !isLoop && !areMultiples && allComponentsExist
 }
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {

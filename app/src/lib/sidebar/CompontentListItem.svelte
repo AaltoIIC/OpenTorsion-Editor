@@ -10,7 +10,7 @@
         if (!event.dataTransfer) {
         return null;
         }
-        event.dataTransfer.setData('application/svelteflow', data.name);
+        event.dataTransfer.setData('application/svelteflow', JSON.stringify(data));
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -85,6 +85,7 @@
         flex-direction: column;
         justify-content: space-between;
         padding: 8px;
+        flex-grow: 1;
     }
     .component-list-item {
         display: flex;
