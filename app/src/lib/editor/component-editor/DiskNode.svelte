@@ -5,7 +5,10 @@
     
     $$restProps
     
-    export let data: ElementType;
+    export let data: {
+        nodeNo: string;
+        data: ElementType;
+    };
 
     let layoverElement: any;
     let onHover = false;
@@ -19,11 +22,11 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="disk"
         on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}></div>
-    <p>Disk</p>
+    <p>{data.nodeNo}</p>
     <ElementLayover
         bind:this={layoverElement}
         nodeOnHover={onHover}
-        params={data}
+        params={data.data}
         possibleParams={possibleParams.disk} />
 </div>
 <style>
@@ -32,7 +35,7 @@
         width: 20px;
         background-color: var(--main-color);
         background-image: linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
-        margin: 10px 0 0 0;
+        margin: 0;
         border-radius: 1.6px;
         border: solid 1px rgba(0, 0, 0, 0.04);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
@@ -48,6 +51,7 @@
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
         font-family: "Roboto Mono", monospace;
+        margin: 1px 0 0 0;
     }
     .disk-outer {
         position: relative;

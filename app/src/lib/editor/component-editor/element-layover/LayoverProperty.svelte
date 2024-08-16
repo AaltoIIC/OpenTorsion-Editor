@@ -1,22 +1,41 @@
 <script lang="ts">
+    import type { ExcitationType } from "$lib/types/types";
+
     export let isEditing: boolean;
     export let paramName: string;
-    export let paramValue: string | number | undefined;
-    let displayValue: string | number | undefined = paramValue;
+    export let paramValue: string | number | ExcitationType | undefined;
     export let onChange: (key: string, value: any) => void;
     export let required: boolean = false;
 
+    const makeString = (val: string | number | ExcitationType | undefined) => {
+        if (typeof val === 'object') {
+            return JSON.stringify(val);
+        } else {
+            return val?.toString();
+        }
+    }
+
+    let displayValue: string | undefined = makeString(paramValue);
     let isUndef: boolean;
     $: isUndef = typeof paramValue === 'undefined';
     let onHover = false;
 
     const makeDef = () => {
         if (isUndef) {
-            paramValue = 0;
+            if (paramName === "excitation") {
+                paramValue = {
+                    type: "excitationValuesRpmPercentage",
+                    values: [[]]
+                };
+            } else if (paramName === "parent") {
+                paramValue = "Gear 1";
+            } else {
+                paramValue = 0;
+            }
             isUndef = false;
             onChange(paramName, paramValue);
         }
-        displayValue = paramValue;
+        displayValue = makeString(paramValue);
     }
 
     const makeUndef = () => {
@@ -35,10 +54,11 @@
         if (isNormalNumber && Number(newParamValue) > 10000000) {
             newParamValue = toEngineeringNotation(Number(newParamValue));
         }
-        
+
         // remove illegal characters
         const illegalChars = /['"\n]/g;
-        if (illegalChars.test(newParamValue)) {
+        const isObj = newParamValue.startsWith("{") && newParamValue.endsWith("}");
+        if (!isObj && illegalChars.test(newParamValue)) {
             newParamValue = newParamValue.replace(illegalChars, '');
         }
 
@@ -51,7 +71,7 @@
         if (isNormalNumber && Number(paramValue) > 10000000) {
             displayValue = toEngineeringNotation(Number(paramValue));
         } else {
-            displayValue = paramValue;
+            displayValue = makeString(paramValue);
         }
     }
 

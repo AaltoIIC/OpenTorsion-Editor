@@ -15,8 +15,8 @@ CORS(app)
 
 @app.route('/campbell', methods=['POST'])
 def handle_post():
-    data = request.json  # Get the JSON data from the request
-    
+    data = request.json
+    '''try:'''
     assembly = parse(data)
     plot_tools = ot.Plots(assembly)
     figure = plot_campbell(plot_tools,
@@ -28,6 +28,9 @@ def handle_post():
     html = mpld3.fig_to_html(figure)
     
     return Response(html, content_type='text/html')
+    '''except Exception as e:
+        print("/campbell error caught: ", e)
+        return Response(str(e), status=400)'''
 
 if __name__ == '__main__':
     app.run(debug=True)

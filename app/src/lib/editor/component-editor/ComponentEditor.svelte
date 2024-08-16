@@ -18,12 +18,14 @@
     import DiskNode from './DiskNode.svelte';
     import ShaftNode from './ShaftNode.svelte';
     import GearNode from './GearNode.svelte';
+    import GearboxNode from './GearboxNode.svelte';
     const { fitView } = useSvelteFlow();
 
     const nodeTypes = {
       'disk': DiskNode,
       'shaft': ShaftNode,
       'gear': GearNode,
+      'gearbox': GearboxNode,
       'empty': EmptyNode
     } as {} as NodeTypes;   
   

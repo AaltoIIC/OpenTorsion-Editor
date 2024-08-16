@@ -4,11 +4,16 @@ export interface NotificationType {
     duration: number;
 }
 
+export interface ExcitationType {
+    type: string;
+    values: number[][];
+}
+
 interface BaseElementType {
     name: string;
     type: string;
     damping: number;
-    excitation?: number[][];
+    excitation?: ExcitationType;
 }
 
 export interface DiskElementType extends BaseElementType {
@@ -23,6 +28,7 @@ export interface ShaftElementType extends BaseElementType {
 
 export interface GearElementType extends BaseElementType {
     type: "GearElement";
+    parent?: string;
     inertia: number;
     diameter: number;
     teeth?: number;

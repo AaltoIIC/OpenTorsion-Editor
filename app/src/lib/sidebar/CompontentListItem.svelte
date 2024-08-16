@@ -1,6 +1,8 @@
 <script lang="ts">
     import type { ComponentType } from "$lib/types/types";
     import Component3dModel from "$lib/editor/system-editor/Component3dModel.svelte";
+    import { currentSystemJSON } from "$lib/stores";
+    import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
 
     export let src: string = "default-custom.png";
     export let data: ComponentType;
@@ -12,6 +14,21 @@
         }
         event.dataTransfer.setData('application/svelteflow', JSON.stringify(data));
         event.dataTransfer.effectAllowed = 'move';
+    };
+
+    const onAdd = () => {
+        const componentData = { ...data };
+        componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.components);
+
+        // add new component to system JSON
+        currentSystemJSON.update((json) => {
+            const newJson = { ...json };
+            newJson.components.push(componentData);
+            return newJson;
+        });
+
+        // add connection to last component
+        addConnectionTolastComponent(componentData);
     };
 
     let hover = false;
@@ -40,7 +57,8 @@
             <p>{isUnique ? "Custom Component" : "Generic Component"}</p>
         </div>
         <div>
-            <button>Add
+            <button
+                on:click={onAdd}>Add
                 <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>        

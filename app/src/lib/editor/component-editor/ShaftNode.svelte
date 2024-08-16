@@ -5,7 +5,10 @@
    
     $$restProps
 
-    export let data: ElementType;
+    export let data: {
+        nodeNo: string;
+        data: ElementType;
+    };
 
     let layoverElement: any;
     let onHover = false;
@@ -18,11 +21,11 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="shaft"
         on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}></div>
-    <p>Shaft</p>
+    <p>{data.nodeNo}</p>
     <ElementLayover
         bind:this={layoverElement}
         nodeOnHover={onHover}
-        params={data}
+        params={data.data}
         possibleParams={possibleParams.shaft} />
 </div>
 <style>
@@ -40,7 +43,7 @@
                 rgba(0, 0, 0, 0.05) 100%
             )
             ;
-        margin: 42px auto;
+        margin: 33px auto;
         border-top: solid 1px rgba(0, 0, 0, 0.04);
         border-bottom: solid 1px rgba(0, 0, 0, 0.04);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
@@ -56,5 +59,6 @@
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
         font-family: "Roboto Mono", monospace;
+        margin:  2px 0 0 0;
     }
 </style>

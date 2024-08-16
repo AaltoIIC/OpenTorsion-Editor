@@ -81,6 +81,14 @@ export const handleJSONEditing = (text: string) => {
             });
             return false
 
+        } else if (!elementOrderValid(json.elements)) {
+            notification.set(
+            {
+                message: "Element order is invalid. Please check the element order.",
+                type: "info",
+                duration: 3600000
+            });
+            return false
         } else if (json.elements.length === 0) {
             notification.set(
             {
@@ -107,6 +115,28 @@ export const handleJSONEditing = (text: string) => {
         );
         return false
     } 
+}
+
+// function to check if the order of elements in a component is valid
+// (doesn't catch all invalid orders)
+const elementOrderValid = (elements: ElementType[]) => {
+    let valid = true;
+    let prevElemType = "";
+    elements.forEach((el, i) => {
+        if (el.type === "Disk") {
+            if (prevElemType !== "ShaftDiscrete" && prevElemType !== "") {
+                valid = false;
+            }
+        } else if (el.type === "ShaftDiscrete") {
+            if (prevElemType !== "Disk" && prevElemType !== "GearElement") {
+                valid = false;
+            }
+        }
+
+        prevElemType = el.type;
+    });
+
+    return valid;
 }
 
 // edit an element in the list of elements
@@ -194,7 +224,7 @@ export const possibleParams = {
     },
     gear: {
         required: ["name", "type", "damping", "inertia", "diameter"],
-        optional: ["excitation", "teeth"]
+        optional: ["parent", "excitation", "teeth"]
     }
 }
 
@@ -243,22 +273,27 @@ export const renderNodes = (elements: any) => {
             }];
     }
 
-    let currentPosition = 0;
+    let currentX = 0;
+    let currentY = 150;
+    let branches: Record<string, {x: number; y: number;}> = {};
     // loop through elements and create nodes
-    elements.forEach((el: ElementType, index: number) => {    
+    elements.forEach((el: ElementType, index: number) => {   
         if (el.type === "Disk") {
             
             nodes.push({
                 id: `${index + 1}`,
                 type: 'disk',
                 dragHandle: '.none',
-                data: _.pick(el, [
-                    ...possibleParams['disk'].required,
-                    ...possibleParams['disk'].optional
-                ] ),
-                position: { x: currentPosition, y: 150 }
+                data: {
+                    nodeNo: index.toString(),
+                    data: _.pick(el, [
+                        ...possibleParams['disk'].required,
+                        ...possibleParams['disk'].optional
+                    ] )
+                },
+                position: { x: currentX, y: currentY }
             });
-            currentPosition += 21;
+            currentX += 21;
 
         } else if (el.type === "ShaftDiscrete") {
 
@@ -266,27 +301,64 @@ export const renderNodes = (elements: any) => {
                 id: `${index + 1}`,
                 type: 'shaft',
                 dragHandle: '.none',
-                data: _.pick(el, [
-                    ...possibleParams['shaft'].required,
-                    ...possibleParams['shaft'].optional
-                ] ),
-                position: { x: currentPosition, y: 150 }
+                data: {
+                    nodeNo: index.toString(),
+                    data: _.pick(el, [
+                        ...possibleParams['shaft'].required,
+                        ...possibleParams['shaft'].optional
+                    ])
+                },
+                position: { x: currentX, y: currentY }
             });
-            currentPosition += 72;
+            currentX += 72;
 
         } else if (el.type === "GearElement") {
+            // add gear to branches
+            branches[el.name] = {x: currentX, y: currentY};
+
+            // check if the gear has a parent
+            if (el.parent && elements.map((el: ElementType) => el.name).includes(el.parent) &&
+                el.name !== el.parent) {
+                // if gear's parent also has a parent, gear's parent is the parent's parent
+                // TODO: this is a temporary solution, need to find a better way to handle this
+
+                const parentPos = branches[el.parent];
+                console.log(branches);
+                console.log(el.parent);
+                if (!parentPos) {
+                    throw new Error("Gear parent position not found");
+                }
+                currentX = parentPos.x;
+                currentY = parentPos.y + 100;
+
+                branches[el.parent] = {x: parentPos.x, y: currentY};
+
+                // add gearbox node
+                nodes.unshift({
+                    id: `gearbox-${index + 1}`,
+                    type: 'gearbox',
+                    draggable: false,
+                    data: {
+                        height: 2
+                    },
+                    position: { x: parentPos.x, y: parentPos.y }
+                });
+            }
 
             nodes.push({
                 id: `${index + 1}`,
                 type: 'gear',
                 dragHandle: '.none',
-                data: _.pick(el, [
-                    ...possibleParams['gear'].required,
-                    ...possibleParams['gear'].optional
-                ] ),
-                position: { x: currentPosition, y: 150 }
+                data: {
+                    nodeNo: index.toString(),
+                    data: _.pick(el, [
+                        ...possibleParams['gear'].required,
+                        ...possibleParams['gear'].optional
+                    ] )
+                },
+                position: { x: currentX, y: currentY }
             });
-            currentPosition += 21;
+            currentX += 21;
         }
     });
 

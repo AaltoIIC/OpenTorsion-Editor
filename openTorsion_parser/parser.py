@@ -19,7 +19,7 @@ def add_element(element_dict, disk_list, shaft_list, gear_list, i, prev_element=
         # if previous element is a gear as well, make it parent of current one
 
         # gear_length is either radius or number of teeth
-        gear_length = element_dict['teeth'] if 'teeth' in element_dict else element_dict['radius'] 
+        gear_length = element_dict['teeth'] if 'teeth' in element_dict else element_dict['diameter']/2 
 
         if prev_element and isinstance(prev_element, ot.Gear):
             current_elem = ot.Gear(i, I=element_dict['inertia'], R=gear_length, parent=prev_element)
@@ -41,6 +41,10 @@ def add_component(component, disk_list, shaft_list, gear_list, i, prev_element=N
     return (i, prev_element)
 
 def find_component(component_name, components):
+    print("----")
+    print(component_name)
+    print(components)
+    print("----")
     """
     Find component based on name
     """
@@ -58,16 +62,23 @@ def structure_to_dict(structure):
 
 # returns an OpenTorsion assembly object of the system in the JSON file
 def parse(input_data):
-        
+
     # get the list of components
-    structure = structure_to_dict(input_data['structure'])
-    first_component = (set(structure.keys()) - set(structure.values())).pop()
-    list_of_components = [first_component]
-    while True:
-        next_component = structure[list_of_components[-1]]
-        list_of_components.append(next_component)
-        if next_component not in structure.keys():
-            break
+    list_of_components = []
+    if (input_data['structure'] == []):
+        if input_data['components'] != []:
+            list_of_components.append(input_data['components'][0]['name'])
+        else:
+            raise ValueError("No components found in the JSON file")
+    else:
+        structure = structure_to_dict(input_data['structure'])
+        first_component = (set(structure.keys()) - set(structure.values())).pop()
+        list_of_components.append(first_component)
+        while True:
+            next_component = structure[list_of_components[-1]]
+            list_of_components.append(next_component)
+            if next_component not in structure.keys():
+                break
     
     # go through components and add them
     disk_list, shaft_list, gear_list = [], [], []

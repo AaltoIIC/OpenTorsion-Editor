@@ -1,9 +1,17 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores";
+    import type { ElementType } from "$lib/types/types";
     import { defaultElement } from "../editor/component-editor/componentHelpers";
 
+    // Constraints for elements
+    let isActive: { [key: string]: boolean }  = {
+        disk: true,
+        shaft: false,
+        gear: true
+    }
     
     const addEl = (type: string) => {
+        if (!isActive[type]) return;
         currentComponentJSON.update(value => {
             return {
                 ...value,
@@ -14,13 +22,48 @@
     }
 
     const onDragStart = (event: DragEvent, type: string) => {
-        if (!event.dataTransfer) {
+        if (!event.dataTransfer || !isActive[type]) {
         return null;
         }
 
         event.dataTransfer.setData('application/svelteflow', type);
         event.dataTransfer.effectAllowed = 'move';
     };
+
+    const updateConstraints = (elements: ElementType[]) => {
+        if (elements.length === 0) {
+            isActive = {
+                disk: true,
+                shaft: false,
+                gear: true
+            }
+        }
+        
+        const lastElement = elements.at(-1)
+        if (lastElement?.type === "Disk") {
+            isActive = {
+                disk: false,
+                shaft: true,
+                gear: true
+            }
+        } else if (lastElement?.type === "ShaftDiscrete") {
+            isActive = {
+                disk: true,
+                shaft: false,
+                gear: true
+            }
+        } else if (lastElement?.type === "GearElement") {
+            isActive = {
+                disk: false,
+                shaft: true,
+                gear: true
+            }
+        }
+    }
+    currentComponentJSON.subscribe(value => {
+        updateConstraints(value.elements);
+    });
+
 </script>
 <div class="element-cont">
     <div class="element-upper">
@@ -28,7 +71,7 @@
     </div>
     <div class="element-list">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item"
+        <div class="element-list-item {isActive.disk ? '' : 'disabled'}"
             on:dragstart={(e) => onDragStart(e, 'disk')}
             draggable={true}>
             <div class="main-illustration-cont">
@@ -50,7 +93,7 @@
             </div>
         </div>
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item"
+        <div class="element-list-item {isActive.shaft ? '' : 'disabled'}"
             on:dragstart={(e) => onDragStart(e, 'shaft')}
             draggable={true}>
             <div class="main-illustration-cont">
@@ -72,7 +115,7 @@
             </div>
         </div>
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item"
+        <div class="element-list-item {isActive.gear ? '' : 'disabled'}"
             on:dragstart={(e) => onDragStart(e, 'gear')}
             draggable={true}>
             <div class="main-illustration-cont">
@@ -170,7 +213,7 @@
     }
     .element-list-item {
         display: flex;
-        border: solid 1px rgba(0, 0, 0, 0.1);
+        border: solid 1px rgba(0, 0, 0, 0.4);
         width: calc(100% - 12px);
         margin: 5px;
         height: 108px;
@@ -178,11 +221,18 @@
         transition: .2s;
         cursor: grab;
     }
+    .element-list-item.disabled {
+        pointer-events: none;
+        opacity: 0.6;
+        background-color: rgb(244, 244, 244);
+        border: solid 1px rgba(0, 0, 0, 0.1) !important;
+        cursor: auto;
+    }
     .element-list-item:active {
         cursor: grabbing;
     }
     .element-list-item:hover {
-        border: solid 1px rgba(0, 0, 0, 0.4);
+        border: solid 1px rgba(0, 0, 0, 0.8);
     }
     .element-info {
         display: flex;
@@ -205,6 +255,9 @@
     .element-list {
         width: 100%;
         border-top: solid 2px rgba(0, 0, 0, 0.1);
+    }
+    .disabled button {
+        cursor: auto;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

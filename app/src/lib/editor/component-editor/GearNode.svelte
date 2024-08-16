@@ -6,7 +6,10 @@
     $$restProps
 
     let layoverElement: any;
-    export let data: ElementType;
+    export let data: {
+        nodeNo: string;
+        data: ElementType;
+    };
    
     let onHover = false;
 </script>
@@ -22,18 +25,18 @@
         <div class="gear-inner">
         </div>
     </div>
-    <p>Gear</p>
+    <p>{data.nodeNo}</p>
     <ElementLayover
         bind:this={layoverElement}
         nodeOnHover={onHover}
-        params={data}
+        params={data.data}
         possibleParams={possibleParams.gear} />
 </div>
 <style>
     .gear {
         height: 60px;
         width: 20px;
-        margin: 20px auto;
+        margin: 10px auto;
         border-radius: 1.6px;
         border: solid 1px rgba(0, 0, 0, 0.04);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
@@ -61,5 +64,6 @@
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
         font-family: "Roboto Mono", monospace;
+        margin:  2px 0 0 0;
     }
 </style>

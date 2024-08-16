@@ -1,4 +1,9 @@
-import type { ElementType, ComponentType } from "./types";
+import type { ElementType, ComponentType, ExcitationType } from "./types";
+
+export function isExcitationType(obj: any): obj is ExcitationType {
+    return (typeof obj.type === 'string' && Array.isArray(obj.values) &&
+            obj.values.every((v: any) => Array.isArray(v) && v.every((n: any) => typeof n === 'number')));
+}
 
 export function isComponentType(obj: any): obj is ComponentType {
     return (

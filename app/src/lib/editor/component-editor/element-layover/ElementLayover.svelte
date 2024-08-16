@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Portal from "svelte-portal";
-    import type { ElementType } from '$lib/types/types';
+    import type { ElementType, ExcitationType } from '$lib/types/types';
+    import { isExcitationType } from '$lib/types/typeguards';
     import { editElement } from '../componentHelpers';
     import { currentComponentJSON, highlightLinesInEditor } from '../../../stores';
     import { nthLinesInJSON } from '$lib/utils';
@@ -34,6 +35,15 @@
     $: allProperties = {...params, ...undefinedParams};
     const handleParamChange = (key: string, value: any) => {
         const isValidNumber = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value);
+        
+        // try to convert to list if it's a list
+        const isObjectStr = typeof value === 'string' && value.startsWith("{") && value.endsWith("}");
+        try {
+            let parsedValue = isObjectStr ? JSON.parse(value) : value;
+            if (isExcitationType(parsedValue)) {
+                value = parsedValue as ExcitationType;
+            }
+        } catch (e) {}
 
         allProperties = {...allProperties, [key]: isValidNumber ? Number(value) : value};
     }
@@ -68,7 +78,6 @@
         span.textContent = allProperties.name;
         nameField.style.width = `${span.offsetWidth}px`;
     }
-    
 
     // handle layover behavior (position, visibility, etc.)
     let onHover = false;
@@ -79,6 +88,7 @@
     export let nodeOnHover = false;
     export const nodeClick = () =>{
         isEditing = true;
+        setNameFieldWidth();
         
         // highligt JSON corresponding to the element in the JSON editor
         if (highlightLinesInEditor) {
@@ -199,8 +209,11 @@
         visibility: hidden;
         white-space: pre;
         position: absolute;
-        font-size: 14px;
+        font-size: 13.5px;
         font-family: 'Inter', sans-serif;  
+        font-weight: 550;
+        padding: 1px;
+        width: fit-content;
     }
     .name-cont.editing svg {
         display: block;
@@ -240,6 +253,7 @@
         font-family: 'Inter', sans-serif;
         font-weight: 550;
         max-width: 16ch;
+        width: 16ch; 
     }
     .name-cont.editing .main-name-field {
         border-bottom: solid 2px rgba(0, 0, 0, 0.1);
