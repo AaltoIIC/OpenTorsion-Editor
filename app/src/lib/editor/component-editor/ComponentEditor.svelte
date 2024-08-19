@@ -67,21 +67,29 @@
         return null;
       }
 
-      let data = event.dataTransfer.getData('application/svelteflow');
-      currentComponentJSON.update(value => {
+      const dataStr = event.dataTransfer.getData('application/svelteflow');
+      let data;
+      try {
+        data = JSON.parse(dataStr) as {event: string, element: string};
+      } catch (e) {
+        return null;
+      }
+      if (data.event === 'addNew') {
+        currentComponentJSON.update(value => {
           return {
               ...value,
-              elements: [...value.elements, defaultElement((value.elements ? value.elements : []), data)]
+              elements: [...value.elements, defaultElement((value.elements ? value.elements : []), data.element)]
           }
       });
+      }
     };
 
+//on:dragover={onDragOver} on:drop={onDrop} 
 </script>
 <SvelteFlow
   nodes={nodes}
   edges={edges}
-  nodeTypes={nodeTypes}
-  on:dragover={onDragOver} on:drop={onDrop}
+  nodeTypes={nodeTypes} 
   fitView
 >
   <Controls />

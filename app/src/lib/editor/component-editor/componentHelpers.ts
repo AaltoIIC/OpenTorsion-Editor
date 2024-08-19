@@ -1,4 +1,4 @@
-import type { ElementType, ComponentType } from '$lib/types/types';
+import type { ElementType, ComponentType, GearElementType } from '$lib/types/types';
 import { currentComponentJSON, notification, customComponents } from '$lib/stores';
 import { isNameValid, isNameUnique } from '$lib/utils';
 import { get } from 'svelte/store';
@@ -273,9 +273,19 @@ export const renderNodes = (elements: any) => {
             }];
     }
 
+    
     let currentX = 0;
     let currentY = 150;
-    let branches: Record<string, {x: number; y: number;}> = {};
+    type Junction = {
+        x: number,
+        startY: number,
+        endY: number,
+        count: number
+    }
+    let branches = new Map<string, Junction>();
+
+    // OpenTorsion node number
+    let nodeNo = 0;
     // loop through elements and create nodes
     elements.forEach((el: ElementType, index: number) => {   
         if (el.type === "Disk") {
@@ -285,7 +295,7 @@ export const renderNodes = (elements: any) => {
                 type: 'disk',
                 dragHandle: '.none',
                 data: {
-                    nodeNo: index.toString(),
+                    nodeNo: nodeNo.toString(),
                     data: _.pick(el, [
                         ...possibleParams['disk'].required,
                         ...possibleParams['disk'].optional
@@ -294,6 +304,7 @@ export const renderNodes = (elements: any) => {
                 position: { x: currentX, y: currentY }
             });
             currentX += 21;
+            nodeNo += 1;
 
         } else if (el.type === "ShaftDiscrete") {
 
@@ -302,7 +313,7 @@ export const renderNodes = (elements: any) => {
                 type: 'shaft',
                 dragHandle: '.none',
                 data: {
-                    nodeNo: index.toString(),
+                    nodeNo: `${nodeNo - 1}-${nodeNo}`,
                     data: _.pick(el, [
                         ...possibleParams['shaft'].required,
                         ...possibleParams['shaft'].optional
@@ -313,36 +324,19 @@ export const renderNodes = (elements: any) => {
             currentX += 72;
 
         } else if (el.type === "GearElement") {
-            // add gear to branches
-            branches[el.name] = {x: currentX, y: currentY};
-
             // check if the gear has a parent
-            if (el.parent && elements.map((el: ElementType) => el.name).includes(el.parent) &&
-                el.name !== el.parent) {
-                // if gear's parent also has a parent, gear's parent is the parent's parent
-                // TODO: this is a temporary solution, need to find a better way to handle this
+            if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
+                // add element to branches with shared value across all gears with the same parent
+                branches.set(el.name, branches.get(el.parent) as Junction);
 
-                const parentPos = branches[el.parent];
-                console.log(branches);
-                console.log(el.parent);
-                if (!parentPos) {
-                    throw new Error("Gear parent position not found");
-                }
-                currentX = parentPos.x;
-                currentY = parentPos.y + 100;
-
-                branches[el.parent] = {x: parentPos.x, y: currentY};
-
-                // add gearbox node
-                nodes.unshift({
-                    id: `gearbox-${index + 1}`,
-                    type: 'gearbox',
-                    draggable: false,
-                    data: {
-                        height: 2
-                    },
-                    position: { x: parentPos.x, y: parentPos.y }
-                });
+                // update the endY of the parent gear
+                currentY += 100;
+                (branches.get(el.name) as Junction).endY = currentY;
+                (branches.get(el.name) as Junction).count = (branches.get(el.name) as Junction).count+1;
+                currentX = (branches.get(el.parent) as Junction).x;
+            } else {
+                // add element to branches with its own position
+                branches.set(el.name, {x: currentX, startY: currentY, endY: currentY, count: 1});
             }
 
             nodes.push({
@@ -350,7 +344,7 @@ export const renderNodes = (elements: any) => {
                 type: 'gear',
                 dragHandle: '.none',
                 data: {
-                    nodeNo: index.toString(),
+                    nodeNo: nodeNo.toString(),
                     data: _.pick(el, [
                         ...possibleParams['gear'].required,
                         ...possibleParams['gear'].optional
@@ -358,9 +352,30 @@ export const renderNodes = (elements: any) => {
                 },
                 position: { x: currentX, y: currentY }
             });
+
             currentX += 21;
+            nodeNo += 1;
         }
     });
+
+    // add gearboxes
+    let gearboxes: any[] = [];
+    const uniqueBranches = new Set(branches.values());
+    uniqueBranches.forEach(value => {
+        if (value.count > 1) {
+            gearboxes.push({
+                id: `gearbox-${value.x}`,
+                type: 'gearbox',
+                draggable: false,
+                data: {
+                    height: value.endY - value.startY,
+                    count: value.count
+                },
+                position: { x: value.x, y: value.startY }
+            });
+        }
+    });
+    nodes.unshift(...gearboxes);
 
     return nodes;
 }

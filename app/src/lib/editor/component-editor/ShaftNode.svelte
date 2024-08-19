@@ -2,6 +2,7 @@
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
     import { possibleParams } from './componentHelpers';
+    import DragAndDropHandle from './DragAndDropHandle.svelte';
    
     $$restProps
 
@@ -12,6 +13,16 @@
 
     let layoverElement: any;
     let onHover = false;
+
+    const onDragStart = (event: DragEvent) => {
+        if (!event.dataTransfer) {
+        return null;
+        }
+
+        let message = {event: 'addExisting', element: data.data.name};
+        event.dataTransfer.setData('application/svelteflow', JSON.stringify(message));
+        event.dataTransfer.effectAllowed = 'move';
+    };
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -20,13 +31,16 @@
     on:mouseleave={() => onHover = false}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="shaft"
-        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}></div>
+        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}
+        on:dragstart={onDragStart}
+        draggable={true}></div>
     <p>{data.nodeNo}</p>
     <ElementLayover
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data.data}
         possibleParams={possibleParams.shaft} />
+    <DragAndDropHandle elementName={data.data.name} />
 </div>
 <style>
     .shaft {

@@ -2,6 +2,7 @@
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
     import { possibleParams } from './componentHelpers';
+    import DragAndDropHandle from './DragAndDropHandle.svelte';
    
     $$restProps
 
@@ -10,8 +11,18 @@
         nodeNo: string;
         data: ElementType;
     };
-   
     let onHover = false;
+
+    
+    const onDragStart = (event: DragEvent) => {
+        if (!event.dataTransfer) {
+        return null;
+        }
+
+        let message = {event: 'addExisting', element: data.data.name};
+        event.dataTransfer.setData('application/svelteflow', JSON.stringify(message));
+        event.dataTransfer.effectAllowed = 'move';
+    };
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -21,7 +32,9 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="gear"
-        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}>
+        on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}
+        on:dragstart={onDragStart}
+        draggable={true}>
         <div class="gear-inner">
         </div>
     </div>
@@ -31,6 +44,7 @@
         nodeOnHover={onHover}
         params={data.data}
         possibleParams={possibleParams.gear} />
+    <DragAndDropHandle elementName={data.data.name} />
 </div>
 <style>
     .gear {
