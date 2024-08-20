@@ -101,6 +101,7 @@
     </span>
     <span class="param-val-outer">
         <input type="text"
+            name={paramName}
             on:input={handleChange}
             on:focus={() => {inFocus = true}}
             on:focusout={() => {inFocus = false}}

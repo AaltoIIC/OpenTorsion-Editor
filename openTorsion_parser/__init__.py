@@ -1,1 +1,1 @@
-# openTorsion_parser/__init__.py
+# OpenTorsion_parser/__init__.py

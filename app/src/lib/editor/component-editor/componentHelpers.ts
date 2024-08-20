@@ -81,10 +81,10 @@ export const handleJSONEditing = (text: string) => {
             });
             return false
 
-        } else if (!elementOrderValid(json.elements)) {
+        } else if (!elementOrderValid(json.elements).valid) {
             notification.set(
             {
-                message: "Element order is invalid. Please check the element order.",
+                message: elementOrderValid(json.elements).message,
                 type: "info",
                 duration: 3600000
             });
@@ -117,26 +117,39 @@ export const handleJSONEditing = (text: string) => {
     } 
 }
 
+export const checkElementOrder = (elements: ElementType[]) => {
+    let isValid = elementOrderValid(elements);
+    if (!isValid.valid) {
+        notification.set(
+            {
+                message: isValid.message,
+                type: "info",
+                duration: 3600000
+            });
+        return false
+    } else {
+        return true
+    }
+}
+
 // function to check if the order of elements in a component is valid
 // (doesn't catch all invalid orders)
 const elementOrderValid = (elements: ElementType[]) => {
     let valid = true;
+    let message = "";
     let prevElemType = "";
-    elements.forEach((el, i) => {
-        if (el.type === "Disk") {
-            if (prevElemType !== "ShaftDiscrete" && prevElemType !== "") {
-                valid = false;
-            }
-        } else if (el.type === "ShaftDiscrete") {
-            if (prevElemType !== "Disk" && prevElemType !== "GearElement") {
-                valid = false;
-            }
-        }
+    
+    // component can't start or end with a shaft
+    if (elements.at(0)?.type === "ShaftDiscrete" ||
+        elements.at(-1)?.type === "ShaftDiscrete") {
+            valid = false;
+        message = "Component can't start or end with a shaft."
+    }
 
-        prevElemType = el.type;
-    });
-
-    return valid;
+    return {
+        valid: valid,
+        message: message
+    };
 }
 
 // edit an element in the list of elements
@@ -304,7 +317,6 @@ export const renderNodes = (elements: any) => {
                 position: { x: currentX, y: currentY }
             });
             currentX += 21;
-            nodeNo += 1;
 
         } else if (el.type === "ShaftDiscrete") {
 
@@ -313,7 +325,7 @@ export const renderNodes = (elements: any) => {
                 type: 'shaft',
                 dragHandle: '.none',
                 data: {
-                    nodeNo: `${nodeNo - 1}-${nodeNo}`,
+                    nodeNo: `${nodeNo}-${nodeNo+1}`,
                     data: _.pick(el, [
                         ...possibleParams['shaft'].required,
                         ...possibleParams['shaft'].optional
@@ -323,9 +335,14 @@ export const renderNodes = (elements: any) => {
             });
             currentX += 72;
 
+            if (elements[index + 1] && elements[index + 1].type !== "ShaftDiscrete") {
+                nodeNo += 1;
+            }
         } else if (el.type === "GearElement") {
             // check if the gear has a parent
             if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
+                nodeNo += 1;
+
                 // add element to branches with shared value across all gears with the same parent
                 branches.set(el.name, branches.get(el.parent) as Junction);
 
@@ -354,7 +371,6 @@ export const renderNodes = (elements: any) => {
             });
 
             currentX += 21;
-            nodeNo += 1;
         }
     });
 
@@ -375,7 +391,9 @@ export const renderNodes = (elements: any) => {
             });
         }
     });
-    nodes.unshift(...gearboxes);
 
-    return nodes;
+    // nodes are added in reverse order so elements that come earlier are on top
+    nodes.push(...gearboxes);
+
+    return nodes.reverse();
 }

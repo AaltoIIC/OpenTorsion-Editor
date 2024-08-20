@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt, mpld3
 
 # Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from openTorsion_parser.parser import parse
+from OpenTorsion_parser.parser import parse
 
 app = Flask(__name__)
 CORS(app)

@@ -26,6 +26,7 @@
     {text}:
     <input
         class="input"
+        name="DDT-name"
         type="text"
         bind:value={value}
         bind:this={inputElement}

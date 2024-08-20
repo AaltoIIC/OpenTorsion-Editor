@@ -116,6 +116,7 @@
                 Import
             </span>
             <input type="file" class="hidden"
+                name="file"
                 bind:this={fileInput}
                 on:change={importSystem}
                 accept=".json">

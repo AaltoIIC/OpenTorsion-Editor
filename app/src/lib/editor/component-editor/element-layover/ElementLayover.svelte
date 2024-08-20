@@ -83,9 +83,11 @@
     let onHover = false;
     let isOpen = false;
     let isEditing = false;
-    $: isOpen = isEditing || nodeOnHover || onHover;
-
+    let x = 0;
+    let y = 0;
     export let nodeOnHover = false;
+    $: isOpen = (x !== 0) && (isEditing || nodeOnHover || onHover);
+
     export const nodeClick = () =>{
         isEditing = true;
         setNameFieldWidth();
@@ -96,10 +98,9 @@
             $highlightLinesInEditor(startIndex, endIndex);
         }
     }
-    let x = 0;
-    let y = 0;
+
     const handleMouseMove = (event: any) => {
-        if (!isOpen || isEditing) return;
+        if (isEditing) return;
         x = event.clientX;
         y = event.clientY;
     };
@@ -143,6 +144,7 @@
     onMount(() => {
         window.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('pointerdown', handleClickOutside);
+        document.addEventListener('dragstart', closeLayover);
         document.addEventListener('keydown', handleKeydown);
 
         const flowEditor = document.querySelector('.svelte-flow__pane');
@@ -153,6 +155,7 @@
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('pointerdown', handleClickOutside);
+            document.removeEventListener('dragstart', closeLayover);
             document.removeEventListener('keydown', handleKeydown);
             flowEditor?.removeEventListener('wheel', closeLayover);
         };
@@ -168,6 +171,7 @@
         <div class="name-cont {isEditing ? 'editing' : ''}">
             <input
                 type="text"
+                name="element-name"
                 value={allProperties.name}
                 on:input={handleNameChange}
                 bind:this={nameField}

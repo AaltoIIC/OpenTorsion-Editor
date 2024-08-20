@@ -156,6 +156,7 @@
                             <span>Element Name:</span>
                             <input
                                 type="text"
+                                name="element-name"
                                 value={allProperties.name}
                                 on:input={handleNameChange}
                                 bind:this={nameField}

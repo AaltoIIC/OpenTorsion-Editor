@@ -58,7 +58,7 @@
       // get component data and give it a unique name
       const componentData = JSON.parse(event.dataTransfer.getData('application/svelteflow')) as ComponentType;
       componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.components);
-
+      
       // add new component to system JSON
       currentSystemJSON.update((json) => {
         const newJson = { ...json };

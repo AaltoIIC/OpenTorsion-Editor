@@ -1,30 +1,24 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores";
-    import type { ElementType } from "$lib/types/types";
-    import { defaultElement } from "./componentHelpers";
+    import { onMount, onDestroy } from "svelte";
+    import { defaultElement, checkElementOrder } from "./componentHelpers";
 
     export let elementName: string;
 
     let leftActive = false;
-    let rightActive = false;
-    let elementIndex = 0;
+    let rightActive = true;
     currentComponentJSON.subscribe(value => {
-        const elementsLength = value.elements.length
-        elementIndex = value.elements
-                                .findIndex((element) => element.name === elementName);
-        leftActive = !(elementIndex === 0);
-        rightActive = elementIndex === elementsLength - 1;
+        leftActive = value.elements[0].name === elementName;
     });
 
     let hoverLeft = false;
     let hoverRight = false;
     let isDragging = false;
 
-    // ennek eleve kene tudni a node positiont
-
     let cancelHover: any;
     const handleDragOver = (event: DragEvent, side: string) => {
         event.preventDefault();
+        event.stopPropagation();
 
         if (event.dataTransfer) {
             event.dataTransfer.dropEffect = 'move';
@@ -45,7 +39,9 @@
     }
 
     const handleDrop = (event: DragEvent, side: string) => {
+
       event.preventDefault();
+      event.stopPropagation();
       if (!event.dataTransfer) {
         return null;
       }
@@ -62,7 +58,6 @@
       currentComponentJSON.update(value => {
         let newElem;
         let newElements = value.elements;
-        let newElemIndex = side === "left" ? elementIndex : elementIndex + 1;
 
         if (data.event === 'addNew') {
             newElem = defaultElement((value.elements ? value.elements : []), data.element);
@@ -71,23 +66,43 @@
             newElements = newElements.filter((element) => element.name !== data.element);
         }
 
+        let elementIndex = newElements.findIndex((element) => element.name === elementName);
+        if (side === 'right') {
+            elementIndex = elementIndex + 1;
+        }
+
         if (!newElem) {
             console.error('Element not found');
             return value;
         }
 
-        newElements.splice(newElemIndex, 0, newElem)
+        newElements.splice(elementIndex, 0, newElem)
         return {
             ...value,
             elements: newElements
         }
-    });
+      });
+      checkElementOrder($currentComponentJSON.elements);
     };
 
 
-    // make drag handle visible when dragging
-    document.addEventListener('dragstart', () => isDragging = true);
-    document.addEventListener('dragend', () => isDragging = false);
+    let cancelDrag: any;
+    const handleDrag = () => {
+        clearTimeout(cancelDrag);
+        isDragging = true;
+        cancelDrag = setTimeout(() => {
+            isDragging = false;
+        }, 100);
+    }
+
+    onMount(() => {
+        // make drag handle visible when dragging
+        document.addEventListener('drag', handleDrag);
+    });
+    onDestroy(() => {
+        // clean up event listeners
+        document.removeEventListener('drag', handleDrag);
+    });
 </script>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if leftActive}
@@ -97,7 +112,7 @@
         >
         <svg class="icon-add" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>      
+        </svg>
     </div>
 {/if}
 {#if rightActive}
@@ -107,7 +122,7 @@
         on:drop={e => handleDrop(e, 'right')}>
         <svg class="icon-add" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg> 
+        </svg>
     </div>
 {/if}
 <style>

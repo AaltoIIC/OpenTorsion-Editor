@@ -15,6 +15,7 @@
     <p>Import DDT</p>
 </div>
 <input type="file" class="file-input"
+    name="DDT-file"
     bind:this={fileInput}
     on:change={importSystem}
     accept=".json"/>

@@ -18,6 +18,7 @@
         if (!event.dataTransfer) {
         return null;
         }
+        onHover = false;
 
         let message = {event: 'addExisting', element: data.data.name};
         event.dataTransfer.setData('application/svelteflow', JSON.stringify(message));

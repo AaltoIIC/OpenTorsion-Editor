@@ -2,16 +2,8 @@
     import { currentComponentJSON } from "$lib/stores";
     import type { ElementType } from "$lib/types/types";
     import { defaultElement } from "../editor/component-editor/componentHelpers";
-
-    // Constraints for elements
-    let isActive: { [key: string]: boolean }  = {
-        disk: true,
-        shaft: false,
-        gear: true
-    }
     
     const addEl = (type: string) => {
-        if (!isActive[type]) return;
         currentComponentJSON.update(value => {
             return {
                 ...value,
@@ -22,7 +14,7 @@
     }
 
     const onDragStart = (event: DragEvent, type: string) => {
-        if (!event.dataTransfer || !isActive[type]) {
+        if (!event.dataTransfer) {
             return null;
         }
 
@@ -30,41 +22,6 @@
         event.dataTransfer.setData('application/svelteflow', JSON.stringify(data));
         event.dataTransfer.effectAllowed = 'move';
     };
-
-    const updateConstraints = (elements: ElementType[]) => {
-        if (elements.length === 0) {
-            isActive = {
-                disk: true,
-                shaft: false,
-                gear: true
-            }
-        }
-        
-        const lastElement = elements.at(-1)
-        if (lastElement?.type === "Disk") {
-            isActive = {
-                disk: false,
-                shaft: true,
-                gear: true
-            }
-        } else if (lastElement?.type === "ShaftDiscrete") {
-            isActive = {
-                disk: true,
-                shaft: false,
-                gear: true
-            }
-        } else if (lastElement?.type === "GearElement") {
-            isActive = {
-                disk: false,
-                shaft: true,
-                gear: true
-            }
-        }
-    }
-    currentComponentJSON.subscribe(value => {
-        updateConstraints(value.elements);
-    });
-
 </script>
 <div class="element-cont">
     <div class="element-upper">
@@ -72,9 +29,10 @@
     </div>
     <div class="element-list">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item {isActive.disk ? '' : 'disabled'}"
+        <div class="element-list-item"
             on:dragstart={(e) => onDragStart(e, 'disk')}
-            draggable={true}>
+            draggable={true}
+            on:dragover={(e) => {e.preventDefault()}} on:drop={(e) => {e.preventDefault()}}>
             <div class="main-illustration-cont">
                 <div class="disk">
                 </div>
@@ -85,18 +43,20 @@
                     <p>Parameters: name, damping, excitation, inertia</p>
                 </div>
                 <div>
-                    <button on:click={() => addEl('disk')}>Add to Component
+                    <button on:click={() => addEl('disk')}>
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
-                        </svg>                                                          
+                        </svg>                             
+                        Add to Component                             
                     </button>
                 </div>
             </div>
         </div>
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item {isActive.shaft ? '' : 'disabled'}"
+        <div class="element-list-item"
             on:dragstart={(e) => onDragStart(e, 'shaft')}
-            draggable={true}>
+            draggable={true}
+            on:dragover={(e) => {e.preventDefault()}} on:drop={(e) => {e.preventDefault()}}>
             <div class="main-illustration-cont">
                 <div class="shaft">
                 </div>
@@ -107,18 +67,20 @@
                     <p>Parameters: name, damping, excitation, stiffness</p>
                 </div>
                 <div>
-                    <button on:click={() => addEl('shaft')}>Add to Component
+                    <button on:click={() => addEl('shaft')}>
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
-                        </svg>                                      
+                        </svg>                              
+                        Add to Component        
                     </button>
                 </div>
             </div>
         </div>
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="element-list-item {isActive.gear ? '' : 'disabled'}"
+        <div class="element-list-item"
             on:dragstart={(e) => onDragStart(e, 'gear')}
-            draggable={true}>
+            draggable={true}
+            on:dragover={(e) => {e.preventDefault()}} on:drop={(e) => {e.preventDefault()}}>
             <div class="main-illustration-cont">
                 <div class="gear">
                 </div>
@@ -129,10 +91,11 @@
                     <p>Parameters: name, damping, excitation, inertia, diameter, teeth</p>
                 </div>
                 <div>
-                    <button on:click={() => addEl('gear')}>Add to Component
+                    <button on:click={() => addEl('gear')}>
                         <svg class="icon-add-to-component" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
                         </svg>                       
+                        Add to Component
                     </button>
                 </div>
             </div>
@@ -222,13 +185,6 @@
         transition: .2s;
         cursor: grab;
     }
-    .element-list-item.disabled {
-        pointer-events: none;
-        opacity: 0.6;
-        background-color: rgb(244, 244, 244);
-        border: solid 1px rgba(0, 0, 0, 0.1) !important;
-        cursor: auto;
-    }
     .element-list-item:active {
         cursor: grabbing;
     }
@@ -256,9 +212,6 @@
     .element-list {
         width: 100%;
         border-top: solid 2px rgba(0, 0, 0, 0.1);
-    }
-    .disabled button {
-        cursor: auto;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

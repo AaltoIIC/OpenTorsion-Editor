@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { currentComponentJSON } from '../../stores';
-    import { renderNodes, defaultElement } from './componentHelpers';
+    import { renderNodes, defaultElement, checkElementOrder } from './componentHelpers';
     import {
       SvelteFlow,
       Controls,
@@ -43,7 +43,7 @@
 
     currentComponentJSON.subscribe(value => {
       if (!value.elements) {
-        alert('Malformed JSON');
+        console.error('Malformed JSON');
       } else {
         nodes.set(renderNodes(value.elements));
         setTimeout(() => {
@@ -80,16 +80,17 @@
               ...value,
               elements: [...value.elements, defaultElement((value.elements ? value.elements : []), data.element)]
           }
-      });
+        });
+        checkElementOrder($currentComponentJSON.elements);
       }
     };
 
-//on:dragover={onDragOver} on:drop={onDrop} 
 </script>
 <SvelteFlow
   nodes={nodes}
   edges={edges}
-  nodeTypes={nodeTypes} 
+  nodeTypes={nodeTypes}
+  on:dragover={onDragOver} on:drop={onDrop} 
   fitView
 >
   <Controls />
