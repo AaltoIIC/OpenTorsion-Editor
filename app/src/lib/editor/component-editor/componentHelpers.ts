@@ -5,7 +5,7 @@ import { get } from 'svelte/store';
 import { isElementType } from '$lib/types/typeguards';
 import _ from 'lodash';
 
-export const handleNameChange = (name: string) => {
+export const handleNameChange = (name: string, checkUniqueness: boolean = true) => {
     if (name === undefined) {
         notification.set(
         {
@@ -30,7 +30,7 @@ export const handleNameChange = (name: string) => {
             duration: 3600000
         });
         return false
-    } else if (!isNameUnique(name, get(customComponents))) {
+    } else if (checkUniqueness && !isNameUnique(name, get(customComponents))) {
         notification.set(
         {
             message: "Component name has to be unique.",
@@ -45,12 +45,12 @@ export const handleNameChange = (name: string) => {
     }
 }
 
-export const handleJSONEditing = (text: string) => {
+export const handleJSONEditing = (text: string, checkNameUniqueness: boolean = true) => {
     try {
         const json = JSON.parse(text);
         
         // Check name and set if it is valid
-        if (!handleNameChange(json.name)) {
+        if (!handleNameChange(json.name, checkNameUniqueness)) {
             return false
         }
 
@@ -212,7 +212,7 @@ export const nameComponentDesign = (components: ComponentType[]) => {
 }
 
 // function to automatically give a unique name to a new element
-const nameElement = (type: string, elements: ElementType[]) => {
+export const nameElement = (type: string, elements: ElementType[]) => {
     const typeToName: { [key: string]: string } = {
         "Disk": "Disk",
         "ShaftDiscrete": "Shaft",

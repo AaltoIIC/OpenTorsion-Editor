@@ -1,9 +1,26 @@
-import { currentSystemJSON, notification } from "./stores";
+import { currentSystemJSON, customComponents, notification } from "./stores";
 import { goto } from "$app/navigation";
 import type { ElementType, ComponentType, SystemType } from "./types/types";
+import { isAlmostComponentType, isAlmostSystemType } from "./types/typeguards";
+import { nameElement } from "./editor/component-editor/componentHelpers";
 import _ from 'lodash';
 
-// Function to import a JSON file into the system editor
+
+export const exportJSON = (json: any) => {
+    const jsonString = JSON.stringify(json, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = json.name + '.json';
+    document.body.appendChild(a);
+    a.click();
+
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+// function to import a JSON file into the system editor
 // to be used as an event handler for an input element
 export const importSystem = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -14,8 +31,18 @@ export const importSystem = (event: Event) => {
         reader.onload = (e) => {
             try {
                 const newJSON = JSON.parse(e.target?.result as string);
-                currentSystemJSON.set(newJSON);
-                goto("/system-editor");
+                if (isAlmostSystemType(newJSON)) {
+                    currentSystemJSON.set(makeSystem(newJSON));
+                    goto("/system-editor");
+                } else if (isAlmostComponentType(newJSON)) {
+                    notification.set({
+                        message: "Imported JSON file is a component. Please import a system JSON file.",
+                        type: "error",
+                        duration: 3000
+                    });
+                } else {
+                    throw new Error();
+                }
             } catch (error) {
                 notification.set({
                     message: "Imported JSON file is invalid. Please check the file and try again.",
@@ -28,7 +55,72 @@ export const importSystem = (event: Event) => {
     }
 }
 
-// Finds the line numbers where an object with a specific key-value pair is located in a JSON string
+// function to import a component from a json file to the list of components
+// to be used as an event handler for an input element
+export const importComponent = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const newJSON = JSON.parse(e.target?.result as string);
+                if (isAlmostComponentType(newJSON)) {
+                    customComponents.update(value => {
+                        return [...value, makeComponent(newJSON)]
+                    });   
+                } else if (isAlmostSystemType(newJSON)) {
+                    notification.set({
+                        message: "Imported JSON file is a system. Please import a component JSON file.",
+                        type: "error",
+                        duration: 3000
+                    });
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                notification.set({
+                    message: "Imported JSON file is invalid. Please check the file and try again.",
+                    type: "error",
+                    duration: 3000
+                });
+            }
+        };
+        reader.readAsText(file);
+    }  
+}
+
+export const makeSystem = (partialSystem: any): SystemType => {
+    let newSystem = { ...partialSystem };
+    newSystem.components = newSystem.components.map((component: any) => {
+        return makeComponent(component);
+    });
+    return newSystem as SystemType;
+}
+
+const makeComponent = (partialComponent: any): ComponentType => {
+    let newComponent = { ...partialComponent };
+    newComponent.elements = partialComponent.elements.map((element: any) => {
+         return makeElement(element, newComponent.elements);
+    });
+    return newComponent as ComponentType;
+}
+
+// Takes an element without name or damping and
+// returns a new element with a unique name and damping = 0
+const makeElement = (partialElement: any, elements: ElementType[]): ElementType => {
+    let newElement = { ...partialElement };
+    if (!newElement.name) {
+        newElement.name = nameElement(newElement.type, elements);
+    }
+    if (!newElement.damping) {
+        newElement.damping = 0;
+    }
+    return newElement as ElementType;
+}
+
+// finds the line numbers where an object with a specific key-value pair is located in a JSON string
 export const nthLinesInJSON = (jsonObj: any, topKey: string, searchKey: string, searchValue: string) => {
     const json: any = { ...jsonObj};
             

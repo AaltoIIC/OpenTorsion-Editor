@@ -1,6 +1,8 @@
 {
 	"/": [],
 	"/analysis": [],
-	"/component-editor": [],
+	"/component-editor/[[componentName]]": [
+		"src/routes/component-editor/[[componentName]]/+page.ts"
+	],
 	"/system-editor": []
 }

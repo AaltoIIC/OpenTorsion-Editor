@@ -1,10 +1,14 @@
 <div class="main-sidebar">
-    <a data-sveltekit-preload-data="hover" href="/">
-        <img class="main-logo" src="./logo.svg" alt="Co-Des logo">
+    <a class="main-logo-link" data-sveltekit-preload-data="hover" href="/">
+        <img class="main-logo" src="../logo.svg" alt="Co-Des logo">
     </a>
     <slot></slot>
 </div>
 <style>
+    .main-logo-link {
+        display: block;
+        width: fit-content;
+    }
     .main-logo {
         width: 114px;
         height: auto;

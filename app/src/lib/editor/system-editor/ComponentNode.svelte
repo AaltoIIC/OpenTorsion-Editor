@@ -4,7 +4,7 @@
     import type { ComponentType } from '$lib/types/types';
     import { nthLinesInJSON } from '$lib/utils';
     import { onMount } from 'svelte';
-    import Component3dModel from './Component3dModel.svelte';
+    import Component3dModel from '../../Component3dModel.svelte';
 
     // NodeProps used by Svelte Flow
     $$restProps

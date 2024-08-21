@@ -7,9 +7,9 @@
 
     let leftActive = false;
     let rightActive = true;
-    currentComponentJSON.subscribe(value => {
-        leftActive = value.elements[0].name === elementName;
-    });
+    $: if ($currentComponentJSON.elements && $currentComponentJSON.elements.length > 0) {
+        leftActive = $currentComponentJSON.elements[0].name === elementName;
+    }
 
     let hoverLeft = false;
     let hoverRight = false;

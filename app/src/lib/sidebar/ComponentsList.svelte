@@ -1,29 +1,47 @@
 <script lang="ts">
     import type { ComponentType } from "$lib/types/types";
-    import Button from "$lib/Button.svelte";
+    import DropdownButton from "$lib/DropdownButton.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
     import { customComponents } from "$lib/stores";
+    import { importComponent } from "$lib/utils";
+    import { goto } from "$app/navigation";
 
     const toComponentType = (json: any) => json as ComponentType;
+    let componentInput: HTMLInputElement;
+
+    const handleNewComponent = (option: string) => {
+        if (option === 'Create New') {
+            goto('/component-editor')
+        } else if (option === 'Import New') {
+            componentInput.click()
+        }
+    }
 </script>
 
 <div class="component-cont">
     <div class="component-upper">
         <h3>Components:</h3>
-        <a href="/component-editor">
-            <Button
+            <DropdownButton
                 isActive={true}
-                lightMode={true}>
+                lightMode={true}
+                icon='<svg class="icon-create" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'
+                options={['Create New','Import New']}
+                optionIcons={[
+                    '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>',
+                    '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>'
+                ]}
+                onClick={handleNewComponent}>
                 New Component
-                <svg class="icon-create" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>                             
-            </Button>
-        </a>
+            </DropdownButton>
+            <input type="file" class="hidden"
+                name="component-file"
+                bind:this={componentInput}
+                on:change={importComponent}
+                accept=".json">
     </div>
     <div class="component-list">
-        {#each [ ...$customComponents].reverse() as component}
+        {#each [ ...$customComponents].reverse() as component (component.name)}
             <ComponentListItem data={component} isUnique={true} />
         {/each}
         {#each basicComponents as component}
@@ -32,6 +50,9 @@
     </div>
 </div>
 <style>
+    .hidden {
+        display: none;
+    }
     .component-upper h3 {
         font-size: 16px;
     }
@@ -43,16 +64,8 @@
         vertical-align: middle;
         margin-top: 25px;
     }
-    .icon-create {
-        width: 18px;
-        height: 18px;
-        margin: 0 0 -4.7px 0;
-        stroke: rgba(255, 255, 255, 0.9);
-        stroke-width: 2px;
-        stroke-linejoin: round;
-    }
     .component-list {
-        width: 100%;
+        width: 360px;
         height: calc(100vh - 150px);
         overflow-y: scroll;
         border-top: solid 2px rgba(0, 0, 0, 0.1);
