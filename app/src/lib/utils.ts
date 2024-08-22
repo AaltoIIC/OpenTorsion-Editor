@@ -1,10 +1,10 @@
 import { currentSystemJSON, customComponents, notification } from "./stores";
 import { goto } from "$app/navigation";
+import { get } from "svelte/store";
 import type { ElementType, ComponentType, SystemType } from "./types/types";
 import { isAlmostComponentType, isAlmostSystemType } from "./types/typeguards";
 import { nameElement } from "./editor/component-editor/componentHelpers";
 import _ from 'lodash';
-
 
 export const exportJSON = (json: any) => {
     const jsonString = JSON.stringify(json, null, 2);
@@ -67,6 +67,16 @@ export const importComponent = (event: Event) => {
             try {
                 const newJSON = JSON.parse(e.target?.result as string);
                 if (isAlmostComponentType(newJSON)) {
+                    // rename the component if it has the same name as an existing component
+                    const componentNames = get(customComponents).map(c => c.name)
+                    if (componentNames.includes(newJSON.name)) {
+                        let i = 2;
+                        while (componentNames.includes(newJSON.name + ` (${i})`)) {
+                            i++;
+                        }
+                        newJSON.name = newJSON.name + ` (${i})`;
+                    }
+
                     customComponents.update(value => {
                         return [...value, makeComponent(newJSON)]
                     });   
@@ -155,7 +165,11 @@ export const isNameValid = (name: string) => {
     )
 }
 
-export const isNameUnique = (name: string, items: ElementType[] | ComponentType[] | SystemType[]) => {
+export const isNameUnique = (name: string,
+    items: ElementType[] | ComponentType[] | SystemType[],
+    originalName: string = '') => {
     const cleanedName = name.toUpperCase().replaceAll(" ", "");
-    return !items.map(item => item.name.toUpperCase().replaceAll(" ", "")).includes(cleanedName);
+    return (!items.filter(item => item.name !== originalName)
+        .map(item => item.name.toUpperCase().replaceAll(" ", ""))
+        .includes(cleanedName));
 }

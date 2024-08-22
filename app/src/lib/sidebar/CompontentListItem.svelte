@@ -3,7 +3,7 @@
     import { goto } from "$app/navigation";
     import type { ComponentType } from "$lib/types/types";
     import Component3dModel from "$lib/Component3dModel.svelte";
-    import { currentSystemJSON, currentComponentJSON, customComponents } from "$lib/stores";
+    import { currentSystemJSON, customComponents } from "$lib/stores";
     import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import DialogBox from "$lib/DialogBox.svelte";
@@ -71,7 +71,7 @@
     {#if isUnique}
         <Component3dModel data={data} hoverable={false} />
     {:else}
-        <img src={`./components/${src}`} alt={data.name} />
+        <img src={`../components/${src}`} alt={data.name} />
     {/if}
     </div>
     <div class="component-info">

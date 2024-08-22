@@ -7,9 +7,14 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
-    import { currentComponentJSON, customComponents, notification, highlightLinesInEditor } from '$lib/stores';
+    import {
+        currentSystemJSON,
+        currentComponentJSON,
+        customComponents,
+        notification,
+        highlightLinesInEditor
+    } from '$lib/stores';
     import { goto } from '$app/navigation';
-    import Notification from '$lib/Notification.svelte';
     import Button from '$lib/Button.svelte';
     import DropdownButton from '$lib/DropdownButton.svelte';
     import { exportJSON } from '$lib/utils';
@@ -24,25 +29,36 @@
     let componentEditor: any;
     let isNameError = false;
     let isError = false;
-    let componentName = nameComponentDesign($customComponents);
+    let componentName: string;
     let JSONEditorComponent: SvelteComponent;
     onMount(() => {
         highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
-        isError = !handleJSONEditing(JSONEditorText, isNewComponent)
+        isError = !handleJSONEditing(JSONEditorText, data.componentName ? data.componentName : '');
     });
 
     export let data;
     let isNewComponent = true;
+
     // initialize the current component JSON
     // if url contained a component name, set the current component JSON to that component
     if (data.componentName) {
-        $customComponents.forEach((component) => {
-            if (component.name === data.componentName) {
-                isNewComponent = false;
-                currentComponentJSON.set(component);
-            }
-        });
+        if ($customComponents.map(component => component.name).includes(data.componentName)) {
+            isNewComponent = false;
+            componentName = data.componentName;
+            $customComponents.forEach((component) => {
+                if (component.name === data.componentName) {
+                    currentComponentJSON.set(component);
+                }
+            });
+        } else {
+            // component with name in url does not exist
+            onMount(() => {
+                notification.set(null);
+                goto('/');
+            });
+        }
     } else {
+        componentName = nameComponentDesign($customComponents);
         currentComponentJSON.set({
             name: componentName,
             elements: []
@@ -59,19 +75,29 @@
     });
 
     const saveComponent = () => {
-        customComponents.update(value => {
-            return [
-                ...value,
-                $currentComponentJSON
-            ]
-        });
+        if (isNewComponent) {
+            customComponents.update(value => {
+                return [
+                    ...value,
+                    $currentComponentJSON
+                ]
+            });
+        } else {
+            customComponents.update(value => {
+                return [
+                    ...value.filter(component => component.name !== data.componentName),
+                    $currentComponentJSON
+                ]
+            });
+        }
+
 
         notification.set({
             message: "Component saved succesfully.",
             type: "success",
             duration: 3000
         });
-        goto('/system-editor');
+        goto(`/system-editor/${$currentSystemJSON.name}`);
     }
     
     let editorElement: HTMLElement;
@@ -117,12 +143,12 @@
             <JSONEditor
                 bind:this={JSONEditorComponent}
                 bind:textContent={JSONEditorText}
-                onInput={(text) => {isError = !handleJSONEditing(text, isNewComponent)}} />
+                onInput={(text) => {isError = !handleJSONEditing(text, data.componentName ? data.componentName : '')}} />
         </div>
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href="/system-editor" on:click={() => {notification.set(null)}}>
+            <a href={`/system-editor/${$currentSystemJSON.name}`} on:click={() => {notification.set(null)}}>
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
@@ -132,7 +158,7 @@
         <NameField text="Component"
                 isError={isNameError} 
                 bind:value={componentName}
-                onInput={text => {isNameError = !handleNameChange(text, isNewComponent)}} />
+                onInput={text => {isNameError = !handleNameChange(text, data.componentName ? data.componentName : '')}} />
         <div class="buttons">
             <DropdownButton
                 isActive={!isError}
@@ -155,7 +181,6 @@
         <ElementsList />
     </Sidebar>
 </div>
-<Notification />
 
 <style>
     /* Resizing JSON editor */

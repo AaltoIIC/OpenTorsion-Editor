@@ -3,7 +3,7 @@
     import DropdownButton from "$lib/DropdownButton.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
-    import { customComponents } from "$lib/stores";
+    import { customComponents, currentSystemJSON } from "$lib/stores";
     import { importComponent } from "$lib/utils";
     import { goto } from "$app/navigation";
 

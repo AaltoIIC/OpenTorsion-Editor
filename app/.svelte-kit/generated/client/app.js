@@ -15,7 +15,7 @@ export const dictionary = {
 		"/": [2],
 		"/analysis": [3],
 		"/component-editor/[[componentName]]": [4],
-		"/system-editor": [5]
+		"/system-editor/[[systemName]]": [5]
 	};
 
 export const hooks = {

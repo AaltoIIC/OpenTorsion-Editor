@@ -4,13 +4,22 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
-    import Notification from "$lib/Notification.svelte";
     import Button from "$lib/Button.svelte";
     import DropdownButton from '$lib/DropdownButton.svelte';
     import NameField from "$lib/NameField.svelte";
-    import { notification, currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
-    import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
+    import DialogBox from '$lib/DialogBox.svelte';
+    import { notification, currentSystemJSON, highlightLinesInEditor, systemNames, customComponents } from '$lib/stores';
+    import {
+        handleJSONEditing,
+        nameSystem,
+        loadCustomComponents,
+        removeSystem
+    } from '$lib/editor/system-editor/systemHelpers';
     import { importSystem, exportJSON } from "$lib/utils";
+    import type { SystemType } from '$lib/types/types';
+    import { isSystemType } from '$lib/types/typeguards.js';
+    import { goto } from '$app/navigation';
+    import { browser } from '$app/environment';
 
     let fileInput: HTMLInputElement;
     let JSONEditorComponent: SvelteComponent;
@@ -18,13 +27,78 @@
         highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
     });
 
-    let systemName = "New System";
+    // Initialize editor
+    let isNewSystem = true;
+    let systemName: string;
+    export let data;
+    if (data.systemName) {
+        if ($systemNames.includes(data.systemName)) {
+            systemName = data.systemName;
+            isNewSystem = false;
+            loadCustomComponents(systemName);
+            let system: SystemType;
+            try {
+                const retrievedSys = JSON.parse(localStorage.getItem(`system.${systemName}`) || '');
+                if (isSystemType(retrievedSys)) {
+                    system = retrievedSys as SystemType;
+                } else {
+                    throw new Error('Invalid system type');
+                }
+            } catch (error) {
+                console.error(error);
+                system = {
+                    name: systemName,
+                    date: new Date().toISOString(),
+                    components: [],
+                    structure: []
+                } as SystemType;
+            }
+            currentSystemJSON.set(system);
+        } else {
+            // If system does not exist, redirect to home
+            onMount(() => {
+                window.location.href = '/';
+            });
+        }
+
+    } else {
+        systemName = nameSystem($systemNames)
+        customComponents.set([]);
+        currentSystemJSON.set({
+            name: systemName,
+            date: new Date().toISOString(),
+            components: [],
+            structure: []
+        } as SystemType);
+    }
+
+    let systemAdded = !isNewSystem;
+    const autoSave = () => {
+        if (!browser || $currentSystemJSON.components.length === 0) return;
+        if (systemAdded) {
+            systemNames.update((systemsNames: string[]) => {
+                const index = systemsNames.findIndex((name: any) => name === data.systemName);
+                systemsNames[index] = $currentSystemJSON.name;
+                return systemsNames;
+            });
+            localStorage.removeItem(`system.${data.systemName}`);
+            localStorage.setItem(`system.${$currentSystemJSON.name}`,
+                JSON.stringify($currentSystemJSON));
+        } else {
+            systemNames.update((systemsNames: string[]) => {
+                systemsNames.push($currentSystemJSON.name);
+                return systemsNames;
+            });
+            localStorage.setItem(`system.${$currentSystemJSON.name}`, JSON.stringify($currentSystemJSON));
+            systemAdded = true;
+        }
+    }
     
     let JSONEditorText = '';
-    currentSystemJSON.subscribe((value) => {
-        notification.set(null);
+    currentSystemJSON.subscribe((value) => {``
         JSONEditorText = JSON.stringify(value, null, 2);
         systemName = value.name;
+        autoSave();
     });
 
     // resize editor
@@ -46,6 +120,36 @@
             return json;
         });
         systemName = text;
+    }
+
+    let dialogBox: DialogBox;
+    const handleBack = () => {
+        if (!isNewSystem) {
+            goto('/');
+            return;
+        } else if ($currentSystemJSON.components.length === 0) {
+            removeSystem(systemName);
+            goto('/');
+            return;
+        } else {
+            dialogBox.openDialog(`Do you want to save ${systemName}?`,
+                "Yes", "No").then((result: Boolean) => {
+                if (!result) {
+                    removeSystem(systemName);
+                }
+                goto('/');
+            });
+        }
+    }
+
+    const handleSave = () => {
+        notification.set({
+            message: "System saved successfully!",
+            type: "success",
+            duration: 3000
+        });
+
+        goto('/');
     }
 
 </script>
@@ -90,12 +194,14 @@
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href="/">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span on:click={handleBack}>
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
                 Back
-            </a>
+            </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <span on:click={() => fileInput.click()}>
@@ -123,7 +229,8 @@
             </DropdownButton>
             <Button
                 isActive={true}
-                icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
+                icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}
+                onClick={handleSave}>
                 Save
             </Button>
         </div>
@@ -132,8 +239,7 @@
         <ComponentsList />
     </Sidebar>
 </div>
-<Notification />
-
+<DialogBox bind:this={dialogBox} />
 <style>
     .hidden {
         display: none;

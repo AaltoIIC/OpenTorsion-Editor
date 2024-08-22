@@ -9,8 +9,8 @@
 <div class="main-tile"
     on:click={() => fileInput.click()}>
     <svg class="import-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-    </svg>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+    </svg>      
             
     <p>Import DDT</p>
 </div>
@@ -26,8 +26,8 @@
     .main-tile {
         width: 175px;
         height: 250px;
-        border: 2px solid rgba(0, 0, 0, 0.1);
-        background-color: var(--main-color-tr);
+        border: 1px solid var(--main-color);
+        background-color: white;
         transition: .2s;
         cursor: pointer;
         display: flex;
@@ -46,12 +46,10 @@
         text-decoration: none;
     }
     .import-icon {
-        width: 45px;
-        height: 45px;
+        width: 42px;
+        height: 42px;
         padding: 15px;
         color: var(--main-color);
-        background-color: var(--main-color-tr-2);
-        border-radius: 50%;
     }
     p {
         font-family: "Inter", sans-serif;

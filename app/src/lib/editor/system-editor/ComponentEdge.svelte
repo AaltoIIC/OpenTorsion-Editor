@@ -11,7 +11,6 @@
     type $$Props = EdgeProps;
     $$restProps
   
-    export let id: $$Props['id'];
     export let source:  $$Props['source'];
     export let target:  $$Props['target'];
     export let sourceX: $$Props['sourceX'];

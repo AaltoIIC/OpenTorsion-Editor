@@ -1,6 +1,8 @@
 <script>
-    import NewDDTTile from "$lib/dashboard/NewDDTTile.svelte";
-    import ImportDdtTile from "$lib/dashboard/ImportDDTTile.svelte";
+    import NewSystemTile from "$lib/dashboard/NewSystemTile.svelte";
+    import ImportSystemTile from "$lib/dashboard/ImportSystemTile.svelte";
+    import SystemTile from "$lib/dashboard/SystemTile.svelte";
+    import { systemNames } from "$lib/stores";
 </script>
 <svelte:head>
     <title>Dashboard | Co-Des Interface</title>
@@ -9,8 +11,11 @@
 <div class="main-page-area">
     <h2>Your Digital Design Templates:</h2>
     <div class="ddt-cont">
-        <NewDDTTile />
-        <ImportDdtTile />
+        {#each $systemNames.reverse() as systemName}
+            <SystemTile systemName={systemName} />
+        {/each}
+        <NewSystemTile />
+        <ImportSystemTile />
     </div>
 </div>
 
@@ -31,5 +36,6 @@
     .ddt-cont {
         display: flex;
         justify-content: start;
+        flex-wrap: wrap;
     }
 </style>

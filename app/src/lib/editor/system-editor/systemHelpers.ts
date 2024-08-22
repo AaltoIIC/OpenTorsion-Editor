@@ -1,9 +1,10 @@
 import type { ComponentType } from "$lib/types/types"
-import { currentSystemJSON, notification } from '$lib/stores';
+import { currentSystemJSON, notification, customComponents, systemNames } from '$lib/stores';
 import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
 import { isNameValid } from "$lib/utils";
+import { browser } from "$app/environment";
 
 // Update the currentSystemJSON with the given component being connected
 // to the last component in the structure
@@ -292,4 +293,44 @@ export const nameComponentInstance = (componentType: string, components: Compone
     const largestNum = components.filter(comp => regex.test(comp.name)).map(compToNum).sort().at(-1)
 
     return `${componentType} ${largestNum ? largestNum + 1 : 1}`;
+}
+
+// function to automatically give a unique name to a new system
+export const nameSystem = (systemNames: string[]) => {
+    let largestNum = 0;
+
+    // check if there is a component with the name "New System"
+    if (systemNames.includes('New System')) {
+        largestNum = 1;
+    }
+
+    // check if there are components with the name "New System (n)"
+    const regex = new RegExp(/^New System \(\d+\)$/);
+    if (systemNames.filter(name => regex.test(name)).length > 0) {
+        largestNum = (systemNames.filter(name => regex.test(name))
+                    .map(name => parseInt(name.split(" (")[1].replace(')',''))).sort().at(-1) as number)
+    }
+    
+    return `New System${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
+}
+
+export const loadCustomComponents = (systemName: string) => {
+    let customComps: ComponentType[] = [];
+    try {
+        const customComponentsJSON = localStorage.getItem(`custom-components.${systemName}`);
+        if (customComponentsJSON) {
+            customComps = JSON.parse(customComponentsJSON);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    customComponents.set(customComps)
+}
+
+export const removeSystem = (systemName: string) => {
+    if (!browser) return;
+    localStorage.removeItem(`system.${systemName}`);
+    systemNames.update((names) => {
+        return names.filter((name) => name !== systemName);
+    });
 }

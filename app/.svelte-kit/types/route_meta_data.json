@@ -4,5 +4,7 @@
 	"/component-editor/[[componentName]]": [
 		"src/routes/component-editor/[[componentName]]/+page.ts"
 	],
-	"/system-editor": []
+	"/system-editor/[[systemName]]": [
+		"src/routes/system-editor/[[systemName]]/+page.ts"
+	]
 }

@@ -11,8 +11,8 @@
     .main-tile {
         width: 175px;
         height: 250px;
-        border: 2px solid rgba(0, 0, 0, 0.1);
-        background-color: var(--main-color-tr);
+        border: 1px solid var(--main-color);
+        background-color: white;
         transition: .2s;
         cursor: pointer;
         display: flex;
@@ -20,6 +20,8 @@
         justify-content: center;
         align-items: center;
         box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
+        margin: 0 0 15px 15px;
+        box-sizing: border-box;
     }
     .main-tile:hover {
         border: 2px solid var(--main-color);
@@ -30,11 +32,9 @@
         text-decoration: none;
     }
     .add-icon {
-        width: 75px;
-        height: 75px;
+        width: 52px;
+        height: 52px;
         color: var(--main-color);
-        background-color: var(--main-color-tr-2);
-        border-radius: 50%;
     }
     p {
         font-family: "Inter", sans-serif;
