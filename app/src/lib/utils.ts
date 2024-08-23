@@ -1,4 +1,10 @@
-import { currentSystemJSON, customComponents, notification } from "./stores";
+import {
+    createSystem,
+    customComponents,
+    notification,
+    createComponent,
+    currentSystemJSON
+} from "./stores/stores";
 import { goto } from "$app/navigation";
 import { get } from "svelte/store";
 import type { ElementType, ComponentType, SystemType } from "./types/types";
@@ -32,8 +38,8 @@ export const importSystem = (event: Event) => {
             try {
                 const newJSON = JSON.parse(e.target?.result as string);
                 if (isAlmostSystemType(newJSON)) {
-                    currentSystemJSON.set(makeSystem(newJSON));
-                    goto("/system-editor");
+                    let [id, sys] = createSystem(makeSystem(newJSON));
+                    goto(`/system-editor/${id}`);
                 } else if (isAlmostComponentType(newJSON)) {
                     notification.set({
                         message: "Imported JSON file is a component. Please import a system JSON file.",
@@ -68,7 +74,9 @@ export const importComponent = (event: Event) => {
                 const newJSON = JSON.parse(e.target?.result as string);
                 if (isAlmostComponentType(newJSON)) {
                     // rename the component if it has the same name as an existing component
-                    const componentNames = get(customComponents).map(c => c.name)
+                    const componentNames = Object.entries(get(customComponents))
+                                            .filter(([id, _]) => id.startsWith(`${get(currentSystemJSON).id}-`))
+                                            .map(([key, val]) => val.name)
                     if (componentNames.includes(newJSON.name)) {
                         let i = 2;
                         while (componentNames.includes(newJSON.name + ` (${i})`)) {
@@ -77,9 +85,7 @@ export const importComponent = (event: Event) => {
                         newJSON.name = newJSON.name + ` (${i})`;
                     }
 
-                    customComponents.update(value => {
-                        return [...value, makeComponent(newJSON)]
-                    });   
+                    createComponent(makeComponent(newJSON));                    
                 } else if (isAlmostSystemType(newJSON)) {
                     notification.set({
                         message: "Imported JSON file is a system. Please import a component JSON file.",

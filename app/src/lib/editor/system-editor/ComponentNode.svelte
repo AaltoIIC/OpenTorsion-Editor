@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Handle, Position, } from '@xyflow/svelte';
-    import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores';
+    import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
     import { nthLinesInJSON } from '$lib/utils';
     import { onMount } from 'svelte';
@@ -19,8 +19,8 @@
     const remove = () => {
         currentSystemJSON.update((json) => {
             const newJson = { ...json };
-            newJson.components = newJson.components.filter((component) => component.name !== id);
-            newJson.structure = newJson.structure.filter(
+            newJson.json.components = newJson.json.components.filter((component) => component.name !== id);
+            newJson.json.structure = newJson.json.structure.filter(
                 (connection) => !connection.some(elem => elem.startsWith(id))
             );
             return newJson;
@@ -32,7 +32,7 @@
 
         // Highlight lines in JSON editor corresponding to this component
         if (highlightLinesInEditor) {
-            let [startIndex, endIndex] = nthLinesInJSON($currentSystemJSON, 'components', 'name', id);
+            let [startIndex, endIndex] = nthLinesInJSON($currentSystemJSON.json, 'components', 'name', id);
             $highlightLinesInEditor(startIndex, endIndex);
         }
     }
@@ -130,8 +130,10 @@
         width: 200px;
         height: 200px;
         background-color: rgba(255, 255, 255, 0.6);
-        border: 2px solid rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(8px) brightness(0.8);
+        border: 3px solid rgba(0, 0, 0, 0.075);
+        backdrop-filter: blur(8px) brightness(0.9);
+        border-radius: var(--main-border-radius);
+        overflow: hidden;
     }
     .hover .img-cont {
         background-color: rgba(255, 255, 255, 0.5);

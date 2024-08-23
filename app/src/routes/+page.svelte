@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
     import NewSystemTile from "$lib/dashboard/NewSystemTile.svelte";
     import ImportSystemTile from "$lib/dashboard/ImportSystemTile.svelte";
     import SystemTile from "$lib/dashboard/SystemTile.svelte";
-    import { systemNames } from "$lib/stores";
+    import { systems } from "$lib/stores/stores";
+
 </script>
 <svelte:head>
     <title>Dashboard | Co-Des Interface</title>
@@ -11,8 +12,8 @@
 <div class="main-page-area">
     <h2>Your Digital Design Templates:</h2>
     <div class="ddt-cont">
-        {#each $systemNames.reverse() as systemName}
-            <SystemTile systemName={systemName} />
+        {#each Object.entries($systems) as [id, system]}
+            <SystemTile id={id} system={system} />
         {/each}
         <NewSystemTile />
         <ImportSystemTile />

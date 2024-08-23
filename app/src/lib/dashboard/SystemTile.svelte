@@ -2,36 +2,50 @@
     import { goto } from "$app/navigation";
     import type { SystemType } from "$lib/types/types";
     import DialogBox from "$lib/DialogBox.svelte";
-    import { systemNames } from "$lib/stores";
+    import { createSystem, removeSystem } from "$lib/stores/stores";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
-    import { removeSystem } from "$lib/editor/system-editor/systemHelpers";
 
-    export let systemName: string;
+    export let id: string;
+    export let system: SystemType;
     let dialogBox: DialogBox;
+
+    const formatDate = (isoString: string) => {
+        const date = new Date(isoString);
+        
+        const pad = (num: number) => num.toString().padStart(2, '0');
+        const day = pad(date.getDate());
+        const month = pad(date.getMonth() + 1);
+        const year = date.getFullYear();
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+
+        return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
 
     const handleMenu = (option: string) => {
         if (option === "Duplicate") {
-            let system: SystemType = JSON.parse(localStorage.getItem(`system.${systemName}`) || '');
-            let copyName = `Copy of ${systemName}`;
-            localStorage.setItem(`system.${copyName}`, JSON.stringify(system));
-            systemNames.update((names) => {
-                return [...names, copyName];
-            });
+            let copy = { ...system,
+                name: `Copy of ${system.name}`,
+                date: new Date().toISOString() };
+            createSystem(copy);
         } else if (option === "Edit") {
-            goto(`/system-editor/${systemName}`);
+            goto(`/system-editor/${id}`);
         } else if (option === "Delete") {
-            dialogBox.openDialog(`Are you sure you want to delete ${systemName}?`,
+            dialogBox.openDialog(`Are you sure you want to delete ${system.name}?`,
                 "Yes", "No").then((result: Boolean) => {
                 if (result) {
-                    removeSystem(systemName);
+                    removeSystem(id);
                 }
             });
         }
     }
 </script>
-<div class="tile">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="tile"
+    on:click={() => {goto(`/system-editor/${id}`)}}>
     <div class="system-name-cont">
-        <h4>{systemName}</h4>
+        <h4>{system.name}</h4>
         <DropdownMenu
             options={["Duplicate", "Edit", "Delete"]}
             optionIcons={[
@@ -41,20 +55,30 @@
             onClick={handleMenu}
         />
     </div>
+    <span>
+        {formatDate(system.date)}
+    </span>
+    <span>
+        {id}
+    </span>
 </div>
 <DialogBox bind:this={dialogBox} />
 <style>
+    span {
+        font-size: 14px;
+    }
     .tile {
         width: 175px;
         height: 250px;
         background-color: white;
-        border: solid 1px var(--main-color);
+        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
         margin: 0 0 15px 15px;
-        padding: 10px;
+        padding: 14px;
         box-sizing: border-box;
         color: rgba(0, 0, 0, 0.9);
         cursor: pointer;
+        border-radius: var(--main-border-radius);
     }
     .tile:hover {
         border: 2px solid var(--main-color);

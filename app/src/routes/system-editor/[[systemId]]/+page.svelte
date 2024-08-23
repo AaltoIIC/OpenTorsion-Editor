@@ -8,18 +8,19 @@
     import DropdownButton from '$lib/DropdownButton.svelte';
     import NameField from "$lib/NameField.svelte";
     import DialogBox from '$lib/DialogBox.svelte';
-    import { notification, currentSystemJSON, highlightLinesInEditor, systemNames, customComponents } from '$lib/stores';
     import {
-        handleJSONEditing,
-        nameSystem,
-        loadCustomComponents,
-        removeSystem
-    } from '$lib/editor/system-editor/systemHelpers';
+        notification,
+        currentSystemJSON,
+        highlightLinesInEditor,
+        systems,
+        removeSystem,
+        saveSystem,
+        createSystem
+    } from '$lib/stores/stores';
+    import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
     import { importSystem, exportJSON } from "$lib/utils";
     import type { SystemType } from '$lib/types/types';
-    import { isSystemType } from '$lib/types/typeguards.js';
     import { goto } from '$app/navigation';
-    import { browser } from '$app/environment';
 
     let fileInput: HTMLInputElement;
     let JSONEditorComponent: SvelteComponent;
@@ -31,29 +32,13 @@
     let isNewSystem = true;
     let systemName: string;
     export let data;
-    if (data.systemName) {
-        if ($systemNames.includes(data.systemName)) {
-            systemName = data.systemName;
+    if (data.systemId) {
+        if ($systems[data.systemId]) {
             isNewSystem = false;
-            loadCustomComponents(systemName);
-            let system: SystemType;
-            try {
-                const retrievedSys = JSON.parse(localStorage.getItem(`system.${systemName}`) || '');
-                if (isSystemType(retrievedSys)) {
-                    system = retrievedSys as SystemType;
-                } else {
-                    throw new Error('Invalid system type');
-                }
-            } catch (error) {
-                console.error(error);
-                system = {
-                    name: systemName,
-                    date: new Date().toISOString(),
-                    components: [],
-                    structure: []
-                } as SystemType;
-            }
-            currentSystemJSON.set(system);
+            currentSystemJSON.set({
+                id: data.systemId,
+                json: $systems[data.systemId]
+            });
         } else {
             // If system does not exist, redirect to home
             onMount(() => {
@@ -62,43 +47,16 @@
         }
 
     } else {
-        systemName = nameSystem($systemNames)
-        customComponents.set([]);
-        currentSystemJSON.set({
-            name: systemName,
-            date: new Date().toISOString(),
-            components: [],
-            structure: []
-        } as SystemType);
-    }
-
-    let systemAdded = !isNewSystem;
-    const autoSave = () => {
-        if (!browser || $currentSystemJSON.components.length === 0) return;
-        if (systemAdded) {
-            systemNames.update((systemsNames: string[]) => {
-                const index = systemsNames.findIndex((name: any) => name === data.systemName);
-                systemsNames[index] = $currentSystemJSON.name;
-                return systemsNames;
-            });
-            localStorage.removeItem(`system.${data.systemName}`);
-            localStorage.setItem(`system.${$currentSystemJSON.name}`,
-                JSON.stringify($currentSystemJSON));
-        } else {
-            systemNames.update((systemsNames: string[]) => {
-                systemsNames.push($currentSystemJSON.name);
-                return systemsNames;
-            });
-            localStorage.setItem(`system.${$currentSystemJSON.name}`, JSON.stringify($currentSystemJSON));
-            systemAdded = true;
-        }
+        let newSystem: SystemType;
+        [data.systemId, newSystem] = createSystem();
+        systemName = newSystem.name;
+        currentSystemJSON.set({id: data.systemId, json: newSystem});
     }
     
     let JSONEditorText = '';
-    currentSystemJSON.subscribe((value) => {``
-        JSONEditorText = JSON.stringify(value, null, 2);
-        systemName = value.name;
-        autoSave();
+    currentSystemJSON.subscribe((value) => {
+        JSONEditorText = JSON.stringify(value.json, null, 2);
+        systemName = value.json.name;
     });
 
     // resize editor
@@ -115,9 +73,9 @@
     }
 
     const handleNameChange = (text: string) => {
-        currentSystemJSON.update((json) => {
-            json.name = text;
-            return json;
+        currentSystemJSON.update((value) => {
+            value.json.name = text;
+            return value;
         });
         systemName = text;
     }
@@ -127,15 +85,15 @@
         if (!isNewSystem) {
             goto('/');
             return;
-        } else if ($currentSystemJSON.components.length === 0) {
-            removeSystem(systemName);
+        } else if ($currentSystemJSON.json.components.length === 0) {
+            removeSystem($currentSystemJSON.id);
             goto('/');
             return;
         } else {
             dialogBox.openDialog(`Do you want to save ${systemName}?`,
                 "Yes", "No").then((result: Boolean) => {
                 if (!result) {
-                    removeSystem(systemName);
+                    removeSystem($currentSystemJSON.id);
                 }
                 goto('/');
             });
@@ -143,6 +101,8 @@
     }
 
     const handleSave = () => {
+        saveSystem($currentSystemJSON.id, $currentSystemJSON.json);
+
         notification.set({
             message: "System saved successfully!",
             type: "success",
@@ -280,7 +240,7 @@
         padding: 8px 14px 11px 16px;
         font-family: 'Inter', sans-serif;
         font-weight: 550;
-        border-radius: 50px;
+        border-radius: var(--main-border-radius);
     }
     .analyze-button:hover {
         border: solid 2px rgba(255, 255, 255, 0.6);

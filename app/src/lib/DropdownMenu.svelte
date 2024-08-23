@@ -23,14 +23,14 @@
     on:mouseleave={() => {onHover = false}}>
 <button
     class="btn"
-    on:click={() => {isDropdownOpen = !isDropdownOpen}}>
+    on:click={(e) => {e.stopPropagation(); isDropdownOpen = !isDropdownOpen}}>
         <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
         </svg>
 </button>
 <div class="main-dropdown">
     {#each options as option, index}
-        <button on:click={() => {onClick(option); isDropdownOpen = false;}}>
+        <button on:click={(e) => {e.stopPropagation(); onClick(option); isDropdownOpen = false;}}>
             {#if optionIcons.length > index}
                 <span class="option-icon">
                     {@html optionIcons[index]}
@@ -93,12 +93,13 @@
         width: fit-content;
         padding: 0;
         background-color: white;
-        border: solid 1px var(--main-color);
+        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         transition: opacity 0.2s;
         visibility: hidden;
         z-index: 10000002;
         opacity: 0;
+        border-radius: var(--main-border-radius);
     }
     .open .main-dropdown {
         visibility: visible;

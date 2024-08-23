@@ -11,7 +11,8 @@
     .main-tile {
         width: 175px;
         height: 250px;
-        border: 1px solid var(--main-color);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: var(--main-border-radius);
         background-color: white;
         transition: .2s;
         cursor: pointer;

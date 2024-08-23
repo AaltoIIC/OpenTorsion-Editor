@@ -8,7 +8,7 @@
 <button
     on:click={onClick}
     class="btn"
-    style={`${lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''} ${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}>
+    style={`${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}>
     {#if icon}
         <span class="main-icon">
                 {@html icon} 
@@ -40,14 +40,14 @@
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color);
         padding: 10px 12px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 50px;
         cursor: pointer;
         transition: .2s;
         overflow: hidden;
         font-family: 'Inter', sans-serif;
+        border-radius: 0.5em;
+        border: none;
     }
     button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        filter: brightness(1.05);
     }
 </style>

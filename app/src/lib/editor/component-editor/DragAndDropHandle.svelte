@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentComponentJSON } from "$lib/stores";
+    import { currentComponentJSON } from "$lib/stores/stores";
     import { onMount, onDestroy } from "svelte";
     import { defaultElement, checkElementOrder } from "./componentHelpers";
 
@@ -7,8 +7,8 @@
 
     let leftActive = false;
     let rightActive = true;
-    $: if ($currentComponentJSON.elements && $currentComponentJSON.elements.length > 0) {
-        leftActive = $currentComponentJSON.elements[0].name === elementName;
+    $: if ($currentComponentJSON.json.elements && $currentComponentJSON.json.elements.length > 0) {
+        leftActive = $currentComponentJSON.json.elements[0].name === elementName;
     }
 
     let hoverLeft = false;
@@ -57,10 +57,10 @@
       // add new element to the component to the left or right of the current element
       currentComponentJSON.update(value => {
         let newElem;
-        let newElements = value.elements;
+        let newElements = value.json.elements;
 
         if (data.event === 'addNew') {
-            newElem = defaultElement((value.elements ? value.elements : []), data.element);
+            newElem = defaultElement((value.json.elements ? value.json.elements : []), data.element);
         } else if (data.event === 'addExisting') {
             newElem = newElements.find((element) => element.name === data.element);
             newElements = newElements.filter((element) => element.name !== data.element);
@@ -79,10 +79,13 @@
         newElements.splice(elementIndex, 0, newElem)
         return {
             ...value,
-            elements: newElements
+            json: {
+                ...value.json,
+                elements: newElements
+            }
         }
       });
-      checkElementOrder($currentComponentJSON.elements);
+      checkElementOrder($currentComponentJSON.json.elements);
     };
 
 

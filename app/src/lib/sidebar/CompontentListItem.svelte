@@ -3,7 +3,11 @@
     import { goto } from "$app/navigation";
     import type { ComponentType } from "$lib/types/types";
     import Component3dModel from "$lib/Component3dModel.svelte";
-    import { currentSystemJSON, customComponents } from "$lib/stores";
+    import {
+        currentSystemJSON,
+        removeComponent,
+        createComponent
+    } from "$lib/stores/stores";
     import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import DialogBox from "$lib/DialogBox.svelte";
@@ -12,7 +16,7 @@
 
     export let src: string = "default-custom.png";
     export let data: ComponentType;
-    export let isUnique: boolean = true;
+    export let id = "";
 
     const onDragStart = (event: DragEvent) => {
         if (!event.dataTransfer) {
@@ -24,12 +28,12 @@
 
     const onAdd = () => {
         const componentData = { ...data };
-        componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.components);
+        componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.json.components);
 
         // add new component to system JSON
         currentSystemJSON.update((json) => {
             const newJson = { ...json };
-            newJson.components.push(componentData);
+            newJson.json.components.push(componentData);
             return newJson;
         });
 
@@ -41,21 +45,14 @@
 
     const handleMenu = (option: string) => {
         if (option === "Duplicate") {
-            customComponents.update((components) => {
-                const newComponent = { ...data };
-                newComponent.name = `Copy of ${data.name}`;
-                return [...components, newComponent];
-            });
+            createComponent(data);
         } else if (option === "Edit") {
-            goto(`/component-editor/${data.name}`);
+            goto(`/component-editor/${id}`);
         } else if (option === "Delete") {
             dialogBox.openDialog(`Are you sure you want to delete the ${data.name} component?`,
                 "Yes", "No").then((result: Boolean) => {
                 if (result) {
-                    customComponents.update((components) => {
-                        const newComponents = components.filter((component) => component.name !== data.name);
-                        return newComponents;
-                    });
+                    removeComponent(id);
                 }
             });
         }
@@ -68,7 +65,7 @@
     on:dragstart={(event) => onDragStart(event)}
     draggable={true}>
     <div class="illustration-cont">
-    {#if isUnique}
+    {#if id}
         <Component3dModel data={data} hoverable={false} />
     {:else}
         <img src={`../components/${src}`} alt={data.name} />
@@ -79,7 +76,7 @@
             <h4>
                 <span>{data.name}</span>
                 <DropdownMenu
-                    options={isUnique ? ["Duplicate", "Edit", "Delete"] : ["Duplicate"]}
+                    options={id ? ["Duplicate", "Edit", "Delete"] : ["Duplicate"]}
                     optionIcons={[
                     '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6" /></svg>',
                     '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>',
@@ -87,7 +84,7 @@
                     onClick={handleMenu}
                 />
             </h4>
-            <p>{isUnique ? "Custom Component" : "Generic Component"}</p>
+            <p>{id ? "Custom Component" : "Generic Component"}</p>
         </div>
         <div>
             <button
@@ -141,6 +138,8 @@
         -ms-user-select: none;
         user-select: none;
         cursor: grab;
+        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
+        border-radius: var(--main-border-radius);
     }
     .component-list-item:active {
         cursor: grabbing;
@@ -153,6 +152,9 @@
         height: 100px;
         overflow: hidden;
         background-color: rgba(0, 0, 0, 0.1);
+        border-top-left-radius: var(--main-border-radius);
+        border-bottom-left-radius: var(--main-border-radius);
+        overflow: hidden;
     }
     .illustration-cont img {
         height: 100%;

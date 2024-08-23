@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentComponentJSON } from "$lib/stores";
+    import { currentComponentJSON } from "$lib/stores/stores";
     import type { ElementType } from "$lib/types/types";
     import { defaultElement } from "../editor/component-editor/componentHelpers";
     
@@ -177,13 +177,15 @@
     }
     .element-list-item {
         display: flex;
-        border: solid 1px rgba(0, 0, 0, 0.4);
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         width: calc(100% - 12px);
         margin: 5px;
         height: 108px;
         overflow: hidden;
         transition: .2s;
         cursor: grab;
+        border-radius: var(--main-border-radius);
     }
     .element-list-item:active {
         cursor: grabbing;

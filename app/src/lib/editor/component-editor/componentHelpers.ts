@@ -1,5 +1,5 @@
 import type { ElementType, ComponentType, GearElementType } from '$lib/types/types';
-import { currentComponentJSON, notification, customComponents } from '$lib/stores';
+import { currentComponentJSON, notification, customComponents } from '$lib/stores/stores';
 import { isNameValid, isNameUnique } from '$lib/utils';
 import { get } from 'svelte/store';
 import { isElementType } from '$lib/types/typeguards';
@@ -30,7 +30,7 @@ export const handleNameChange = (name: string, originalName: string = '') => {
             duration: 3600000
         });
         return false
-    } else if (originalName !== '' && !isNameUnique(name, get(customComponents), originalName)) {
+    } else if (originalName !== '' && !isNameUnique(name, Object.values(get(customComponents)), originalName)) {
         notification.set(
         {
             message: "Component name has to be unique.",
@@ -99,7 +99,7 @@ export const handleJSONEditing = (text: string, originalName: string = '') => {
             return false
 
         } else {
-            newJson.elements = json.elements;
+            newJson.json.elements = json.elements;
         }
 
         currentComponentJSON.set(newJson);

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import { onMount } from "svelte";
-    import { currentSystemJSON } from "$lib/stores";
+    import { currentSystemJSON } from "$lib/stores/stores";
 
     let responseHTML: string = "";
     const plotStyles = `

@@ -25,7 +25,7 @@
     on:mouseleave={() => {onHover = false}}>
 <button
     class="btn"
-    style={`${lightMode ? 'border: solid 1px rgba(0, 0, 0, 0.06) !important;' : ''} ${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}
+    style={`${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}
     on:click={() => {isDropdownOpen = !isDropdownOpen}}>
     {#if icon}
         <span class="main-icon">
@@ -93,12 +93,13 @@
         width: 162px;
         padding: 0;
         background-color: white;
-        border: solid 1px var(--main-color);
+        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         transition: opacity 0.2s;
         visibility: hidden;
         z-index: 10000002;
         opacity: 0;
+        border-radius: var(--main-border-radius);
     }
     .open .main-dropdown {
         visibility: visible;
@@ -126,15 +127,15 @@
         display: inline-flex;
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color);
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 50px;
+        border: none;
+        border-radius: var(--main-border-radius);
         cursor: pointer;
         transition: .2s;
         overflow: hidden;
         font-family: 'Inter', sans-serif;
     }
     .btn:hover {
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        filter: brightness(1.05);
     }
     .main-text {
         color: rgba(255, 255, 255, 0.9);

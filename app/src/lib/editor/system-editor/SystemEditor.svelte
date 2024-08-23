@@ -15,7 +15,7 @@
     import ComponentNode from './ComponentNode.svelte';
     import EmptySystemNode from './EmptySystemNode.svelte';
     import RemovableEdge from './ComponentEdge.svelte';
-    import { currentSystemJSON } from '$lib/stores';
+    import { currentSystemJSON } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
     import {
       nameComponentInstance,
@@ -57,12 +57,12 @@
 
       // get component data and give it a unique name
       const componentData = JSON.parse(event.dataTransfer.getData('application/svelteflow')) as ComponentType;
-      componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.components);
+      componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.json.components);
       
       // add new component to system JSON
       currentSystemJSON.update((json) => {
         const newJson = { ...json };
-        newJson.components.push(componentData);
+        newJson.json.components.push(componentData);
         return newJson;
       });
 

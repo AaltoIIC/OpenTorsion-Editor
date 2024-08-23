@@ -38,14 +38,17 @@
         left: 15px;
         width: 300px;
         height: fit-content;
-        background-color: white;
         color: rgba(0, 0, 0, 0.9);
         z-index: 10000;
-        box-shadow: rgba(149, 157, 165, 0.3) 0px 8px 24px;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         padding: 12px;
-        border: solid 1px var(--main-color);
         font-size: 14px;
         transition: .3s;
+        border-radius: var(--main-border-radius);
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        background-color: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(33px);
+        background-blend-mode: overlay;
     }
     .inner {
         display: flex;

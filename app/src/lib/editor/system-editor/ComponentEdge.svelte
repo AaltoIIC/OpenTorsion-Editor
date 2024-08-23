@@ -5,7 +5,7 @@
       type EdgeProps,
       EdgeLabelRenderer
     } from '@xyflow/svelte';
-    import { currentSystemJSON } from '$lib/stores';
+    import { currentSystemJSON } from '$lib/stores/stores';
     import _ from 'lodash';
   
     type $$Props = EdgeProps;
@@ -36,21 +36,21 @@
       currentSystemJSON.update((json) => {
         const newJson = { ...json };
 
-        let sourceStartElem = newJson.components
+        let sourceStartElem = newJson.json.components
                                 .find(component => component.name === source)
                                 ?.elements.at(0)?.name;
-        let sourceEndElem = newJson.components
+        let sourceEndElem = newJson.json.components
                                 .find(component => component.name === source)
                                 ?.elements.at(-1)?.name;
-        let targetStartElem = newJson.components
+        let targetStartElem = newJson.json.components
                                 .find(component => component.name === target)
                                 ?.elements.at(0)?.name;
-        let targetEndElem = newJson.components
+        let targetEndElem = newJson.json.components
                                 .find(component => component.name === target)
                                 ?.elements.at(-1)?.name;
   
         // remove old connection
-        newJson.structure = newJson.structure
+        newJson.json.structure = newJson.json.structure
                               .filter((connection) => 
                               !_.isEqual(connection,
                                 [`${source}.${sourceEndElem}`, `${target}.${targetStartElem}`])
@@ -58,7 +58,7 @@
 
         // switch old source's connection to connect to old target's start element
         // and old target's connection to connect to old source's end element
-        newJson.structure = newJson.structure
+        newJson.json.structure = newJson.json.structure
                               .map((connection) => {
                                 if (connection[1] === `${source}.${sourceStartElem}`) {
                                   return [connection[0], `${target}.${targetStartElem}`];
@@ -70,7 +70,7 @@
                               })
         
         // add new connection between new source's end element and new target's start element
-        newJson.structure.push([`${target}.${targetEndElem}`, `${source}.${sourceStartElem}`]);
+        newJson.json.structure.push([`${target}.${targetEndElem}`, `${source}.${sourceStartElem}`]);
 
         return newJson;
       });

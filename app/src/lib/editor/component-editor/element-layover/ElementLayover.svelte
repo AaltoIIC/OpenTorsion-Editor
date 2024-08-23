@@ -4,7 +4,7 @@
     import type { ElementType, ExcitationType } from '$lib/types/types';
     import { isExcitationType } from '$lib/types/typeguards';
     import { editElement } from '../componentHelpers';
-    import { currentComponentJSON, highlightLinesInEditor } from '../../../stores';
+    import { currentComponentJSON, highlightLinesInEditor } from '../../../stores/stores';
     import { nthLinesInJSON } from '$lib/utils';
     import LayoverProperty from './LayoverProperty.svelte';
     
@@ -16,10 +16,9 @@
         isOpen = false;
         isEditing = false;
         currentComponentJSON.update(value => {
-            return {
-                ...value,
-                elements: value.elements ? value.elements.filter((el: any) => el.name !== params.name) : []
-            }
+            let newVal = {...value};
+            newVal.json.elements = value.json.elements.filter((el: any) => el.name !== params.name)
+            return newVal;
         })
     }
 
@@ -59,7 +58,7 @@
         }
 
         // check if the name is already taken or empty
-        const nameExists = $currentComponentJSON.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
+        const nameExists = $currentComponentJSON.json.elements.some((el: any) => el.name !== params.name && el.name === event.target.value);
         if (nameExists || event.target.value === '') {
             isNameError = true;
 
@@ -94,7 +93,7 @@
         
         // highligt JSON corresponding to the element in the JSON editor
         if (highlightLinesInEditor) {
-            let [startIndex, endIndex] = nthLinesInJSON($currentComponentJSON, 'elements', 'name', params.name);
+            let [startIndex, endIndex] = nthLinesInJSON($currentComponentJSON.json, 'elements', 'name', params.name);
             $highlightLinesInEditor(startIndex, endIndex);
         }
     }
@@ -117,10 +116,9 @@
             // update the element with the new properties
             if (isEditing) {
                 currentComponentJSON.update(value => {
-                return {
-                        ...value,
-                        elements: editElement(value.elements, params.name, allProperties, true)
-                    }
+                let newVal = {...value};
+                newVal.json.elements =  editElement(value.json.elements, params.name, allProperties, true);
+                return newVal;
                 })
             }
         }
@@ -273,12 +271,11 @@
         border: none;
         font-family: 'Inter', sans-serif;
         font-size: 12px;
-        border: solid 1px rgba(0, 0, 0, 0.1);
         cursor: pointer;
-        border-radius: 0;
+        border-radius: 0 0 var(--main-border-radius) var(--main-border-radius);
     }
     .close-btn:hover {
-        border: solid 1px rgba(255, 255, 255, 0.3);
+        filter: brightness(1.05);
     }
     .params-cont {
         display: flex;
@@ -306,6 +303,7 @@
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         color: rgba(0, 0, 0, 0.9);
+        border-radius: var(--main-border-radius);
     }
 
     .main-layover-cont.active {

@@ -1,15 +1,17 @@
-import type { ComponentType } from "$lib/types/types"
-import { currentSystemJSON, notification, customComponents, systemNames } from '$lib/stores';
+import type { ComponentType, SystemType } from "$lib/types/types"
+import {
+    currentSystemJSON,
+    notification,
+    getSystem
+} from '$lib/stores/stores';
 import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
 import { isNameValid } from "$lib/utils";
-import { browser } from "$app/environment";
-
 // Update the currentSystemJSON with the given component being connected
 // to the last component in the structure
 export const addConnectionTolastComponent = (component: ComponentType) => {
-    let currentJSON = get(currentSystemJSON)
+    let currentJSON = get(currentSystemJSON).json
 
     // If there are no components, don't add connection
     if (currentJSON.components.length === 1) return;
@@ -22,7 +24,7 @@ export const addConnectionTolastComponent = (component: ComponentType) => {
     if (endComponent) {
         const endElement = currentJSON.components.find(comp => comp.name === endComponent)?.elements.at(-1)?.name
         currentJSON.structure.push([`${endComponent}.${endElement}`, `${component.name}.${component.elements[0].name}`])
-        currentSystemJSON.set(currentJSON)
+        currentSystemJSON.update(value => ({ ...value, json: currentJSON }))
     } else {
         notification.set(
             {
@@ -40,7 +42,7 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
     let currentEdges = get(edges)
 
     // Add new nodes for newly added components
-    currentJSON.components.forEach((comp: ComponentType) => {
+    currentJSON.json.components.forEach((comp: ComponentType) => {
         // Check if node with this name already exists
         const existingNode = get(nodes).find(node => node.id === comp.name)
         if (!existingNode) {
@@ -58,11 +60,11 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
     })
 
     // Remove nodes that had their corresponding component removed
-    let componentNames = currentJSON.components.map(comp => comp.name)
+    let componentNames = currentJSON.json.components.map(comp => comp.name)
     nodes.update(nodes => nodes.filter(node => componentNames.includes(node.id)))
 
     // Add new edges for newly added connections
-    currentJSON.structure.forEach((connection: string[]) => {
+    currentJSON.json.structure.forEach((connection: string[]) => {
         let sourceComponent = connection[0].split('.')[0]
         let targetComponent = connection[1].split('.')[0]
         let isEdgeAdded = currentEdges.find(edge => edge.id === `${sourceComponent}-${targetComponent}`)
@@ -79,7 +81,7 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
     })
 
     // Remove edges that had their corresponding connection removed
-    let connectionIds = currentJSON.structure.map(
+    let connectionIds = currentJSON.json.structure.map(
         connection => `${connection[0].split('.')[0]}-${connection[1].split('.')[0]}`
     )
     edges.update(edges => edges.filter(edge => connectionIds.includes(edge.id)))
@@ -127,7 +129,7 @@ const hasDuplicates = (array: any[]) => {
 export const handleJSONEditing = (text: string) => {
     try {
         const json = JSON.parse(text);
-        const newJson = {...get(currentSystemJSON)}
+        const newJson = {...get(currentSystemJSON).json}
         
         // Check name and set if it is valid
         if (json.name === undefined) {
@@ -238,7 +240,7 @@ export const handleJSONEditing = (text: string) => {
         }
 
 
-        currentSystemJSON.set(newJson);
+        currentSystemJSON.update(value => ({ ...value, json: newJson }));
         notification.set(null);
     } catch (e) {
         notification.set(
@@ -278,7 +280,7 @@ export const checkConnections = (structure: string[][]) => {
     let areMultiples = (new Set(sources)).size !== sources.length || (new Set(targets)).size !== targets.length
 
     // Check if all components exist in the components array
-    const components = get(currentSystemJSON).components.map(comp => comp.name)
+    const components = get(currentSystemJSON).json.components.map(comp => comp.name)
     const allComponentsExist = sources.every(comp => components.includes(comp)) && targets.every(comp => components.includes(comp))
 
     return !isLoop && !areMultiples && allComponentsExist
@@ -296,7 +298,8 @@ export const nameComponentInstance = (componentType: string, components: Compone
 }
 
 // function to automatically give a unique name to a new system
-export const nameSystem = (systemNames: string[]) => {
+export const nameSystem = (systems: SystemType[]) => {
+    let systemNames = systems.map(sys => sys.name as string);
     let largestNum = 0;
 
     // check if there is a component with the name "New System"
@@ -312,25 +315,4 @@ export const nameSystem = (systemNames: string[]) => {
     }
     
     return `New System${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
-}
-
-export const loadCustomComponents = (systemName: string) => {
-    let customComps: ComponentType[] = [];
-    try {
-        const customComponentsJSON = localStorage.getItem(`custom-components.${systemName}`);
-        if (customComponentsJSON) {
-            customComps = JSON.parse(customComponentsJSON);
-        }
-    } catch (e) {
-        console.error(e);
-    }
-    customComponents.set(customComps)
-}
-
-export const removeSystem = (systemName: string) => {
-    if (!browser) return;
-    localStorage.removeItem(`system.${systemName}`);
-    systemNames.update((names) => {
-        return names.filter((name) => name !== systemName);
-    });
 }

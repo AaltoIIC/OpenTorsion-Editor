@@ -4,7 +4,7 @@
     import _ from 'lodash';
     import type { ElementType } from '$lib/types/types';
     import { defaultElement, possibleParams } from '../componentHelpers';
-    import { currentComponentJSON } from '../../../stores';
+    import { currentCompone../../../stores/stores../../../stores/stores';
     import LayoverPropery from '../element-layover/LayoverProperty.svelte';
     import PrevElementListItem from './PrevElementListItem.svelte';
     

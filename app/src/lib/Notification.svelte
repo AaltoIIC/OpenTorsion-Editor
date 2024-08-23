@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { notification } from '$lib/stores'
+    import { notification } from '$lib/stores/stores'
 
     let isShown = false;
     let currentText = '';

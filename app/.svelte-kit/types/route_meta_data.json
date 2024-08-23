@@ -1,10 +1,10 @@
 {
 	"/": [],
 	"/analysis": [],
-	"/component-editor/[[componentName]]": [
-		"src/routes/component-editor/[[componentName]]/+page.ts"
+	"/component-editor/[[componentId]]": [
+		"src/routes/component-editor/[[componentId]]/+page.ts"
 	],
-	"/system-editor/[[systemName]]": [
-		"src/routes/system-editor/[[systemName]]/+page.ts"
+	"/system-editor/[[systemId]]": [
+		"src/routes/system-editor/[[systemId]]/+page.ts"
 	]
 }

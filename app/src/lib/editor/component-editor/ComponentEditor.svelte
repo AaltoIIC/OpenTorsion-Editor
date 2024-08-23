@@ -1,6 +1,6 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { currentComponentJSON } from '../../stores';
+    import { currentComponentJSON } from '../../stores/stores';
     import { renderNodes, defaultElement, checkElementOrder } from './componentHelpers';
     import {
       SvelteFlow,
@@ -42,10 +42,10 @@
     const edges = writable([]);
 
     currentComponentJSON.subscribe(value => {
-      if (!value.elements) {
+      if (!value.json.elements) {
         console.error('Malformed JSON');
       } else {
-        nodes.set(renderNodes(value.elements));
+        nodes.set(renderNodes(value.json.elements));
         setTimeout(() => {
             fitView();
         }, 0);
@@ -76,12 +76,11 @@
       }
       if (data.event === 'addNew') {
         currentComponentJSON.update(value => {
-          return {
-              ...value,
-              elements: [...value.elements, defaultElement((value.elements ? value.elements : []), data.element)]
-          }
+          let newVal = {...value};
+          newVal.json.elements = [...value.json.elements, defaultElement((value.json.elements ? value.json.elements : []), data.element)]
+          return newVal;
         });
-        checkElementOrder($currentComponentJSON.elements);
+        checkElementOrder($currentComponentJSON.json.elements);
       }
     };
 

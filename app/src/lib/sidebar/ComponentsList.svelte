@@ -3,12 +3,19 @@
     import DropdownButton from "$lib/DropdownButton.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
     import { basicComponents } from "../editor/basicComponents";
-    import { customComponents, currentSystemJSON } from "$lib/stores";
+    import { customComponents, currentSystemJSON } from "$lib/stores/stores";
     import { importComponent } from "$lib/utils";
     import { goto } from "$app/navigation";
 
     const toComponentType = (json: any) => json as ComponentType;
     let componentInput: HTMLInputElement;
+
+    let shownComponents =  Object.entries($customComponents)
+                                .filter(([key, val]) => key.startsWith(`${$currentSystemJSON.id}-`))
+    customComponents.subscribe(value => {
+        shownComponents = Object.entries(value)
+            .filter(([key, val]) => key.startsWith(`${$currentSystemJSON.id}-`)) as [string, ComponentType][]
+    })
 
     const handleNewComponent = (option: string) => {
         if (option === 'Create New') {
@@ -41,11 +48,11 @@
                 accept=".json">
     </div>
     <div class="component-list">
-        {#each [ ...$customComponents].reverse() as component (component.name)}
-            <ComponentListItem data={component} isUnique={true} />
+        {#each shownComponents as [id, component]}
+            <ComponentListItem id={id} data={component} />
         {/each}
         {#each basicComponents as component}
-            <ComponentListItem data={toComponentType(component.json)} src={component.icon} isUnique={false} />
+            <ComponentListItem data={toComponentType(component.json)} src={component.icon} />
         {/each}
     </div>
 </div>
