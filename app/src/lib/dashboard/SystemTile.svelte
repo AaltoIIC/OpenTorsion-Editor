@@ -71,8 +71,6 @@
         width: 175px;
         height: 250px;
         background-color: white;
-        border: solid 1px rgba(0, 0, 0, 0.1);
-        box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
         margin: 0 0 15px 15px;
         padding: 14px;
         box-sizing: border-box;

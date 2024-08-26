@@ -11,16 +11,13 @@
     .main-tile {
         width: 175px;
         height: 250px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: var(--main-border-radius);
         background-color: white;
-        transition: .2s;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
         margin: 0 0 15px 15px;
         box-sizing: border-box;
     }

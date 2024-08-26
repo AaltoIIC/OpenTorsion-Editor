@@ -42,7 +42,7 @@
         } else {
             // If system does not exist, redirect to home
             onMount(() => {
-                window.location.href = '/';
+                goto('/');
             });
         }
 
@@ -51,6 +51,9 @@
         [data.systemId, newSystem] = createSystem();
         systemName = newSystem.name;
         currentSystemJSON.set({id: data.systemId, json: newSystem});
+        onMount(() => {
+            window.history.replaceState({}, '', `/system-editor/${data.systemId}`);
+        });
     }
     
     let JSONEditorText = '';
@@ -206,11 +209,10 @@
     }
     .resize-slider {
         width: 100%;
-        height: 6px;
+        height: 8px;
         background-color: rgba(0, 0, 0, 0.1);
         border: none !important;
         border-radius: 0;
-        border-top: solid 1px rgb(215,215,215) !important;
         cursor: n-resize;
     }
     .flow-editor {

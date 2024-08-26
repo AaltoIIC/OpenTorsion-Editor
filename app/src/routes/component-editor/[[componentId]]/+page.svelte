@@ -3,18 +3,23 @@
     import {
       SvelteFlowProvider
     } from '@xyflow/svelte';
-    import type { ComponentType } from '$lib/types/types';
+    import type { ComponentType, SystemType } from '$lib/types/types';
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
+    import DialogBox from '$lib/DialogBox.svelte';
     import {
         currentSystemJSON,
+        setCurrentSystem,
         currentComponentJSON,
         customComponents,
         createComponent,
+        saveCurrentComponent,
         notification,
-        highlightLinesInEditor
+        resetCurrentComponent,
+        highlightLinesInEditor,
+        createSystem,
     } from '$lib/stores/stores.js';
     import { goto } from '$app/navigation';
     import Button from '$lib/Button.svelte';
@@ -40,24 +45,11 @@
     export let data;
     let originalName: string;
     let isNewComponent = true;
+    let dialogBox: SvelteComponent;
 
     // initialize the current component JSON
     // if url contained a component id, set the current component JSON to that component
-    if (data.componentId) {
-        if (Object.keys($customComponents).includes(data.componentId)) {
-            isNewComponent = false;
-            originalName = $customComponents[data.componentId].name;
-            currentComponentJSON.set({
-                id: data.componentId,
-                json: $customComponents[data.componentId]
-            });
-        } else {
-            // component with name in url does not exist
-            onMount(() => {
-                window.location.href = '/';
-            });
-        }
-    } else {
+    const newComponent = () => {
         let newComponent: ComponentType;
         [data.componentId, newComponent] = createComponent();
         originalName = newComponent.name;
@@ -67,6 +59,62 @@
         });
     }
 
+    if (data.componentId) {
+        if (Object.keys($customComponents).includes(data.componentId)) {
+            isNewComponent = false;
+            // load the system corresponding to the component
+            setCurrentSystem(data.componentId.split('-')[0]);
+
+            // if component has unsaved changes in currentComponentJSON, don't load saved version
+            if ($currentComponentJSON.id !== data.componentId) {
+                originalName = $customComponents[data.componentId].name;
+                currentComponentJSON.set({
+                    id: data.componentId,
+                    json: $customComponents[data.componentId]
+                });
+            } else {
+                originalName = $currentComponentJSON.json.name;
+            }
+        } else {
+            // component with name in url does not exist
+            onMount(() => {
+                goto('/');
+            });
+        }
+    } else {
+        // if current system is not set, ask user whether to create a new system
+        if (!$currentSystemJSON.id) {
+            currentComponentJSON.set({
+                        id: '-1',
+                        json: {
+                            name: 'New Component',
+                            elements: []
+                        }
+            });
+            onMount(() => {
+                dialogBox.openDialog("Do you want to create a new system to store your component?",
+                "Yes","Choose an existing system").then((value: boolean) => {
+                    if (value) {
+                        // create a new system
+                        let newSystem: SystemType, systemId: string;
+                        [systemId, newSystem] = createSystem();
+                        currentSystemJSON.set({id: systemId, json: newSystem});
+                        newComponent();
+                        window.history.replaceState({}, '', `/component-editor/${data.componentId}`);
+                    } else {
+                        goto('/');
+                    }
+                });
+            });
+        } else {
+            newComponent();
+            onMount(() => {
+                window.history.replaceState({}, '', `/component-editor/${data.componentId}`);
+            });
+        }
+    }
+
+    // sync the JSON editor text with the current component JSON
     let JSONEditorText = '';
     currentComponentJSON.subscribe((value) => {
         notification.set(null);
@@ -76,13 +124,33 @@
         componentName = value.json.name;
     });
 
-    const saveComponent = () => {
+    // handle pressing the save button
+    const handleSave = () => {
+        saveCurrentComponent();
         notification.set({
             message: "Component saved succesfully.",
             type: "success",
             duration: 3000
         });
         goto(`/system-editor/${$currentSystemJSON.id}`);
+    }
+
+    // handle pressing the back button
+    const handleBack = () => {
+        if ($currentComponentJSON.json.elements.length === 0) {
+            resetCurrentComponent();
+            notification.set(null);
+            goto(`/system-editor/${$currentSystemJSON.id}`);
+        } else {
+            dialogBox.openDialog("You have unsaved changes. Do you want to discard them?",
+                "Discard changes","Cancel").then((value: boolean) => {
+                    if (value) {
+                        resetCurrentComponent();
+                        notification.set(null);
+                        goto(`/system-editor/${$currentSystemJSON.id}`);
+                    }
+                });
+        }
     }
     
     let editorElement: HTMLElement;
@@ -133,12 +201,14 @@
     </div>
     <div class="top-menu">
         <div class="links">
-            <a href={`/system-editor/${$currentSystemJSON.id}`} on:click={() => {notification.set(null)}}>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span on:click={handleBack}>
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
                 Back to System Editor
-            </a>
+            </span>
         </div>
         <NameField text="Component"
                 isError={isNameError} 
@@ -155,7 +225,7 @@
                 Export
             </DropdownButton>
             <Button
-                onClick={saveComponent}
+                onClick={handleSave}
                 isActive={!isError}
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
                 Save Component
@@ -166,7 +236,7 @@
         <ElementsList />
     </Sidebar>
 </div>
-
+<DialogBox bind:this={dialogBox} />
 <style>
     /* Resizing JSON editor */
     .resize-slider {
@@ -200,13 +270,14 @@
         height: 20px;
         margin: 0 -2px -5px 0;
     }
-    .top-menu a {
+    .top-menu span {
         color: rgba(255, 255, 255, 0.9);
         font-size: 14px;
         font-weight: 400;
         text-decoration: none;
         display: inline-block;
         margin: 0 16px;
+        cursor: pointer;
     }
     .top-menu {
         position: absolute;

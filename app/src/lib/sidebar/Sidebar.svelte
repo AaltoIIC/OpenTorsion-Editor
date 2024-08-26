@@ -12,8 +12,10 @@
     .main-logo {
         width: 114px;
         height: auto;
-        margin: 12px 18px;
+        margin: 24px 18px;
         display: block;
+        z-index: 11;
+        position: relative;
     }
     .main-sidebar {
         position: absolute;

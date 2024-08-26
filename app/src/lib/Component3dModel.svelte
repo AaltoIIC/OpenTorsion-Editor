@@ -37,36 +37,31 @@
 
 
     // functions to create elements
-
-    // keep track of z position of last element
-    let currentZ = 0;
-
-    const createDisk = () => {
-        currentZ += 3;
+    const createDisk = (z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 20, 20, 6, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
         const disk = new THREE.Mesh(geometry, material);
         disk.castShadow = true;
         disk.rotateX(Math.PI*(90/180));
-        disk.position.z = currentZ;
-        currentZ += 3;
+        disk.position.x = x;
+        disk.position.y = y;
+        disk.position.z = z+3;
         scene.add(disk);
     }
 
-    const createShaft = () => {
-        currentZ += 10;
+    const createShaft = (z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 4, 4, 20, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
         const shaft = new THREE.Mesh(geometry, material);
         shaft.castShadow = true;
         shaft.rotateX(Math.PI*(90/180));
-        shaft.position.z = currentZ;
-        currentZ += 10;
+        shaft.position.x = x;
+        shaft.position.y = y;
+        shaft.position.z = z+10;
         scene.add(shaft);
     }
 
-    const createGear = () => {
-        currentZ += 3.5;
+    const createGear = (z: number, y: number, x: number, rotateX: number = 0) => {
         const geometry = new THREE.CylinderGeometry( 14, 14, 7, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
         const gear = new THREE.Mesh(geometry, material);
@@ -85,30 +80,72 @@
         }
 
         geometry.rotateX(Math.PI*(90/180));
-        gear.position.z = currentZ;
-
-        currentZ += 3.5;
+        gear.position.x = x;
+        gear.position.y = y;
+        gear.position.z = z+3.5;
+        gear.rotation.z = rotateX;
         scene.add(gear);
     }
 
+    // keep track of z position of last element
+    let Zdimension = 0;
+    let Ydepth = 0;
     // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
     let renderer: THREE.WebGLRenderer;
+    let branchHeight = 32;
     onMount(() => {
-        camera = new THREE.OrthographicCamera(-50, 50, 50, -50, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
+        // generate 3d model
+        type Junction = {
+            z: number,
+            endY: number
+        }
+        let currentZ = 0;
+        let currentY = 0;
+        let currentX = 0;
+        let branches = new Map<string, Junction>();
+        data.elements.forEach(el => {
+            if (el.type === "Disk") {
+                createDisk(currentZ, currentY, currentX);
+                currentZ += 6;
+            } else if (el.type === "ShaftDiscrete") {
+                createShaft(currentZ, currentY, currentX);
+                currentZ += 20;
+            } else if (el.type === "GearElement") {
+                // update branches
+                if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
+                    // add element to branches with shared value across all gears with the same parent
+                    branches.set(el.name, branches.get(el.parent) as Junction);
+                    currentY -= branchHeight;
+                    (branches.get(el.name) as Junction).endY = currentY;
+                    currentZ = (branches.get(el.parent) as Junction).z;
+                } else {
+                    branches.set(el.name, {z: currentZ, endY: currentY});
+                }
 
-        // generate 3d model 
-        data.elements.forEach(element => {
-            if (element.type === "Disk") {
-                createDisk();
-            } else if (element.type === "ShaftDiscrete") {
-                createShaft();
-            } else if (element.type === "GearElement") {
-                createGear();
+                let rotateX =  0;
+                if ((currentY%(branchHeight*2)) != 0) {
+                    rotateX =  (Math.PI/180) * 22.5;
+                    currentX = -22.6;
+                } else {
+                    currentX = 0;
+                }
+                createGear(currentZ, currentY, currentX, rotateX);
+                currentZ += 7;
+            }
+
+            if (currentZ > Zdimension) {
+                Zdimension = currentZ;
+            }
+            if (currentY < Ydepth) {
+                Ydepth = currentY;
             }
         });
+
+        const cameraSize = 70 + 35*(Ydepth / -branchHeight);
+        camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
 
         // add shadow plane
         const planeGeometry = new THREE.PlaneGeometry(200, 200);
@@ -118,7 +155,7 @@
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         plane.rotation.x = - Math.PI / 2;
-        plane.position.y = -21;
+        plane.position.y = Ydepth-21;
         plane.position.z = currentZ/2;
 
         scene.add(plane);
@@ -140,8 +177,14 @@
 
     // function to (re)set camera position
     const setCameraPosition = () => {
-        camera.position.set( 70, 85, 88 + currentZ/2 );
-        camera.lookAt( 0, 0, currentZ/2 );
+        camera.position.set(
+            70,
+            85 + Ydepth/2,
+            Math.min(88 + Zdimension/2, 138));
+        camera.lookAt(
+            0,
+            Ydepth/2,
+            Math.min(Zdimension/2, 50));
         renderer.render(scene, camera);
     }   
 
@@ -150,10 +193,9 @@
         const width = el.clientWidth;
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
-        const currentCamZ = (x / width) * (currentZ+320) * 2
-
-        camera.position.set( 70, 85, -160 + currentCamZ );
-        camera.lookAt( 0, 0, currentZ/2 );
+        const currentCamZ = (x / width) * (Zdimension+320) * 2
+        camera.position.set( 70, 85 + Ydepth/2, -160 + currentCamZ );
+        camera.lookAt( 0, Ydepth/2, Zdimension/2 );
 
         renderer.render(scene, camera);
     }
@@ -166,7 +208,7 @@
     canvas {
         width: 100%;
         height: 100%;
-        mask-image: url(./edge-mask.png);
+        mask-image: url(../edge-mask.png);
         mask-size: cover;
     }
 </style>

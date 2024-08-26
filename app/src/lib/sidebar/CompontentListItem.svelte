@@ -14,7 +14,7 @@
     
     let dialogBox: SvelteComponent;
 
-    export let src: string = "default-custom.png";
+    export let isUnique = true;
     export let data: ComponentType;
     export let id = "";
 
@@ -65,11 +65,7 @@
     on:dragstart={(event) => onDragStart(event)}
     draggable={true}>
     <div class="illustration-cont">
-    {#if id}
         <Component3dModel data={data} hoverable={false} />
-    {:else}
-        <img src={`../components/${src}`} alt={data.name} />
-    {/if}
     </div>
     <div class="component-info">
         <div>
@@ -127,38 +123,31 @@
     }
     .component-list-item {
         display: flex;
-        border: solid 1px rgba(0, 0, 0, 0.1);
         width: calc(100% - 12px);
         margin: 5px;
         height: 100px;
-        transition: .2s;
         -moz-user-select: -moz-none;
         -khtml-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
         user-select: none;
         cursor: grab;
-        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         border-radius: var(--main-border-radius);
+        background: white;
+    }
+    .component-list-item.hover {
+        background: rgb(250, 250, 250);
     }
     .component-list-item:active {
         cursor: grabbing;
-    }
-    .component-list-item:hover {
-        border: solid 1px rgba(0, 0, 0, 0.4);
     }
     .illustration-cont {
         width: 100px;
         height: 100px;
         overflow: hidden;
-        background-color: rgba(0, 0, 0, 0.1);
         border-top-left-radius: var(--main-border-radius);
         border-bottom-left-radius: var(--main-border-radius);
         overflow: hidden;
-    }
-    .illustration-cont img {
-        height: 100%;
-        width: auto;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

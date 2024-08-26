@@ -214,7 +214,7 @@
     .line-number {
         height: 18px;
         width: 26px;
-        background-color: rgb(235, 235, 235);
+        background-color: rgb(240, 240, 240);
         color: rgba(0, 0, 0, 0.5);
         font-size: 14px;
         text-align: right;
@@ -234,7 +234,7 @@
         background-color: rgba(0, 0, 0, 0.06);
     }
     .main-line-cont {
-        padding: 10px 10px 10px 10px;
+        padding: 10px;
         border: 0;
         overflow: hidden;
         width: calc(100% - 20px);
@@ -242,6 +242,17 @@
         position: absolute;
         top: 0;
         left: 0;
+    }
+
+    .code-line:first-of-type div {
+        border-top-left-radius: var(--main-border-radius);
+        border-top-right-radius: var(--main-border-radius);
+        overflow: hidden;
+    }
+    .code-line:last-of-type div {
+        border-bottom-left-radius: var(--main-border-radius);
+        border-bottom-right-radius: var(--main-border-radius);
+        overflow: hidden;
     }
 
     .main-textarea-cont {
@@ -253,7 +264,7 @@
         overflow: hidden;
         border: none;
         background-color: white;
-        border: solid 1px rgb(215, 215, 215);
+
     }
     textarea {
         resize: none;
@@ -299,18 +310,15 @@
     }
 
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
     }
-    ::-webkit-scrollbar-track {
-        background: transparent;
-    }
+
     ::-webkit-scrollbar-thumb {
-        background: rgb(217, 217, 217);
-        border: solid 1px rgb(205, 205, 205);
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
         cursor: pointer;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgb(204, 204, 204);
+        background: rgba(0, 0, 0, 0.15);
     }
 </style>

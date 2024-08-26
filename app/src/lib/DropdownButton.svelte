@@ -93,7 +93,6 @@
         width: 162px;
         padding: 0;
         background-color: white;
-        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         transition: opacity 0.2s;
         visibility: hidden;
@@ -128,7 +127,7 @@
         color: rgba(255, 255, 255, 0.9);
         background-color: var(--main-color);
         border: none;
-        border-radius: var(--main-border-radius);
+        border-radius: 50px;
         cursor: pointer;
         transition: .2s;
         overflow: hidden;
@@ -147,7 +146,7 @@
         height: 18px;
         color: rgba(255, 255, 255, 0.9);
         padding: 8px 6px 13px 8px;
-        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 2px rgba(0, 0, 0, 0.04);
         margin: 0 -2px -5px 0;
     }
 </style>

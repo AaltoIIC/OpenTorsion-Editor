@@ -1,5 +1,4 @@
 import type { ComponentType, SystemType, NotificationType } from '../types/types';
-import { browser } from "$app/environment"
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import persistentStore from './persistentStore';
@@ -13,15 +12,6 @@ export const highlightLinesInEditor = writable<((from: number, to: number) => vo
 // components persistent store
 
 export const customComponents = persistentStore<Record<string, ComponentType>>('customComponents', {}); // custom components persistent store
-
-export const saveComponent = (id: string, component: ComponentType) => {
-    if (Object.keys(get(customComponents)).includes(id)) {
-        customComponents.update((components) => {
-            components[id] = component;
-            return components;
-        });
-    }
-}
 
 export const getComponent = (id: string): ComponentType | null => {
     if (Object.keys(get(customComponents)).includes(id)) {
@@ -47,10 +37,6 @@ export const createComponent = (component: ComponentType | null = null) => {
             elements: []
         } as ComponentType;
     }
-    customComponents.update((value) => {
-        value[id] = component;
-        return value;   
-    });
 
     return [id, component] as [string, ComponentType];
 }
@@ -62,23 +48,30 @@ export const removeComponent = (id: string) => {
     });
 }
 
-export const currentComponentJSON = writable<{id: string, json: ComponentType}>({
+export const currentComponentJSON = persistentStore<{id: string, json: ComponentType}>('currentComponentJSON', {
     id: '',
     json: {
         name: "",
         elements: []
     } as ComponentType
-});
+})
 
-// autosave current component
-currentComponentJSON.subscribe(value => {
-    if (value.id && value.json.name) {
-        customComponents.update((components) => {
-            components[value.id] = value.json;
-            return components;
-        });
-    }
-});
+export const resetCurrentComponent = () => {
+    currentComponentJSON.set({
+        id: '',
+        json: {
+            name: "",
+            elements: []
+        } as ComponentType
+    });
+}
+
+export const saveCurrentComponent = () => {
+    customComponents.update((components) => {
+        components[get(currentComponentJSON).id] = get(currentComponentJSON).json;
+        return components;
+    });
+}
 
 
 // systems persistent store
@@ -118,6 +111,15 @@ export const createSystem = (system: SystemType|null = null) => {
     });
 
     return [id, system] as [string, SystemType];
+}
+
+export const setCurrentSystem = (id: string) => {
+    if (Object.keys(get(systems)).includes(id)) {
+        currentSystemJSON.set({
+            id: id,
+            json: get(systems)[id]
+        });
+    }
 }
 
 export const removeSystem = (id: string) => {

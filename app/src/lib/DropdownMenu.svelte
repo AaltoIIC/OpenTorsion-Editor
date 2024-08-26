@@ -93,7 +93,6 @@
         width: fit-content;
         padding: 0;
         background-color: white;
-        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         transition: opacity 0.2s;
         visibility: hidden;

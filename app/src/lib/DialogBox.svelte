@@ -129,21 +129,20 @@
         width: fit-content;
         max-width: 400px;
         height: fit-content;
-        box-shadow: 0 10px 15px rgb(0 0 0 / 10%);
+        box-shadow: 0 10px 15px rgb(0 0 0 / 6%);
         text-align: center;
         z-index: 10000000000;
         padding: 20px 30px 12px 30px;
         transition: .3s;
         opacity: 0;
         border-radius: var(--main-border-radius);
-        border: solid 1px rgba(0, 0, 0, 0.1);
         background-color: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(33px);
         background-blend-mode: overlay;
     }
     .main-dialogbox p {
         font-size: 14px;
-        font-weight: 550;
+        font-weight: 450;
         margin: 0;
     }
     .viewport-cover {

@@ -44,7 +44,7 @@
         transition: .2s;
         overflow: hidden;
         font-family: 'Inter', sans-serif;
-        border-radius: 0.5em;
+        border-radius: 50px;
         border: none;
     }
     button:hover {

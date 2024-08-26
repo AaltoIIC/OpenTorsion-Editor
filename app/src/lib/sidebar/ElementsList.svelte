@@ -1,15 +1,13 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores/stores";
-    import type { ElementType } from "$lib/types/types";
     import { defaultElement } from "../editor/component-editor/componentHelpers";
     
     const addEl = (type: string) => {
         currentComponentJSON.update(value => {
-            return {
-                ...value,
-                elements: [...value.elements,
-                    defaultElement((value.elements ? value.elements : []), type)]
-            }
+            let newVal = {...value};
+            newVal.json.elements = [...value.json.elements,
+                defaultElement((value.json.elements ? value.json.elements : []), type)];
+            return newVal;
         });
     }
 
