@@ -12,9 +12,9 @@
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
-    import ComponentNode from './ComponentNode.svelte';
-    import EmptySystemNode from './EmptySystemNode.svelte';
-    import RemovableEdge from './ComponentEdge.svelte';
+    import ComponentNode from './nodes/ComponentNode.svelte';
+    import EmptySystemNode from './nodes/EmptySystemNode.svelte';
+    import RemovableEdge from './RemovableEdge.svelte';
     import { currentSystemJSON } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
     import {

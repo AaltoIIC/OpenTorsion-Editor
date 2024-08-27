@@ -7,7 +7,7 @@
 
 <button
     on:click={onClick}
-    class="btn"
+    class={`btn ${lightMode ? "lightmode" : ""}`}
     style={`${isActive ? '' : 'pointer-events: none !important; background-color: var(--main-color-dark-2); opacity: 0.7;'}`}>
     {#if icon}
         <span class="main-icon">
@@ -23,6 +23,9 @@
         padding: 0;
         display: inline-flex;
     }
+    .lightmode {
+        box-shadow: var(--main-shadow);
+    }
     .main-text {
         color: rgba(255, 255, 255, 0.9);
         padding: 8.5px 14px 9px 12px;
@@ -33,7 +36,7 @@
         height: 18px;
         color: rgba(255, 255, 255, 0.9);
         padding: 8px 6px 13px 8px;
-        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 2px rgba(0, 0, 0, 0.04);
         margin: 0 -2px -5px 0;
     }
     button {

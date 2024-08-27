@@ -3,8 +3,10 @@
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
     import { nthLinesInJSON } from '$lib/utils';
+    import { findComponentOutputs } from '../systemHelpers';
+    import TooltipHandle from './TooltipHandle.svelte';
     import { onMount } from 'svelte';
-    import Component3dModel from '../../Component3dModel.svelte';
+    import Component3dModel from '../../../Component3dModel.svelte';
 
     // NodeProps used by Svelte Flow
     $$restProps
@@ -14,6 +16,8 @@
 
     let hover = false;
     let isSelected = false;
+
+    let highlightedElement: string | null = null;
 
 
     const remove = () => {
@@ -57,7 +61,8 @@
         <div class="img-cont">
             <Component3dModel
                 data={data}
-                hoverable={isSelected} />
+                hoverable={isSelected}
+                highlightedElement={highlightedElement} />
         </div>
         <p>{data.name}</p>
         <button class="remove-button"
@@ -68,10 +73,17 @@
         </button>
     </div>
 <div class="handle-wrapper left">
-    <Handle type="target" position={Position.Left} isConnectable={false}  />
+    <Handle type="target" position={Position.Left} />
 </div>
 <div class="handle-wrapper right">
-    <Handle type="source" position={Position.Right} isConnectable={false} />
+    {#each findComponentOutputs(data).reverse() as output}
+        <TooltipHandle 
+            componentName={data.name}
+            elementName={output}
+            on:mouseenter={() => highlightedElement = output}
+            on:mouseleave={() => highlightedElement = null}
+        />
+    {/each}
 </div>
 
 <style>
@@ -111,11 +123,14 @@
     }
     .handle-wrapper {
         position: absolute;
-        top: 50%;
+        top: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        flex-direction: column-reverse;
     }
     .handle-wrapper.right {
-        position: absolute;
-        top: 50%;
         right: 2px;
     }
     .main-component-node {

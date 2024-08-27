@@ -67,7 +67,6 @@
             <p>{dialogText}</p>
             <div class="btn-cont">
                 <Button 
-                    lightMode={true}
                     onClick={handleConfirm}>
                     <svg class="option-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -75,7 +74,6 @@
                     {confirmText}
                 </Button>
                 <Button 
-                    lightMode={true}    
                     onClick={handleDeny}>
                     <svg class="option-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -129,16 +127,14 @@
         width: fit-content;
         max-width: 400px;
         height: fit-content;
-        box-shadow: 0 10px 15px rgb(0 0 0 / 6%);
+        box-shadow: var(--main-box-shadow);
         text-align: center;
         z-index: 10000000000;
         padding: 20px 30px 12px 30px;
         transition: .3s;
         opacity: 0;
         border-radius: var(--main-border-radius);
-        background-color: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(33px);
-        background-blend-mode: overlay;
+        background-color: white;
     }
     .main-dialogbox p {
         font-size: 14px;

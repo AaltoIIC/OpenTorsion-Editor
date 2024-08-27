@@ -199,8 +199,10 @@
 <div class="main-line-cont">
     <div class="line-cont-inner" style="transform: translateY({-scrollTop}px);">
         {#each Array.from({ length: nofLines }, (_, i) => i) as i}
-            <div class="code-line {activeLine === i ? "active" : ""} line-{i}">
-                <div class="line-number {i+1 >= highlightedLines.start && i+1 < highlightedLines.end ? "highlighted" : ""}">
+            <div class="code-line 
+                {i+1 >= highlightedLines.start && i+1 < highlightedLines.end ? "highlighted" : ""}
+                {activeLine === i ? "active" : ""} line-{i}">
+                <div class="line-number">
                     {i + 1}
                 </div>
             </div>
@@ -221,7 +223,7 @@
         padding: 0 4px;
         font-family: 'Roboto Mono', monospace;
     }
-    .line-number.highlighted {
+    .highlighted .line-number {
         background-color: var(--main-color-dark);
         color: rgba(255, 255, 255, 0.9);
         opacity: 0.8;
@@ -252,6 +254,11 @@
     .code-line:last-of-type div {
         border-bottom-left-radius: var(--main-border-radius);
         border-bottom-right-radius: var(--main-border-radius);
+        overflow: hidden;
+    }
+    .highlighted:nth-of-type(1) {
+        border-top-left-radius: var(--main-border-radius);
+        border-top-right-radius: var(--main-border-radius);
         overflow: hidden;
     }
 

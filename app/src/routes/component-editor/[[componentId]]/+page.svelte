@@ -145,9 +145,9 @@
             dialogBox.openDialog("You have unsaved changes. Do you want to discard them?",
                 "Discard changes","Cancel").then((value: boolean) => {
                     if (value) {
+                        goto(`/system-editor/${$currentSystemJSON.id}`);
                         resetCurrentComponent();
                         notification.set(null);
-                        goto(`/system-editor/${$currentSystemJSON.id}`);
                     }
                 });
         }

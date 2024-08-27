@@ -148,6 +148,8 @@
         border-top-left-radius: var(--main-border-radius);
         border-bottom-left-radius: var(--main-border-radius);
         overflow: hidden;
+        mask-image: url(../edge-mask.png);
+        mask-size: cover;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

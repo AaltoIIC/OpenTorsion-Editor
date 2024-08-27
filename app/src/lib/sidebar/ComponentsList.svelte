@@ -78,7 +78,7 @@
         width: 360px;
         height: calc(100vh - 126px);
         overflow-y: scroll;
-        background: rgb(245, 245, 245);
+        background: var(--main-grey-color);
     }
     ::-webkit-scrollbar {
         width: 6px;

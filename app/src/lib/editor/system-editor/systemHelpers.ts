@@ -8,6 +8,27 @@ import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
 import { isNameValid } from "$lib/utils";
+
+
+// Find possible output elements of a component
+export const findComponentOutputs = (component: ComponentType): string[] => {
+    const outputs: string[] = [];
+    for (let i = 0; i < component.elements.length; i++) {
+        const nextEl = component.elements[i+1];
+        if (i === component.elements.length - 1) {
+            outputs.push(component.elements[i].name);
+        } else if (nextEl.type === "GearElement" &&
+            nextEl.parent &&
+            component.elements.slice(0, i+1).map(el => el.name).includes(nextEl.parent)) {
+        
+            outputs.push(component.elements[i].name);
+        
+        }
+    }
+
+    return outputs;
+}
+
 // Update the currentSystemJSON with the given component being connected
 // to the last component in the structure
 export const addConnectionTolastComponent = (component: ComponentType) => {
@@ -288,11 +309,16 @@ export const checkConnections = (structure: string[][]) => {
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {
     // Get the maximum number
-    const regex = new RegExp(`^${componentType} \\d+$`);
-    const compToNum = (comp: ComponentType) => { return (
-        parseInt(comp.name.split(" ")[comp.name.split(" ").length - 1])
-    )}
-    const largestNum = components.filter(comp => regex.test(comp.name)).map(compToNum).sort().at(-1)
+    const compToNum = (comp: ComponentType) => {
+        const nameList = comp.name.split(" ")
+        const nameWithoutLastWord = nameList.slice(0, -1).join(' ')
+        if (nameWithoutLastWord === componentType) {
+            return parseInt(nameList.at(-1) || '0')
+        } else {
+            return null
+        }
+    }
+    const largestNum = components.map(compToNum).filter(el => el !== null).sort().at(-1)
 
     return `${componentType} ${largestNum ? largestNum + 1 : 1}`;
 }

@@ -8,7 +8,9 @@
     --main-color-tr-3: rgba(72, 229, 194, 0.24);
     --main-error-color: rgb(244, 108, 108);
     --main-error-color-dark: rgb(227, 97, 97);
+    --main-grey-color: rgb(245, 245, 245);
     --main-border-radius: 0.5em;
+    --main-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 body {
     background: white;

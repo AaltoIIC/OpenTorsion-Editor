@@ -5,6 +5,7 @@
 
     export let data: ComponentType = {name: "",elements: []};
     export let hoverable = true;
+    export let highlightedElement: string | null = null;
 
     let el: HTMLCanvasElement;
 
@@ -21,13 +22,13 @@
             light.castShadow = true;
             light.shadow.camera.near = 0.05;
             light.shadow.camera.far = 500;
-            light.shadow.camera.left = -200;
-            light.shadow.camera.right = 200;
-            light.shadow.camera.top = 200;
-            light.shadow.camera.bottom = -200;
-            light.shadow.mapSize.width = 512;
-            light.shadow.mapSize.height = 512;
-            light.shadow.radius = 6;
+            light.shadow.camera.left = -400;
+            light.shadow.camera.right = 400;
+            light.shadow.camera.top = 400;
+            light.shadow.camera.bottom = -400;
+            light.shadow.mapSize.width = 2048;
+            light.shadow.mapSize.height = 2048;
+            light.shadow.radius = 12;
         }
         scene.add( light );
     }
@@ -37,8 +38,8 @@
 
 
     // functions to create elements
-    const createDisk = (z: number, y: number, x: number) => {
-        const geometry = new THREE.CylinderGeometry( 20, 20, 6, 32 );
+    const createDisk = (name: string, z: number, y: number, x: number) => {
+        const geometry = new THREE.CylinderGeometry( 17, 17, 6, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
         const disk = new THREE.Mesh(geometry, material);
         disk.castShadow = true;
@@ -46,10 +47,12 @@
         disk.position.x = x;
         disk.position.y = y;
         disk.position.z = z+3;
+        disk.name = name;
+        disk.userData = {"color": 0x48e5c2};
         scene.add(disk);
     }
 
-    const createShaft = (z: number, y: number, x: number) => {
+    const createShaft = (name: string, z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 4, 4, 20, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
         const shaft = new THREE.Mesh(geometry, material);
@@ -58,20 +61,22 @@
         shaft.position.x = x;
         shaft.position.y = y;
         shaft.position.z = z+10;
+        shaft.name = name;
+        shaft.userData = {"color": 0x000000};
         scene.add(shaft);
     }
 
-    const createGear = (z: number, y: number, x: number, rotateX: number = 0) => {
-        const geometry = new THREE.CylinderGeometry( 14, 14, 7, 32 );
+    const createGear = (name: string, z: number, y: number, x: number) => {
+        const geometry = new THREE.CylinderGeometry( 18, 18, 7, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
         const gear = new THREE.Mesh(geometry, material);
         gear.castShadow = true;
 
         // add cogs
-        const cogGeometry = new THREE.BoxGeometry(7, 7, 7);
+        const cogGeometry = new THREE.BoxGeometry(7, 8, 7);
         const addCog = (rotation: number) => {
             const cog = new THREE.Mesh(cogGeometry, material);
-            cog.position.set(14 * Math.cos(rotation), 14 * Math.sin(rotation), 0);
+            cog.position.set(18 * Math.cos(rotation), 18 * Math.sin(rotation), 0);
             cog.rotateZ(rotation);
             gear.add(cog);
         };
@@ -83,17 +88,18 @@
         gear.position.x = x;
         gear.position.y = y;
         gear.position.z = z+3.5;
-        gear.rotation.z = rotateX;
+        gear.name = name;
+        gear.userData = {"color": 0x48e5c2};
         scene.add(gear);
     }
 
-    // keep track of z position of last element
+    // keep track of dimensions of component
     let Zdimension = 0;
     let Ydepth = 0;
     // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
     let renderer: THREE.WebGLRenderer;
-    let branchHeight = 32;
+    let branchHeight = 34;
     onMount(() => {
         // generate 3d model
         type Junction = {
@@ -106,10 +112,10 @@
         let branches = new Map<string, Junction>();
         data.elements.forEach(el => {
             if (el.type === "Disk") {
-                createDisk(currentZ, currentY, currentX);
+                createDisk(el.name, currentZ, currentY, currentX);
                 currentZ += 6;
             } else if (el.type === "ShaftDiscrete") {
-                createShaft(currentZ, currentY, currentX);
+                createShaft(el.name, currentZ, currentY, currentX);
                 currentZ += 20;
             } else if (el.type === "GearElement") {
                 // update branches
@@ -123,14 +129,12 @@
                     branches.set(el.name, {z: currentZ, endY: currentY});
                 }
 
-                let rotateX =  0;
                 if ((currentY%(branchHeight*2)) != 0) {
-                    rotateX =  (Math.PI/180) * 22.5;
-                    currentX = -22.6;
+                    currentX = -branchHeight/1.5;
                 } else {
                     currentX = 0;
                 }
-                createGear(currentZ, currentY, currentX, rotateX);
+                createGear(el.name, currentZ, currentY, currentX);
                 currentZ += 7;
             }
 
@@ -142,13 +146,15 @@
             }
         });
 
-        const cameraSize = 70 + 35*(Ydepth / -branchHeight);
+        // set camera size (larger components apper smaller)
+        const maxDimension = Math.max(-Ydepth, Zdimension * 0.45);
+        const cameraSize = 70 + Math.min(maxDimension, 100);
         camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
 
         // add shadow plane
-        const planeGeometry = new THREE.PlaneGeometry(200, 200);
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
         const planeMaterial = new THREE.ShadowMaterial({
             opacity: 0.15
         });
@@ -156,7 +162,7 @@
         plane.receiveShadow = true;
         plane.rotation.x = - Math.PI / 2;
         plane.position.y = Ydepth-21;
-        plane.position.z = currentZ/2;
+        plane.position.z = 0;
 
         scene.add(plane);
         renderer.shadowMap.enabled = true;
@@ -177,14 +183,17 @@
 
     // function to (re)set camera position
     const setCameraPosition = () => {
+        const Xdepth =  Ydepth ? -branchHeight/2 : 0
         camera.position.set(
-            70,
+            70 + Xdepth/2,
             85 + Ydepth/2,
-            Math.min(88 + Zdimension/2, 138));
+            88 + Zdimension/2);
+        // look at the middle of component
         camera.lookAt(
-            0,
+            Xdepth/2,
             Ydepth/2,
-            Math.min(Zdimension/2, 50));
+            Zdimension/2);
+        
         renderer.render(scene, camera);
     }   
 
@@ -193,12 +202,37 @@
         const width = el.clientWidth;
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
+        const Xdepth =  Ydepth ? -branchHeight/2 : 0
         const currentCamZ = (x / width) * (Zdimension+320) * 2
-        camera.position.set( 70, 85 + Ydepth/2, -160 + currentCamZ );
-        camera.lookAt( 0, Ydepth/2, Zdimension/2 );
+        camera.position.set( 70 + Xdepth/2, 85 + Ydepth/2, -160 + currentCamZ );
+        camera.lookAt( Xdepth/2, Ydepth/2, Zdimension/2 );
 
         renderer.render(scene, camera);
     }
+
+    const highlightElement = (highlightedElement: string | null) => {
+        if (highlightedElement) {
+            if (!renderer) return;
+            scene.traverse((object) => {
+                if (object instanceof THREE.Mesh && object.name !== highlightedElement) {
+                    object.material.color.set(0xffffff);
+                }
+            });
+            renderer.render(scene, camera);
+        } else {
+            if (!renderer) return;
+            scene.traverse((object) => {
+                console.log(object.userData.color);
+                if (object instanceof THREE.Mesh && object.userData.color) {
+                    object.material.color.set(object.userData.color);
+                }
+            });
+            renderer.render(scene, camera);
+    }
+    }
+
+    // highlight element
+    $: highlightElement(highlightedElement);
 </script>
 <canvas bind:this={el}
     on:mousemove={hoverable ? handleMouseMove : undefined}
@@ -208,7 +242,5 @@
     canvas {
         width: 100%;
         height: 100%;
-        mask-image: url(../edge-mask.png);
-        mask-size: cover;
     }
 </style>

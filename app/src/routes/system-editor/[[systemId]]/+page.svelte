@@ -146,13 +146,13 @@
                 bind:textContent={JSONEditorText}
                 onInput={handleJSONEditing} />
         </div>
-        <a href="/analysis">
-            <button class="analyze-button">
+        <a class="analyze-btn-cont" href="/analysis">
+            <Button lightMode={true}>
                 Analyze DDT
                 <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>              
-            </button>
+            </Button>
         </a>
     </div>
     <div class="top-menu">
@@ -204,13 +204,28 @@
 </div>
 <DialogBox bind:this={dialogBox} />
 <style>
+    .analyze-btn-cont {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10;
+    }
+    .icon-analyze {
+        width: 16px;
+        height: 16px;
+        margin: 0 0 -2.5px 0;
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.9);;
+        stroke-width: 2px;
+        stroke-linejoin: round;
+    }
     .hidden {
         display: none;
     }
     .resize-slider {
         width: 100%;
         height: 8px;
-        background-color: rgba(0, 0, 0, 0.1);
+        background: rgb(240, 240, 240);
         border: none !important;
         border-radius: 0;
         cursor: n-resize;
@@ -221,32 +236,6 @@
     .json-editor {
         height: var(--json-editor-height);
     }
-    .icon-analyze {
-        width: 22px;
-        height: 22px;
-        margin: 0 0 -5px 0;
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2px;
-        stroke-linejoin: round;
-    }
-    .analyze-button {
-        position: fixed;
-        bottom: 32px;
-        right: 32px;
-        z-index: 10;
-        font-size: 14px;
-        border: solid 2px rgba(255, 255, 255, 0.3);
-        background-color: var(--main-color);
-        box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
-        padding: 8px 14px 11px 16px;
-        font-family: 'Inter', sans-serif;
-        font-weight: 550;
-        border-radius: var(--main-border-radius);
-    }
-    .analyze-button:hover {
-        border: solid 2px rgba(255, 255, 255, 0.6);
-    }
     .main-editor-area {
         position: absolute;
         top: 68px;
@@ -255,19 +244,6 @@
         height: calc(100vh - 68px);
         overflow: hidden;
         background-color: rgb(255, 255, 255);
-    }
-    button {
-        color: rgba(255, 255, 255, 0.9);
-        background-color: var(--main-color);
-        padding: 8px;
-        font-weight: 500;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-        cursor: pointer;
-        transition: .2s;
-    }
-    button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.4);
     }
     .icon-back {
         width: 20px;
