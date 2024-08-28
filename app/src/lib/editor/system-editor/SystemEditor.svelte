@@ -9,6 +9,8 @@
       type EdgeTypes,
       type Node,
       type Edge,
+      type Connection,
+      ConnectionLineType,
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
@@ -19,8 +21,7 @@
     import type { ComponentType } from '$lib/types/types';
     import {
       nameComponentInstance,
-      updateSystemEditor,
-      addConnectionTolastComponent
+      updateSystemEditor
      } from './systemHelpers';
 
     const nodeTypes: NodeTypes = {
@@ -65,9 +66,6 @@
         newJson.json.components.push(componentData);
         return newJson;
       });
-
-      // add connection to last component
-      addConnectionTolastComponent(componentData);
     };
 
     // add empty system node if there are no nodes
@@ -85,6 +83,25 @@
         nodes.set(value.filter(node => node.type !== 'empty'));
       }
     });
+
+    // function to update the system JSON when a new connection is made
+    const handleNewConnection = (newConnection: Connection) => {
+      if (!newConnection.sourceHandle || !newConnection.targetHandle) return;
+      currentSystemJSON.update(value => {
+        const newJson = { ...value };
+        // if connection from source/to target already exists, remove it
+        newJson.json.structure = newJson.json.structure.filter(
+          connection => connection[0] !== newConnection.sourceHandle && connection[1] !== newConnection.targetHandle
+        );
+
+        // add new connection to system JSON
+        newJson.json.structure.push([
+          newConnection.sourceHandle as string,
+          newConnection.targetHandle as string
+        ]);
+        return newJson;
+      });
+    };
 </script>
 
 <SvelteFlow
@@ -96,6 +113,8 @@
     {edges}
     on:dragover={onDragOver} on:drop={onDrop}
     fitView
+    connectionLineType={ConnectionLineType.SmoothStep}
+    onconnect={handleNewConnection}
     defaultEdgeOptions={{
       animated: true,
       deletable: true,

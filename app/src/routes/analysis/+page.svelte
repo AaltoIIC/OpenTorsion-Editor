@@ -22,7 +22,6 @@
         }).then(response => response.text())
             .then(data => {
                 responseHTML = `${data}<style>${plotStyles}</style>`;
-                console.log(data);
             });
     }
 

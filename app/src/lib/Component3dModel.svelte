@@ -40,43 +40,41 @@
     // functions to create elements
     const createDisk = (name: string, z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 17, 17, 6, 32 );
-        const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2, transparent: true });
         const disk = new THREE.Mesh(geometry, material);
         disk.castShadow = true;
         disk.rotateX(Math.PI*(90/180));
         disk.position.x = x;
         disk.position.y = y;
-        disk.position.z = z+3;
+        disk.position.z = z-3;
         disk.name = name;
-        disk.userData = {"color": 0x48e5c2};
         scene.add(disk);
     }
 
     const createShaft = (name: string, z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 4, 4, 20, 32 );
-        const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x000000, transparent: true });
         const shaft = new THREE.Mesh(geometry, material);
         shaft.castShadow = true;
         shaft.rotateX(Math.PI*(90/180));
         shaft.position.x = x;
         shaft.position.y = y;
-        shaft.position.z = z+10;
+        shaft.position.z = z-10;
         shaft.name = name;
-        shaft.userData = {"color": 0x000000};
         scene.add(shaft);
     }
 
     const createGear = (name: string, z: number, y: number, x: number) => {
         const geometry = new THREE.CylinderGeometry( 18, 18, 7, 32 );
-        const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2, transparent: true });
         const gear = new THREE.Mesh(geometry, material);
         gear.castShadow = true;
 
         // add cogs
-        const cogGeometry = new THREE.BoxGeometry(7, 8, 7);
+        const cogGeometry = new THREE.BoxGeometry(4, 8, 7);
         const addCog = (rotation: number) => {
             const cog = new THREE.Mesh(cogGeometry, material);
-            cog.position.set(18 * Math.cos(rotation), 18 * Math.sin(rotation), 0);
+            cog.position.set(19 * Math.cos(rotation), 19 * Math.sin(rotation), 0);
             cog.rotateZ(rotation);
             gear.add(cog);
         };
@@ -87,15 +85,14 @@
         geometry.rotateX(Math.PI*(90/180));
         gear.position.x = x;
         gear.position.y = y;
-        gear.position.z = z+3.5;
+        gear.position.z = z-3.5;
         gear.name = name;
-        gear.userData = {"color": 0x48e5c2};
         scene.add(gear);
     }
 
     // keep track of dimensions of component
     let Zdimension = 0;
-    let Ydepth = 0;
+    let Ydimension = 0;
     // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
     let renderer: THREE.WebGLRenderer;
@@ -113,42 +110,41 @@
         data.elements.forEach(el => {
             if (el.type === "Disk") {
                 createDisk(el.name, currentZ, currentY, currentX);
-                currentZ += 6;
+                currentZ -= 6;
             } else if (el.type === "ShaftDiscrete") {
                 createShaft(el.name, currentZ, currentY, currentX);
-                currentZ += 20;
+                currentZ -= 20;
             } else if (el.type === "GearElement") {
                 // update branches
                 if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
                     // add element to branches with shared value across all gears with the same parent
                     branches.set(el.name, branches.get(el.parent) as Junction);
-                    currentY -= branchHeight;
+                    currentY += branchHeight;
                     (branches.get(el.name) as Junction).endY = currentY;
                     currentZ = (branches.get(el.parent) as Junction).z;
                 } else {
                     branches.set(el.name, {z: currentZ, endY: currentY});
                 }
 
-                if ((currentY%(branchHeight*2)) != 0) {
-                    currentX = -branchHeight/1.5;
+                if ((currentY%(branchHeight*2)) !== 0) {
+                    currentX = branchHeight/1.5;
                 } else {
                     currentX = 0;
                 }
                 createGear(el.name, currentZ, currentY, currentX);
-                currentZ += 7;
+                currentZ -= 7;
             }
 
-            if (currentZ > Zdimension) {
+            if (currentZ < Zdimension) {
                 Zdimension = currentZ;
             }
-            if (currentY < Ydepth) {
-                Ydepth = currentY;
+            if (currentY > Ydimension) {
+                Ydimension = currentY;
             }
         });
-
         // set camera size (larger components apper smaller)
-        const maxDimension = Math.max(-Ydepth, Zdimension * 0.45);
-        const cameraSize = 70 + Math.min(maxDimension, 100);
+        const maxDimension = Math.max(Ydimension, -Zdimension * 0.45);
+        const cameraSize = 70 + Math.min(maxDimension, 116);
         camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -160,8 +156,9 @@
         });
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
+        plane.name = "shadowPlane";
         plane.rotation.x = - Math.PI / 2;
-        plane.position.y = Ydepth-21;
+        plane.position.y = -21;
         plane.position.z = 0;
 
         scene.add(plane);
@@ -183,15 +180,15 @@
 
     // function to (re)set camera position
     const setCameraPosition = () => {
-        const Xdepth =  Ydepth ? -branchHeight/2 : 0
+        const Xdepth =  Ydimension ? branchHeight/2 : 0
         camera.position.set(
             70 + Xdepth/2,
-            85 + Ydepth/2,
+            85 + Ydimension/2,
             88 + Zdimension/2);
         // look at the middle of component
         camera.lookAt(
             Xdepth/2,
-            Ydepth/2,
+            Ydimension/2,
             Zdimension/2);
         
         renderer.render(scene, camera);
@@ -202,10 +199,10 @@
         const width = el.clientWidth;
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
-        const Xdepth =  Ydepth ? -branchHeight/2 : 0
+        const Xdepth =  Ydimension ? branchHeight/2 : 0
         const currentCamZ = (x / width) * (Zdimension+320) * 2
-        camera.position.set( 70 + Xdepth/2, 85 + Ydepth/2, -160 + currentCamZ );
-        camera.lookAt( Xdepth/2, Ydepth/2, Zdimension/2 );
+        camera.position.set( 70 + Xdepth/2, 85 + Ydimension/2, -160 + currentCamZ );
+        camera.lookAt( Xdepth/2, Ydimension/2, Zdimension/2 );
 
         renderer.render(scene, camera);
     }
@@ -214,17 +211,20 @@
         if (highlightedElement) {
             if (!renderer) return;
             scene.traverse((object) => {
-                if (object instanceof THREE.Mesh && object.name !== highlightedElement) {
-                    object.material.color.set(0xffffff);
+                if (object instanceof THREE.Mesh &&
+                    object.name &&
+                    object.name !== highlightedElement &&
+                    object.name !== "shadowPlane") {
+                    object.material.opacity = 0.2;
                 }
             });
             renderer.render(scene, camera);
         } else {
             if (!renderer) return;
             scene.traverse((object) => {
-                console.log(object.userData.color);
-                if (object instanceof THREE.Mesh && object.userData.color) {
-                    object.material.color.set(object.userData.color);
+                if (object instanceof THREE.Mesh &&
+                    object.name !== "shadowPlane") {
+                    object.material.opacity = 1;
                 }
             });
             renderer.render(scene, camera);

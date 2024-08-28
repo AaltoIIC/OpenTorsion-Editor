@@ -2,21 +2,23 @@
     import { Handle, Position, } from '@xyflow/svelte';
     import { createEventDispatcher } from 'svelte';
 
+    export let type: 'input' | 'output';
     export let elementName: string;
     export let componentName: string;
 
     const dispatch = createEventDispatcher();
     let hover = false;
 </script>
-<div class="handle-outer">
+<div class="handle-outer"
+    style={`transform: translate(${type === 'input' ? '-' : ''}50%, 0);`}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="handle-inner"
         on:mouseenter={() => {hover = true; dispatch('mouseenter')}}
         on:mouseleave={() => {hover = false; dispatch('mouseleave')}}>
         <Handle
-            type="target"
+            type={type === 'input' ? 'target' : 'source'}
             id={`${componentName}.${elementName}`}
-            position={Position.Right}
+            position={type === 'input' ? Position.Left : Position.Right}
             style="position: relative; top: 0; left: 0; transform: none;"
             />
     </div>
@@ -26,7 +28,6 @@
 </div>
 <style>
     .handle-outer {
-        transform: translate(50%, 0);
         position: relative;
     }
     .tooltip {

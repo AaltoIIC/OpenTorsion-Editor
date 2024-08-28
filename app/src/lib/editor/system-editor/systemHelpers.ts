@@ -32,7 +32,7 @@ export const findComponentOutputs = (component: ComponentType): string[] => {
 // Update the currentSystemJSON with the given component being connected
 // to the last component in the structure
 export const addConnectionTolastComponent = (component: ComponentType) => {
-    let currentJSON = get(currentSystemJSON).json
+    let currentJSON = get(currentSystemJSON).json;
 
     // If there are no components, don't add connection
     if (currentJSON.components.length === 1) return;
@@ -59,10 +59,11 @@ export const addConnectionTolastComponent = (component: ComponentType) => {
 // Update nodes and edges of the System Editor based on currentSystemJSON 
 export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge[]>) => {
     // Go through nodes
-    let currentJSON = get(currentSystemJSON)
-    let currentEdges = get(edges)
+    let currentJSON = get(currentSystemJSON);
+    let currentEdges = get(edges);
 
-    // Add new nodes for newly added components
+    // Add new nodes for newly added components and remove nodes for removed components
+    let newNodes: Node[] = [];
     currentJSON.json.components.forEach((comp: ComponentType) => {
         // Check if node with this name already exists
         const existingNode = get(nodes).find(node => node.id === comp.name)
@@ -74,70 +75,97 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
                 draggable: false,
                 data: comp,
                 position: { x: 0, y: 0 },
-                origin: [0.5, 0.0]
+                origin: [0.5, 0.5]
             } as Node
-            nodes.update(nodes => [...nodes, newNode])
+            newNodes.push(newNode);
+        } else {
+            newNodes.push(existingNode);
         }
-    })
+    });
 
-    // Remove nodes that had their corresponding component removed
-    let componentNames = currentJSON.json.components.map(comp => comp.name)
-    nodes.update(nodes => nodes.filter(node => componentNames.includes(node.id)))
 
     // Add new edges for newly added connections
     currentJSON.json.structure.forEach((connection: string[]) => {
-        let sourceComponent = connection[0].split('.')[0]
-        let targetComponent = connection[1].split('.')[0]
-        let isEdgeAdded = currentEdges.find(edge => edge.id === `${sourceComponent}-${targetComponent}`)
+        let source = connection[0];
+        let target = connection[1];
+        let isEdgeAdded = currentEdges.find(edge => edge.id === `${source}..${target}`);
 
         if (!isEdgeAdded) {
             let newEdge = {
-                id: `${sourceComponent}-${targetComponent}`,
-                source: sourceComponent,
-                target: targetComponent,
+                id: `${source}..${target}`,
+                source: source.split(".")[0],
+                target: target.split(".")[0],
+                sourceHandle: source,
+                targetHandle: target,
                 class: ''
-            } as Edge
-            edges.update(edges => [...edges, newEdge])
+            } as Edge;
+            edges.update(edges => [...edges, newEdge]);
         }
     })
 
     // Remove edges that had their corresponding connection removed
     let connectionIds = currentJSON.json.structure.map(
-        connection => `${connection[0].split('.')[0]}-${connection[1].split('.')[0]}`
-    )
-    edges.update(edges => edges.filter(edge => connectionIds.includes(edge.id)))
+        connection => `${connection[0]}..${connection[1]}`
+    );
+    edges.update(edges => edges.filter(edge => connectionIds.includes(edge.id)));
 
 
     // Update position of nodes
-    let newNodes = get(nodes)
-
-    const connections = new Map<Node, Node>();
-    get(edges).forEach(edge => {
-        let sourceNode = newNodes.find(node => node.id === edge.source)
-        let targetNode = newNodes.find(node => node.id === edge.target)
-        if (sourceNode && targetNode) connections.set(sourceNode, targetNode)
-    })
+    const gridSize = 270;
+    const components = get(currentSystemJSON).json.components.map(comp => comp.name);
+    const structure = get(currentSystemJSON).json.structure;
+    const componentsWithInputs = get(edges).map(edge => edge.target);
+    const componentsWithOutputs = get(edges).map(edge => edge.source);
     
-    const values = Array.from(connections.values());
-    let startingComponents: Node[] = newNodes.filter(node => !values.includes(node))
+    const startingNodes = components.filter(comp => (
+        componentsWithOutputs.includes(comp) && !componentsWithInputs.includes(comp)
+    ));
+    const endingNodes = components.filter(comp => (
+        componentsWithInputs.includes(comp) && !componentsWithOutputs.includes(comp)
+    ));
     
-    let currentY = 0
-    startingComponents.forEach(comp => {
-        let currentX = 0;
-        let currentComp: Node | undefined = comp;
-
-        while (currentComp) {
-            const nextComp = connections.get(currentComp)
-            currentComp.position = { x: currentX, y: currentY }
-            currentComp = nextComp;
-
-            currentX += 280;
+    // Calculate the height of the subtrees for each component
+    const subtreeHeight = new Map<string, number>();
+    endingNodes.forEach((compName: string) => {
+        subtreeHeight.set(compName, 1);
+        let inputNode = structure.find(row => row[1].split(".")[0] === compName)?.[0].split(".")[0];
+        while (inputNode) {
+            subtreeHeight.set(inputNode, (subtreeHeight.get(inputNode) || 0) + 1);
+            inputNode = structure.find(row => row[1].split(".")[0] === inputNode)?.[0].split(".")[0];
         }
-
-        currentY += 280;
     })
 
-    nodes.set(newNodes)
+    let currentX = 0;
+    // places one column of nodes
+    const placeNodes = (nodes: Node[]) => {
+        currentX += gridSize;
+        let currentY = 0;
+        nodes.forEach((node: Node) => {
+            const compName = node.id;
+            const height = subtreeHeight.get(compName) || 0;
+            currentY += height * gridSize / 2;
+            node.position.x = currentX;
+            node.position.y = currentY;
+            currentY += height * gridSize / 2;
+
+            const connectedComponents = get(edges)
+                .filter(edge => edge.source === compName)
+                .map(edge => newNodes.find(node => node.id === edge.target)) as Node[];
+            if (connectedComponents.length > 0) {
+                placeNodes(connectedComponents);
+            }
+        });
+    }
+
+    startingNodes.forEach((compName: string, index: number) => {
+        const node = newNodes.find(node => node.id === compName);
+        if (node) {
+            placeNodes([node]);
+        }
+        currentX += gridSize;
+    });
+    nodes.set(newNodes);
+
 }
 
 const hasDuplicates = (array: any[]) => {
@@ -308,7 +336,6 @@ export const checkConnections = (structure: string[][]) => {
 }
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {
-    // Get the maximum number
     const compToNum = (comp: ComponentType) => {
         const nameList = comp.name.split(" ")
         const nameWithoutLastWord = nameList.slice(0, -1).join(' ')
@@ -318,7 +345,7 @@ export const nameComponentInstance = (componentType: string, components: Compone
             return null
         }
     }
-    const largestNum = components.map(compToNum).filter(el => el !== null).sort().at(-1)
+    const largestNum = components.map(compToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1)
 
     return `${componentType} ${largestNum ? largestNum + 1 : 1}`;
 }

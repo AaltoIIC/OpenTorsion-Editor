@@ -218,10 +218,17 @@ export const nameElement = (type: string, elements: ElementType[]) => {
         "ShaftDiscrete": "Shaft",
         "GearElement": "Gear"
     }
-    // Get the maximum number
-    const regex = new RegExp(`^${typeToName[type]} \\d+$`);
-    const largestNum = elements.filter(el => el.type === type && regex.test(el.name))
-                                .map(el => parseInt(el.name.split(" ")[1])).sort().at(-1)
+    const elemToNum = (el: ElementType) => {
+        const nameList = el.name.split(" ")
+        const nameWithoutLastWord = nameList.slice(0, -1).join(' ')
+        if (nameWithoutLastWord === typeToName[type]) {
+            return parseInt(nameList.at(-1) || '0')
+        } else {
+            return null
+        }
+    }
+    console.log(elements.map(elemToNum).filter(el => el !== null).sort())
+    const largestNum = elements.map(elemToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1)
     return `${typeToName[type]} ${largestNum ? largestNum + 1 : 1}`;
 }
 

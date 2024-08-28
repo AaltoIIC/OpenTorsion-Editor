@@ -73,11 +73,18 @@
         </button>
     </div>
 <div class="handle-wrapper left">
-    <Handle type="target" position={Position.Left} />
+    <TooltipHandle 
+            type="input"
+            componentName={data.name}
+            elementName={data.elements[0].name}
+            on:mouseenter={() => highlightedElement = data.elements[0].name}
+            on:mouseleave={() => highlightedElement = null}
+    />
 </div>
 <div class="handle-wrapper right">
-    {#each findComponentOutputs(data).reverse() as output}
-        <TooltipHandle 
+    {#each findComponentOutputs(data) as output}
+        <TooltipHandle
+            type="output"
             componentName={data.name}
             elementName={output}
             on:mouseenter={() => highlightedElement = output}

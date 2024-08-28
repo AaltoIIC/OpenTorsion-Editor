@@ -11,8 +11,6 @@
     type $$Props = EdgeProps;
     $$restProps
   
-    export let source:  $$Props['source'];
-    export let target:  $$Props['target'];
     export let sourceX: $$Props['sourceX'];
     export let sourceY: $$Props['sourceY'];
     export let sourcePosition: $$Props['sourcePosition'];
@@ -21,6 +19,8 @@
     export let targetPosition: $$Props['targetPosition'];
     export let markerEnd: $$Props['markerEnd'] = undefined;
     export let style: $$Props['style'] = undefined;
+    export let sourceHandleId: $$Props['sourceHandleId'] = null;
+    export let targetHandleId: $$Props['targetHandleId'] = null;
   
     $: [edgePath, labelX, labelY] = getSmoothStepPath({
       sourceX,
@@ -32,46 +32,11 @@
     });
   
     const onEdgeClick = () => {
-      // switch source and target with their connections
       currentSystemJSON.update((json) => {
         const newJson = { ...json };
-
-        let sourceStartElem = newJson.json.components
-                                .find(component => component.name === source)
-                                ?.elements.at(0)?.name;
-        let sourceEndElem = newJson.json.components
-                                .find(component => component.name === source)
-                                ?.elements.at(-1)?.name;
-        let targetStartElem = newJson.json.components
-                                .find(component => component.name === target)
-                                ?.elements.at(0)?.name;
-        let targetEndElem = newJson.json.components
-                                .find(component => component.name === target)
-                                ?.elements.at(-1)?.name;
-  
-        // remove old connection
-        newJson.json.structure = newJson.json.structure
-                              .filter((connection) => 
-                              !_.isEqual(connection,
-                                [`${source}.${sourceEndElem}`, `${target}.${targetStartElem}`])
-                              );
-
-        // switch old source's connection to connect to old target's start element
-        // and old target's connection to connect to old source's end element
-        newJson.json.structure = newJson.json.structure
-                              .map((connection) => {
-                                if (connection[1] === `${source}.${sourceStartElem}`) {
-                                  return [connection[0], `${target}.${targetStartElem}`];
-                                } else if (connection[0] === `${target}.${targetEndElem}`) {
-                                  return [`${source}.${sourceEndElem}`, connection[1]];
-                                } else {
-                                  return connection;
-                                }
-                              })
-        
-        // add new connection between new source's end element and new target's start element
-        newJson.json.structure.push([`${target}.${targetEndElem}`, `${source}.${sourceStartElem}`]);
-
+        newJson.json.structure = newJson.json.structure.filter(
+          (connection) => connection[0] !== sourceHandleId && connection[1] !== targetHandleId
+        );
         return newJson;
       });
     }
