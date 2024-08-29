@@ -136,7 +136,7 @@
         background: white;
     }
     .component-list-item.hover {
-        background: rgb(250, 250, 250);
+        background: var(--main-hover-color);
     }
     .component-list-item:active {
         cursor: grabbing;

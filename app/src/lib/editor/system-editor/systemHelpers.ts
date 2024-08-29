@@ -75,7 +75,7 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
                 draggable: false,
                 data: comp,
                 position: { x: 0, y: 0 },
-                origin: [0.5, 0.5]
+                origin: [0, 0.75]
             } as Node
             newNodes.push(newNode);
         } else {
@@ -118,10 +118,10 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
     const componentsWithOutputs = get(edges).map(edge => edge.source);
     
     const startingNodes = components.filter(comp => (
-        componentsWithOutputs.includes(comp) && !componentsWithInputs.includes(comp)
+        !componentsWithInputs.includes(comp)
     ));
     const endingNodes = components.filter(comp => (
-        componentsWithInputs.includes(comp) && !componentsWithOutputs.includes(comp)
+        !componentsWithOutputs.includes(comp)
     ));
     
     // Calculate the height of the subtrees for each component
@@ -135,34 +135,46 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
         }
     })
 
-    let currentX = 0;
-    // places one column of nodes
-    const placeNodes = (nodes: Node[]) => {
-        currentX += gridSize;
-        let currentY = 0;
-        nodes.forEach((node: Node) => {
-            const compName = node.id;
-            const height = subtreeHeight.get(compName) || 0;
-            currentY += height * gridSize / 2;
-            node.position.x = currentX;
-            node.position.y = currentY;
-            currentY += height * gridSize / 2;
+    let systemWidth = 0;
 
-            const connectedComponents = get(edges)
-                .filter(edge => edge.source === compName)
-                .map(edge => newNodes.find(node => node.id === edge.target)) as Node[];
-            if (connectedComponents.length > 0) {
-                placeNodes(connectedComponents);
+    // Recursive function to place nodes in the correct position
+    const placeNode = (node: Node, currentX: number, currentY: number, parentId: string) => {
+        const compName = node.id;
+        const height = (subtreeHeight.get(compName) || 0) * gridSize;
+        node.position.x = currentX;
+        node.position.y = currentY + height / 2;
+        node.parentId = parentId;
+        node.expandParent = true;
+
+        const connectedComponents = get(edges)
+            .filter(edge => edge.source === compName)
+            .map(edge => newNodes.find(node => node.id === edge.target)) as Node[];
+        let newY = currentY;
+        connectedComponents.forEach((node: Node) => {
+            if (currentX + gridSize > systemWidth) {
+                systemWidth = currentX + gridSize;
             }
-        });
+            newY = placeNode(node, currentX + gridSize, newY, parentId);
+        })
+
+        currentY += height;
+        return currentY;
     }
 
-    startingNodes.forEach((compName: string, index: number) => {
+    startingNodes.forEach((compName: string) => {
         const node = newNodes.find(node => node.id === compName);
         if (node) {
-            placeNodes([node]);
+            newNodes.unshift({
+                id: `group-${compName}`,
+                type: 'group',
+                data: {},
+                draggable: false,
+                position: { x: systemWidth, y: 0 },
+                style: 'width: 170px; height: 140px;'
+            });
+            placeNode(node, 0, 0, `group-${compName}`);
+            systemWidth += gridSize*1.5;
         }
-        currentX += gridSize;
     });
     nodes.set(newNodes);
 
@@ -368,4 +380,32 @@ export const nameSystem = (systems: SystemType[]) => {
     }
     
     return `New System${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
+}
+
+// checks if the given structure is a tree (contains no loops)
+export const isStructureTree = (structure: string[][]): boolean => {
+    let connectedParts: Set<string>[] = [];
+    for (let connection of structure) {
+        const source = connection[0].split(".")[0];
+        const target = connection[1].split(".")[0];
+
+        let sourcePart = connectedParts.find(part => part.has(source));
+        let targetPart = connectedParts.find(part => part.has(target));
+        if (sourcePart && targetPart) {
+            if (sourcePart !== targetPart) {
+                connectedParts = connectedParts.filter(part => part !== sourcePart && part !== targetPart);
+                connectedParts.push(new Set([...sourcePart, ...targetPart]));
+            } else {
+                return false;
+            }
+        } else if (sourcePart) {
+            sourcePart.add(target);
+        } else if (targetPart) {
+            targetPart.add(source);
+        } else {
+            connectedParts.push(new Set([source, target]));
+        }
+    } 
+
+    return true;
 }

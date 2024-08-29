@@ -96,7 +96,8 @@
         display: flex;
         align-items: center;
         vertical-align: middle;
-        border: solid 1px rgba(0, 0, 0, 0.1);
+        border-radius: var(--main-border-radius);
+        overflow: hidden;
         transition: .3s;
     }
     .main-notification-cont.is-error {

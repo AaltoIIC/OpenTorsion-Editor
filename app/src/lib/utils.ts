@@ -12,6 +12,16 @@ import { isAlmostComponentType, isAlmostSystemType } from "./types/typeguards";
 import { nameElement } from "./editor/component-editor/componentHelpers";
 import _ from 'lodash';
 
+// function to find an element in the current system JSON based on
+// its name found in connection strings
+export const findElement = (elementId: string): ElementType | undefined => {
+    const system = get(currentSystemJSON);
+    const componentName = elementId.split('.')[0];
+    const elementName = elementId.split('.')[1];
+    const component = system.json.components.find((component) => component.name === componentName);
+    return component?.elements.find((element) => element.name === elementName);
+}
+
 export const exportJSON = (json: any) => {
     const jsonString = JSON.stringify(json, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores/stores";
-    import { defaultElement } from "../editor/component-editor/componentHelpers";
+    import { defaultElement, possibleParams } from "../editor/component-editor/componentHelpers";
     
     const addEl = (type: string) => {
         currentComponentJSON.update(value => {
@@ -38,7 +38,14 @@
             <div class="element-info">
                 <div>
                     <h4>Disk</h4>
-                    <p>Parameters: name, damping, excitation, inertia</p>
+                    <p>
+                        {#each possibleParams['disk'].required as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                        {#each possibleParams['disk'].optional as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                    </p>
                 </div>
                 <div>
                     <button on:click={() => addEl('disk')}>
@@ -62,7 +69,14 @@
             <div class="element-info">
                 <div>
                     <h4>Shaft</h4>
-                    <p>Parameters: name, damping, excitation, stiffness</p>
+                    <p>
+                        {#each possibleParams['shaft'].required as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                        {#each possibleParams['shaft'].optional as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                    </p>
                 </div>
                 <div>
                     <button on:click={() => addEl('shaft')}>
@@ -86,7 +100,14 @@
             <div class="element-info">
                 <div>
                     <h4>Gear</h4>
-                    <p>Parameters: name, damping, excitation, inertia, diameter, teeth</p>
+                    <p>
+                        {#each possibleParams['gear'].required as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                        {#each possibleParams['gear'].optional as param}
+                            <span class="param">{param}</span>
+                        {/each}
+                    </p>
                 </div>
                 <div>
                     <button on:click={() => addEl('gear')}>
@@ -101,6 +122,25 @@
     </div>
 </div>
 <style>
+    .param {
+        font-family: 'Roboto Mono', monospace;
+        margin: 1.5px;
+        padding: 2px;
+        border-radius: 5px;
+        background-color: var(--main-grey-color);
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.6);
+    }
+    .element-info p {
+        margin: 0;
+        padding: 0;
+        padding: 0;
+        line-height: 1.5;
+        display: flex;
+        flex-wrap: wrap;
+        white-space: normal;
+        width: 100%;
+    }
     .element-cont {
         -moz-user-select: -moz-none;
         -khtml-user-select: none;
@@ -120,12 +160,6 @@
     .element-info h4 {
         margin: 0;
     }
-    .element-info p {
-        font-size: 14px;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.6);
-        margin: 0;
-    }
     .element-info button {
         background-color: rgb(34, 34, 34);
         font-family: "Inter", sans-serif;
@@ -137,27 +171,30 @@
         height: 80px;
         width: 20px;
         background-color: var(--main-color);
-        margin: 12px auto;
+        margin: 20px 40px;
+        box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        box-shadow: var(--main-shadow);
     }
     .shaft {
-        height: 14px;
+        height: 18px;
         width: 72px;
         background-color: var(--main-color);
-        margin: 45px auto;
+        margin: 51px 14px;
+        box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        box-shadow: var(--main-shadow);
     }
     .gear {
         height: 60px;
         width: 20px;
-        margin: 22px auto;
+        margin: 30px 40px;
+        box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        box-shadow: var(--main-shadow);
         background-color: var(--main-color);
         background-image: repeating-linear-gradient(
             0deg,
@@ -168,28 +205,27 @@
         );
     }
     .main-illustration-cont {
-        height: 108px;
-        width: 108px;
-        background-color: var(--main-color-tr-2);
-        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        height: 120px;
+        width: 100px;
+        overflow: hidden;
     }
     .element-list-item {
         display: flex;
-        border: solid 1px rgba(0, 0, 0, 0.1);
         box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         width: calc(100% - 12px);
-        margin: 5px;
-        height: 108px;
+        margin: 0 5px 5px 5px;
+        height: 124px;
         overflow: hidden;
         transition: .2s;
         cursor: grab;
         border-radius: var(--main-border-radius);
+        background-color: white;
     }
     .element-list-item:active {
         cursor: grabbing;
     }
     .element-list-item:hover {
-        border: solid 1px rgba(0, 0, 0, 0.8);
+        background: var(--main-hover-color);
     }
     .element-info {
         display: flex;
@@ -205,13 +241,18 @@
         padding: 0 5px;
         vertical-align: middle;
         margin-top: 25px;
+        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
+        z-index: 10;
+        position: relative;
     }
     .element-upper h3 {
         font-size: 16px;
     }
     .element-list {
         width: 100%;
-        border-top: solid 2px rgba(0, 0, 0, 0.1);
+        background: var(--main-grey-color);
+        height: calc(100vh - 126px);
+        padding-top: 5px;
     }
     button {
         color: rgba(255, 255, 255, 0.9);

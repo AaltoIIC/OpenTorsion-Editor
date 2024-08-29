@@ -11,6 +11,7 @@
       type Edge,
       type Connection,
       ConnectionLineType,
+      SvelteFlowProvider
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
@@ -21,8 +22,10 @@
     import type { ComponentType } from '$lib/types/types';
     import {
       nameComponentInstance,
-      updateSystemEditor
+      updateSystemEditor,
+      isStructureTree,
      } from './systemHelpers';
+    import { findElement } from '$lib/utils';
 
     const nodeTypes: NodeTypes = {
       'component': ComponentNode,
@@ -102,23 +105,45 @@
         return newJson;
       });
     };
+
+    // function to check if a connection is valid
+    const checkConnectionConstraints = (connection: Connection | Edge) => {
+      if (!connection.sourceHandle || !connection.targetHandle) return false;
+      let isValid = true;
+      
+      // don't allow connections between two shafts
+      if (findElement(connection.sourceHandle)?.type === 'ShaftDiscrete' &&
+          findElement(connection.targetHandle)?.type === 'ShaftDiscrete') {
+        isValid = false;
+      }
+
+      // don't allow loops
+      if (!isStructureTree([...$currentSystemJSON.json.structure, [connection.sourceHandle, connection.targetHandle]])) {
+        isValid = false;
+      }
+
+      return isValid;
+    };
 </script>
 
-<SvelteFlow
-    minZoom={0.3}
-    maxZoom={1}
-    nodeTypes={nodeTypes}
-    edgeTypes={edgeTypes}
-    {nodes}
-    {edges}
-    on:dragover={onDragOver} on:drop={onDrop}
-    fitView
-    connectionLineType={ConnectionLineType.SmoothStep}
-    onconnect={handleNewConnection}
-    defaultEdgeOptions={{
-      animated: true,
-      deletable: true,
-    }}>
-    <Controls />
-    <Background variant={BackgroundVariant.Dots} gap={54} size={2} />
-</SvelteFlow>
+<SvelteFlowProvider>
+  <SvelteFlow
+      minZoom={0.3}
+      maxZoom={1}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      {nodes}
+      {edges}
+      on:dragover={onDragOver} on:drop={onDrop}
+      fitView
+      connectionLineType={ConnectionLineType.SmoothStep}
+      isValidConnection={checkConnectionConstraints}
+      onconnect={handleNewConnection}
+      defaultEdgeOptions={{
+        animated: true,
+        deletable: true,
+      }}>
+      <Controls />
+      <Background variant={BackgroundVariant.Dots} gap={54} size={2} />
+  </SvelteFlow>
+</SvelteFlowProvider>
