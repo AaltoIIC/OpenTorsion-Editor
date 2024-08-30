@@ -1,8 +1,7 @@
 import type { ComponentType, SystemType } from "$lib/types/types"
 import {
     currentSystemJSON,
-    notification,
-    getSystem
+    notification
 } from '$lib/stores/stores';
 import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
@@ -75,7 +74,7 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
                 draggable: false,
                 data: comp,
                 position: { x: 0, y: 0 },
-                origin: [0, 0.75]
+                origin: [0.5, 0.5]
             } as Node
             newNodes.push(newNode);
         } else {
@@ -164,15 +163,22 @@ export const updateSystemEditor = (nodes: Writable<Node[]>, edges: Writable<Edge
     startingNodes.forEach((compName: string) => {
         const node = newNodes.find(node => node.id === compName);
         if (node) {
-            newNodes.unshift({
-                id: `group-${compName}`,
-                type: 'group',
-                data: {},
-                draggable: false,
-                position: { x: systemWidth, y: 0 },
-                style: 'width: 170px; height: 140px;'
-            });
-            placeNode(node, 0, 0, `group-${compName}`);
+
+            let partNode = get(nodes).find(node => node.id === `group.${compName}`);
+            if (!partNode) {
+                partNode = {
+                    id: `group.${compName}`,
+                    type: 'group',
+                    data: {},
+                    draggable: false,
+                    position: { x: systemWidth, y: 0 },
+                    origin: [0.5, 0.5],
+                    style: 'display: none;'
+                }
+            }
+            newNodes.unshift(partNode);
+
+            placeNode(node, 0, 0, `group.${compName}`);
             systemWidth += gridSize*1.5;
         }
     });

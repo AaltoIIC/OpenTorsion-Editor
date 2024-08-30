@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import type { ComponentType } from "$lib/types/types";
+    import { threeRenderer } from "./stores/stores";
     import * as THREE from 'three';
 
     export let data: ComponentType = {name: "",elements: []};
@@ -8,6 +9,8 @@
     export let highlightedElement: string | null = null;
 
     let el: HTMLCanvasElement;
+    let context: CanvasRenderingContext2D | null;
+    let isLoaded = false;
 
     // creating THREE.js scene
     const scene = new THREE.Scene();
@@ -93,11 +96,37 @@
     // keep track of dimensions of component
     let Zdimension = 0;
     let Ydimension = 0;
+
+    // function to render scene and update canvas
+    const render = () => {
+        if (context && $threeRenderer) {
+            context.canvas.width = el.clientWidth;
+            context.canvas.height = el.clientHeight;
+            let dpr = window.devicePixelRatio || 1;
+            $threeRenderer.setSize(
+                (context.canvas.width / dpr)*2,
+                (context.canvas.height / dpr)*2,
+                false);
+
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            $threeRenderer.render(scene, camera);
+            context.drawImage($threeRenderer.domElement, 0, 0, context.canvas.width, context.canvas.height);
+            isLoaded = true;
+        }
+    }
+
     // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
-    let renderer: THREE.WebGLRenderer;
     let branchHeight = 34;
     onMount(() => {
+        // create renderer if it doesn't exist
+        if (!$threeRenderer) {
+            const newRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            newRenderer.setPixelRatio(window.devicePixelRatio);
+            newRenderer.shadowMap.enabled = true;
+            threeRenderer.set(newRenderer);
+        }
+
         // generate 3d model
         type Junction = {
             z: number,
@@ -146,8 +175,6 @@
         const maxDimension = Math.max(Ydimension, -Zdimension * 0.45);
         const cameraSize = 70 + Math.min(maxDimension, 116);
         camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ antialias: true, canvas: el, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
 
         // add shadow plane
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
@@ -162,19 +189,17 @@
         plane.position.z = 0;
 
         scene.add(plane);
-        renderer.shadowMap.enabled = true;
 
         resize();
         setCameraPosition();
         window.addEventListener('resize', resize);
+        context = el.getContext('2d');
+        
+        render();
     });
 
     const resize = () => {
         if (!el) return;
-
-        const width = el.clientWidth;
-        const height = el.clientHeight;
-        renderer.setSize(width, height, false);
         camera.updateProjectionMatrix();
     };
 
@@ -191,7 +216,7 @@
             Ydimension/2,
             Zdimension/2);
         
-        renderer.render(scene, camera);
+        render();
     }   
 
     // animation on hover
@@ -204,12 +229,11 @@
         camera.position.set( 70 + Xdepth/2, 85 + Ydimension/2, -160 + currentCamZ );
         camera.lookAt( Xdepth/2, Ydimension/2, Zdimension/2 );
 
-        renderer.render(scene, camera);
+        render();
     }
 
     const highlightElement = (highlightedElement: string | null) => {
         if (highlightedElement) {
-            if (!renderer) return;
             scene.traverse((object) => {
                 if (object instanceof THREE.Mesh &&
                     object.name &&
@@ -218,16 +242,15 @@
                     object.material.opacity = 0.2;
                 }
             });
-            renderer.render(scene, camera);
+            render();
         } else {
-            if (!renderer) return;
             scene.traverse((object) => {
                 if (object instanceof THREE.Mesh &&
                     object.name !== "shadowPlane") {
                     object.material.opacity = 1;
                 }
             });
-            renderer.render(scene, camera);
+            render();
     }
     }
 
@@ -237,10 +260,16 @@
 <canvas bind:this={el}
     on:mousemove={hoverable ? handleMouseMove : undefined}
     on:mouseleave={hoverable ? setCameraPosition : undefined}
+    class="{isLoaded ? 'loaded' : 'loading'}"
 ></canvas>
 <style>
     canvas {
         width: 100%;
         height: 100%;
+    }
+    .loading {
+        animation-name: placeHolderShimmer;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
     }
 </style>

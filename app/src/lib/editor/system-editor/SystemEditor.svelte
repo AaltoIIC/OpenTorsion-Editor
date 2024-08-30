@@ -11,7 +11,7 @@
       type Edge,
       type Connection,
       ConnectionLineType,
-      SvelteFlowProvider
+      useSvelteFlow
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
     import './system-editor.css';
@@ -52,6 +52,7 @@
       }
     };
 
+    const { screenToFlowPosition } = useSvelteFlow();
     const onDrop = (event: DragEvent) => {
       event.preventDefault();
 
@@ -69,6 +70,23 @@
         newJson.json.components.push(componentData);
         return newJson;
       });
+
+      // modify the position of the new node
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY
+      });
+      position.y -= 100;
+      position.x += 100;
+
+      nodes.update(value => {
+        const compNode = value.find(node => node.id = `group.${componentData.name}`);
+        if (compNode) {
+          compNode.position = position;
+        }
+        return value;
+      });
+
     };
 
     // add empty system node if there are no nodes
@@ -126,24 +144,22 @@
     };
 </script>
 
-<SvelteFlowProvider>
-  <SvelteFlow
-      minZoom={0.3}
-      maxZoom={1}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      {nodes}
-      {edges}
-      on:dragover={onDragOver} on:drop={onDrop}
-      fitView
-      connectionLineType={ConnectionLineType.SmoothStep}
-      isValidConnection={checkConnectionConstraints}
-      onconnect={handleNewConnection}
-      defaultEdgeOptions={{
-        animated: true,
-        deletable: true,
-      }}>
-      <Controls />
-      <Background variant={BackgroundVariant.Dots} gap={54} size={2} />
-  </SvelteFlow>
-</SvelteFlowProvider>
+<SvelteFlow
+    minZoom={0.3}
+    maxZoom={1}
+    nodeTypes={nodeTypes}
+    edgeTypes={edgeTypes}
+    {nodes}
+    {edges}
+    on:dragover={onDragOver} on:drop={onDrop}
+    fitView
+    connectionLineType={ConnectionLineType.SmoothStep}
+    isValidConnection={checkConnectionConstraints}
+    onconnect={handleNewConnection}
+    defaultEdgeOptions={{
+      animated: true,
+      deletable: true,
+    }}>
+    <Controls />
+    <Background variant={BackgroundVariant.Dots} gap={54} size={2} />
+</SvelteFlow>

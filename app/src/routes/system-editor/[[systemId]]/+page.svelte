@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount, type SvelteComponent } from 'svelte';
+    import { SvelteFlowProvider } from '@xyflow/svelte';
     import SystemEditor from "$lib/editor/system-editor/SystemEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ComponentsList from "$lib/sidebar/ComponentsList.svelte";
@@ -133,7 +134,9 @@
         }}
         style="--json-editor-height: {jsonEditorHeightPx}; --flow-editor-height: {flowEditorHeight};">
         <div class="flow-editor">
-            <SystemEditor />
+            <SvelteFlowProvider>
+                <SystemEditor />
+            </SvelteFlowProvider>
         </div>
         <div class="json-editor"
             bind:this={editorElement}>

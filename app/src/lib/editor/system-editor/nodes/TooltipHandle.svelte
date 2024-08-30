@@ -11,6 +11,9 @@
 </script>
 <div class="handle-outer"
     style={`transform: translate(${type === 'input' ? '-' : ''}50%, 0);`}>
+    <div class="tooltip {hover ? "hover" : ""}">
+        {elementName}
+    </div>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="handle-inner"
         on:mouseenter={() => {hover = true; dispatch('mouseenter')}}
@@ -20,10 +23,7 @@
             id={`${componentName}.${elementName}`}
             position={type === 'input' ? Position.Left : Position.Right}
             style="position: relative; top: 0; left: 0; transform: none;"
-            />
-    </div>
-    <div class="tooltip {hover ? "hover" : ""}">
-        {elementName}
+        />
     </div>
 </div>
 <style>
@@ -32,7 +32,7 @@
     }
     .tooltip {
         position: absolute;
-        top: 29px;
+        top: 16px;
         visibility: hidden;
         opacity: 0;
         transition: .2s;
@@ -43,7 +43,7 @@
         width: max-content;
         font-size: 14px;
         font-family: 'Roboto Mono', monospace;
-        transform: translate(calc(-50% + 11px), 0);
+        transform: translate(calc(-50% + 1px), 0);
         z-index: 99;
     }
     .tooltip::after {
@@ -62,6 +62,13 @@
         opacity: 1;
     }
     .handle-inner {
-        padding: 2px;
+        width: 36px;
+        height: 36px;
+        border-radius: 36px;
+        padding: 11px;
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        position: absolute;
+        z-index: 100;
     }
 </style>

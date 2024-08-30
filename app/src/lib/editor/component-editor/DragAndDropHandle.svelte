@@ -1,7 +1,7 @@
 <script lang="ts">
     import { currentComponentJSON } from "$lib/stores/stores";
     import { onMount, onDestroy } from "svelte";
-    import { defaultElement, checkElementOrder } from "./componentHelpers";
+    import { defaultElement } from "./componentHelpers";
 
     export let elementName: string;
 
@@ -85,7 +85,6 @@
             }
         }
       });
-      checkElementOrder($currentComponentJSON.json.elements);
     };
 
 

@@ -80,7 +80,6 @@
           newVal.json.elements = [...value.json.elements, defaultElement((value.json.elements ? value.json.elements : []), data.element)]
           return newVal;
         });
-        checkElementOrder($currentComponentJSON.json.elements);
       }
     };
 

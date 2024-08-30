@@ -81,14 +81,6 @@ export const handleJSONEditing = (text: string, originalName: string = '') => {
             });
             return false
 
-        } else if (!elementOrderValid(json.elements).valid) {
-            notification.set(
-            {
-                message: elementOrderValid(json.elements).message,
-                type: "info",
-                duration: 3600000
-            });
-            return false
         } else if (json.elements.length === 0) {
             notification.set(
             {
@@ -137,13 +129,25 @@ export const checkElementOrder = (elements: ElementType[]) => {
 const elementOrderValid = (elements: ElementType[]) => {
     let valid = true;
     let message = "";
-    let prevElemType = "";
     
     // component can't start or end with a shaft
     if (elements.at(0)?.type === "ShaftDiscrete" ||
         elements.at(-1)?.type === "ShaftDiscrete") {
             valid = false;
         message = "Component can't start or end with a shaft."
+    }
+
+    // component can't have two shafts connected
+    let prevElemType = "";
+    for (let element of elements) {
+        if (element.type === "ShaftDiscrete") {
+            if (prevElemType === "ShaftDiscrete") {
+                valid = false;
+                message = "Two shafts can't be connected."
+                break;
+            }
+        }
+        prevElemType = element.type;
     }
 
     return {

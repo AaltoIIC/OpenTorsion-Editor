@@ -3,11 +3,12 @@ import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import persistentStore from './persistentStore';
 import { nameSystem } from '../editor/system-editor/systemHelpers';
-import { nameComponentDesign } from '$lib/editor/component-editor/componentHelpers';
+import { nameComponentDesign } from '../editor/component-editor/componentHelpers';
+import * as THREE from 'three';
 
 export const notification = writable<NotificationType | null>(null);
 export const highlightLinesInEditor = writable<((from: number, to: number) => void)>((from: number, to: number) => {});
-
+export const threeRenderer = writable<THREE.WebGLRenderer | null>(null);
 
 // components persistent store
 

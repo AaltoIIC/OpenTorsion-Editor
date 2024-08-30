@@ -6,14 +6,13 @@
     import TooltipHandle from './TooltipHandle.svelte';
     import { onMount } from 'svelte';
     import Component3dModel from '../../../Component3dModel.svelte';
-    import { useSvelteFlow, useNodes} from '@xyflow/svelte';
+    import { useSvelteFlow, type Node} from '@xyflow/svelte';
 
     // NodeProps used by Svelte Flow
     $$restProps
 
     export let data: ComponentType;
     export let parentId;
-    export let position;
     export let id: string;
 
     let hover = false;
@@ -50,39 +49,28 @@
         }
     }
 
-
-    let wrapperComponent: HTMLElement;
-    let parentComponent: HTMLElement;
-    onMount(() => {
-        document.addEventListener('pointerdown',handleClickOut)
-        wrapperComponent = document.querySelector(`[data-id="${data.name}"]`) as HTMLElement;
-        parentComponent = document.querySelector(`[data-id="${parentId}"]`) as HTMLElement;
-
-    })
-
     // handle dragging
     let isMouseDown = false;
-    const { updateNode } = useSvelteFlow();
-    const nodes = useNodes();
-
+    const { getNode, updateNode, getZoom } = useSvelteFlow();
+    let parentNode: Node | undefined;
+    $: parentNode = getNode(parentId);
     let lastX = -1;
     let lastY = -1;
-    const handleDrag = (e: PointerEvent) => {
-        console.log('dragging')
-        if (lastX !== -1) {
-            const diffX = e.clientX - lastX;
-            const diffY = e.clientY - lastY;
+    const resetDrag = () => {
+        lastX = -1;
+        lastY = -1;
+    }
 
-            nodes.update((nodes) => {
-                nodes.forEach((node) => {
-                    if (node.id === parentId) {
-                        node.position = {
-                            x: node.position.x + diffX,
-                            y: node.position.y + diffY
-                        }
-                    }
-                })
-                return nodes;
+    const handleDrag = (e: PointerEvent) => {
+        if (lastX !== -1 && parentNode) {
+            const diffX = (e.clientX - lastX)/getZoom();
+            const diffY = (e.clientY - lastY)/getZoom();
+
+            updateNode(parentId,
+                { position: {
+                    x: parentNode.position.x + diffX,
+                    y: parentNode.position.y + diffY
+                }
             });
         }
 
@@ -90,17 +78,29 @@
         lastY = e.clientY;
     }
 
+    onMount(() => {
+        document.addEventListener('pointerdown',handleClickOut)
+        window.addEventListener('wheel', () => {
+            resetDrag();
+        })
+        window.addEventListener('pointerup', () => {
+            isMouseDown = false;
+            resetDrag();
+        })
+        window.addEventListener('pointermove', (e) => {
+            if (isMouseDown) {
+                handleDrag(e);
+            }
+        })
 
+    })
 </script>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="main-component-node {hover ? "hover" : ""} {isSelected ? "selected" : ""}"
-    on:mouseenter={() => {hover = true}}
-    on:mouseleave={() => {hover = false}}
-    on:pointerdown={() => {isMouseDown = true}}
-    on:pointerup={() => {isMouseDown = false}}
-    on:pointermove={(e) => {if (isMouseDown) {handleDrag(e)}}}
-
+    on:mouseenter={() => hover = true}
+    on:mouseleave={() => hover = false}
+    on:pointerdown={() => isMouseDown = true}
     on:click={handleSelect}>
         <div class="img-cont">
             <Component3dModel

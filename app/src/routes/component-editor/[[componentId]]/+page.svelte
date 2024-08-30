@@ -28,7 +28,8 @@
     import NameField from '$lib/NameField.svelte';
     import {
         handleJSONEditing,
-        handleNameChange
+        handleNameChange,
+        checkElementOrder
     } from '$lib/editor/component-editor/componentHelpers';
     
 
@@ -119,9 +120,11 @@
     currentComponentJSON.subscribe((value) => {
         notification.set(null);
         JSONEditorText = JSON.stringify(value.json, null, 2);
-        isError = false;
         isNameError = false;
         componentName = value.json.name;
+
+        // check if the elements are in the correct order
+        isError = !checkElementOrder(value.json.elements);
     });
 
     // handle pressing the save button
