@@ -8,13 +8,23 @@ const persistentStore = <T>(key: string, initValue: T): Writable<T> => {
     if (!browser) return store;
 
     const storedValueStr = localStorage.getItem(key);
-    if (storedValueStr != null) store.set(JSON.parse(storedValueStr));
-
+    if (storedValueStr != null) {
+        const parsedValue = JSON.parse(storedValueStr);
+        if ( initValue instanceof Map && Array.isArray(parsedValue)) {
+            store.set(new Map(parsedValue) as unknown as T);
+        } else {
+            store.set(parsedValue);
+        }
+    }
     store.subscribe((val) => {
         if (val === null || val === undefined) {
             localStorage.removeItem(key)
         } else {
-            localStorage.setItem(key, JSON.stringify(val))
+            if (initValue instanceof Map && val instanceof Map) {
+                localStorage.setItem(key, JSON.stringify(Array.from(val.entries())));
+            } else {
+                localStorage.setItem(key, JSON.stringify(val));
+            }
         }
     })
 

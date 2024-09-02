@@ -10,11 +10,13 @@
     const toComponentType = (json: any) => json as ComponentType;
     let componentInput: HTMLInputElement;
 
-    let shownComponents =  Object.entries($customComponents)
+    let shownComponents =  Array.from($customComponents.entries())
                                 .filter(([key, val]) => key.startsWith(`${$currentSystemJSON.id}-`))
+                                .reverse() as [string, ComponentType][]
     customComponents.subscribe(value => {
-        shownComponents = Object.entries(value)
-            .filter(([key, val]) => key.startsWith(`${$currentSystemJSON.id}-`)) as [string, ComponentType][]
+        shownComponents = Array.from(value.entries())
+            .filter(([key, val]) => key.startsWith(`${$currentSystemJSON.id}-`))
+            .reverse() as [string, ComponentType][]
     })
 
     const handleNewComponent = (option: string) => {

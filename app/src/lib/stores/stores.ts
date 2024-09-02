@@ -12,20 +12,17 @@ export const threeRenderer = writable<THREE.WebGLRenderer | null>(null);
 
 // components persistent store
 
-export const customComponents = persistentStore<Record<string, ComponentType>>('customComponents', {}); // custom components persistent store
+export const customComponents = persistentStore<Map<string, ComponentType>>('customComponents', new Map<string, ComponentType>()); // custom components persistent store
 
 export const getComponent = (id: string): ComponentType | null => {
-    if (Object.keys(get(customComponents)).includes(id)) {
-        return get(customComponents)[id];
-    }
-    return null;
+    return (get(customComponents).get(id) || null);
 }
 
 export const createComponent = (component: ComponentType | null = null) => {
-    const componentIds = Object.keys(get(customComponents))
+    const componentIds = Array.from(get(customComponents).keys())
         .filter(compId => compId.startsWith(`${get(currentSystemJSON).id}-`))
         .map(compId => compId.split('-')[1]);
-    const componentsInSystem = Object.entries(get(customComponents))
+    const componentsInSystem = Array.from(get(customComponents).entries())
         .filter(([compId, _]) => compId.startsWith(`${get(currentSystemJSON).id}-`))
         .map(([_, comp]) => comp);
     
@@ -44,7 +41,7 @@ export const createComponent = (component: ComponentType | null = null) => {
 
 export const removeComponent = (id: string) => {
     customComponents.update((components) => {
-        delete components[id];
+        components.delete(id);
         return components;
     });
 }
@@ -69,7 +66,7 @@ export const resetCurrentComponent = () => {
 
 export const saveCurrentComponent = () => {
     customComponents.update((components) => {
-        components[get(currentComponentJSON).id] = get(currentComponentJSON).json;
+        components.set(get(currentComponentJSON).id, get(currentComponentJSON).json);
         return components;
     });
 }

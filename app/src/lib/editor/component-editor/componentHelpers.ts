@@ -30,7 +30,7 @@ export const handleNameChange = (name: string, originalName: string = '') => {
             duration: 3600000
         });
         return false
-    } else if (originalName !== '' && !isNameUnique(name, Object.values(get(customComponents)), originalName)) {
+    } else if (originalName !== '' && !isNameUnique(name, Array.from(get(customComponents).values()), originalName)) {
         notification.set(
         {
             message: "Component name has to be unique.",
@@ -39,7 +39,11 @@ export const handleNameChange = (name: string, originalName: string = '') => {
         });
         return false
     } else {
-        currentComponentJSON.update(json => ({...json, name: name}));
+        currentComponentJSON.update(json => {
+            let newJson = {...json};
+            newJson.json.name = name;
+            return newJson;
+        });
         notification.set(null);
         return true
     }
@@ -130,9 +134,9 @@ const elementOrderValid = (elements: ElementType[]) => {
     let valid = true;
     let message = "";
     
-    // component can't start or end with a shaft
-    if (elements.at(0)?.type === "ShaftDiscrete" ||
-        elements.at(-1)?.type === "ShaftDiscrete") {
+    // component can't start or end with a shaft (but can consist only of a shaft)
+    if (elements.length > 1 && (elements.at(0)?.type === "ShaftDiscrete" ||
+        elements.at(-1)?.type === "ShaftDiscrete")) {
             valid = false;
         message = "Component can't start or end with a shaft."
     }
@@ -231,7 +235,6 @@ export const nameElement = (type: string, elements: ElementType[]) => {
             return null
         }
     }
-    console.log(elements.map(elemToNum).filter(el => el !== null).sort())
     const largestNum = elements.map(elemToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1)
     return `${typeToName[type]} ${largestNum ? largestNum + 1 : 1}`;
 }

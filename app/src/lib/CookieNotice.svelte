@@ -27,7 +27,7 @@
             <p>We use cookies and similar technologies to save your progress in the app.</p>              
         </div>   
         <div class="btn-cont">
-            <Button lightMode={true} onClick={handleClick}>Got it!</Button>
+            <Button onClick={handleClick}>Got it!</Button>
         </div>
     </div>
 </Portal>

@@ -53,7 +53,7 @@
         systemName = newSystem.name;
         currentSystemJSON.set({id: data.systemId, json: newSystem});
         onMount(() => {
-            window.history.replaceState({}, '', `/system-editor/${data.systemId}`);
+            goto(`/system-editor/${data.systemId}`, {replaceState: true});
         });
     }
     

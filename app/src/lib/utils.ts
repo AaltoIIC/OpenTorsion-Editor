@@ -84,7 +84,7 @@ export const importComponent = (event: Event) => {
                 const newJSON = JSON.parse(e.target?.result as string);
                 if (isAlmostComponentType(newJSON)) {
                     // rename the component if it has the same name as an existing component
-                    const componentNames = Object.entries(get(customComponents))
+                    const componentNames = Array.from(get(customComponents).entries())
                                             .filter(([id, _]) => id.startsWith(`${get(currentSystemJSON).id}-`))
                                             .map(([key, val]) => val.name)
                     if (componentNames.includes(newJSON.name)) {
