@@ -1,7 +1,8 @@
 import type { ComponentType, SystemType } from "$lib/types/types"
 import {
     currentSystemJSON,
-    notification
+    notification,
+    systems
 } from '$lib/stores/stores';
 import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
@@ -191,6 +192,51 @@ const hasDuplicates = (array: any[]) => {
     return uniqueElements.size !== array.length;
 }
 
+const isSystemNameUnique = (name: string) => {
+    let systemNames = Array.from(get(systems).values()).map(val => (
+            val.name
+                .replace(/\s+\(\d+\)$/, '')
+                .toUpperCase()
+            ));
+    return !systemNames.includes(name.replace(/\s+\(\d+\)$/, '').toUpperCase());
+}
+
+export const handleSystemNameChange = (name: string) => {
+    if (name === undefined) {
+        notification.set(
+        {
+            message: "Name field is missing from JSON.",
+            type: "error",
+            duration: 3600000
+        });
+        return false;
+    } else if (typeof name !== 'string') {
+        notification.set(
+        {
+            message: "Name field in JSON has to be a string.",
+            type: "error",
+            duration: 3600000
+        });
+        return false;
+    } else if (!isNameValid(name)) {
+        notification.set(
+        {
+            message: "Name field in JSON is invalid.",
+            type: "error",
+            duration: 3600000
+        });
+        return false;
+    } else {
+        currentSystemJSON.update(json => {
+            let newJson = {...json};
+            newJson.json.name = name;
+            return newJson;
+        });
+        notification.set(null);
+        return true
+    }
+}
+
 // Handle JSON editing
 // Do not let invalid JSON to be set, notify user about errors
 export const handleJSONEditing = (text: string) => {
@@ -199,32 +245,8 @@ export const handleJSONEditing = (text: string) => {
         const newJson = {...get(currentSystemJSON).json}
         
         // Check name and set if it is valid
-        if (json.name === undefined) {
-            notification.set(
-            {
-                message: "Name field is missing from JSON.",
-                type: "error",
-                duration: 3600000
-            });
-            return
-        } else if (typeof json.name !== 'string') {
-            notification.set(
-            {
-                message: "Name field in JSON has to be a string.",
-                type: "error",
-                duration: 3600000
-            });
-            return
-        } else if (!isNameValid(json.name)) {
-            notification.set(
-            {
-                message: "Name field in JSON is invalid.",
-                type: "error",
-                duration: 3600000
-            });
-            return 
-        } else {
-            newJson.name = json.name;
+        if (!handleSystemNameChange(json.name)) {
+            return false
         }
 
         // Check date and set it if valid
@@ -235,7 +257,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else if (typeof json.date !== 'string') {
             notification.set(
             {
@@ -243,7 +265,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else {
             newJson.date = json.date;
         }
@@ -256,7 +278,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else if (json.components.some((comp: any) => !isComponentType(comp))) {
             notification.set(
             {
@@ -264,7 +286,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else if (hasDuplicates(json.components.map((comp: any) => comp.name))) {
             notification.set(
             {
@@ -272,7 +294,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else {
             newJson.components = json.components;
         }
@@ -285,7 +307,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return 
+            return false;
         } else if (!Array.isArray(json.structure) || json.structure.some((row: any) => !Array.isArray(row))) {
             notification.set(
             {
@@ -293,7 +315,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else if (!checkConnections(json.structure)) {
             notification.set(
             {
@@ -301,7 +323,7 @@ export const handleJSONEditing = (text: string) => {
                 type: "error",
                 duration: 3600000
             });
-            return
+            return false;
         } else {
             newJson.structure = json.structure;
         }
@@ -309,6 +331,7 @@ export const handleJSONEditing = (text: string) => {
 
         currentSystemJSON.update(value => ({ ...value, json: newJson }));
         notification.set(null);
+        return true;
     } catch (e) {
         notification.set(
             {
@@ -317,6 +340,7 @@ export const handleJSONEditing = (text: string) => {
                 duration: 3600000
             }
         );
+        return false;
     }
 }
 

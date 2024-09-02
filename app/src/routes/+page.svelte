@@ -13,7 +13,7 @@
     <div class="main-page-area">
         <h2>Your Digital Design Templates:</h2>
         <div class="ddt-cont">
-            {#each Object.entries($systems) as [id, system]}
+            {#each Array.from($systems.entries()).reverse() as [id, system]}
                 <SystemTile id={id} system={system} />
             {/each}
             <NewSystemTile />

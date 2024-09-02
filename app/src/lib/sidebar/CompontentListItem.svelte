@@ -14,7 +14,6 @@
     
     let dialogBox: SvelteComponent;
 
-    export let isUnique = true;
     export let data: ComponentType;
     export let id = "";
 
@@ -45,7 +44,7 @@
 
     const handleMenu = (option: string) => {
         if (option === "Duplicate") {
-            createComponent(data);
+            createComponent({...data, name: `Copy of ${data.name}`});
         } else if (option === "Edit") {
             goto(`/component-editor/${id}`);
         } else if (option === "Delete") {

@@ -36,6 +36,11 @@ export const createComponent = (component: ComponentType | null = null) => {
         } as ComponentType;
     }
 
+    customComponents.update((components) => {
+        components.set(id, component);
+        return components;
+    });
+
     return [id, component] as [string, ComponentType];
 }
 
@@ -74,37 +79,37 @@ export const saveCurrentComponent = () => {
 
 // systems persistent store
 
-export const systems = persistentStore<Record<string, SystemType>>('systems', {});
+export const systems = persistentStore<Map<string, SystemType>>('systems', new Map<string, SystemType>());
 
 
 export const saveSystem = (id: string, system: SystemType) => {
-    if (Object.keys(get(systems)).includes(id)) {
+    if (Array.from(get(systems).keys()).includes(id)) {
         systems.update((systems) => {
-            systems[id] = system;
+            systems.set(id, system);
             return systems;
         });
     }
 }
 
 export const getSystem = (id: string): SystemType | null => {
-    if (Object.keys(get(systems)).includes(id)) {
-        return get(systems)[id];
+    if (Array.from(get(systems).keys()).includes(id)) {
+        return get(systems).get(id) || null;
     }
     return null;
 }
 
 export const createSystem = (system: SystemType|null = null) => {
-    const id = generateId(Object.keys(get(systems)));
+    const id = generateId(Array.from(get(systems).keys()));
     if (!system) {
         system = {
-            name: nameSystem(Object.values(get(systems))),
+            name: nameSystem(Array.from(get(systems).values())),
             date: new Date().toISOString(),
             components: [],
             structure: []
         } as SystemType;
     }
     systems.update((value) => {
-        value[id] = system;
+        value.set(id, system);
         return value;
     });
 
@@ -112,17 +117,17 @@ export const createSystem = (system: SystemType|null = null) => {
 }
 
 export const setCurrentSystem = (id: string) => {
-    if (Object.keys(get(systems)).includes(id)) {
+    if (Array.from(get(systems).keys()).includes(id)) {
         currentSystemJSON.set({
             id: id,
-            json: get(systems)[id]
+            json: get(systems).get(id) as SystemType
         });
     }
 }
 
 export const removeSystem = (id: string) => {
     systems.update((systems) => {
-        delete systems[id];
+        systems.delete(id);
         return systems;
     });
 }
@@ -142,7 +147,7 @@ export const currentSystemJSON = writable<{id: string, json: SystemType}>({
 currentSystemJSON.subscribe(value => {
     if (value.id && value.json.name) {
         systems.update((systems) => {
-            systems[value.id] = value.json;
+            systems.set(value.id, value.json);
             return systems;
         });
     }

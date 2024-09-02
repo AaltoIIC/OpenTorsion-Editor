@@ -54,7 +54,7 @@
             <ComponentListItem id={id} data={component} />
         {/each}
         {#each basicComponents as component}
-            <ComponentListItem data={toComponentType(component.json)} isUnique={false} />
+            <ComponentListItem data={toComponentType(component.json)} />
         {/each}
     </div>
 </div>

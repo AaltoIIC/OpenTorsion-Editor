@@ -3,7 +3,8 @@ import {
     customComponents,
     notification,
     createComponent,
-    currentSystemJSON
+    currentSystemJSON,
+    systems
 } from "./stores/stores";
 import { goto } from "$app/navigation";
 import { get } from "svelte/store";
@@ -48,6 +49,18 @@ export const importSystem = (event: Event) => {
             try {
                 const newJSON = JSON.parse(e.target?.result as string);
                 if (isAlmostSystemType(newJSON)) {
+                    // rename the system if it has the same name as an existing one
+                    const systemNames = Array.from(get(systems).values())
+                        .map(val => val.name)
+
+                    if (systemNames.includes(newJSON.name)) {
+                        let i = 2;
+                        while (systemNames.includes(newJSON.name + ` (${i})`)) {
+                            i++;
+                        }
+                        newJSON.name = newJSON.name + ` (${i})`;
+                    }
+
                     let [id, sys] = createSystem(makeSystem(newJSON));
                     goto(`/system-editor/${id}`);
                 } else if (isAlmostComponentType(newJSON)) {
@@ -94,7 +107,6 @@ export const importComponent = (event: Event) => {
                         }
                         newJSON.name = newJSON.name + ` (${i})`;
                     }
-
                     createComponent(makeComponent(newJSON));                    
                 } else if (isAlmostSystemType(newJSON)) {
                     notification.set({
