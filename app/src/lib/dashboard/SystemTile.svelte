@@ -79,7 +79,7 @@
         border-radius: var(--main-border-radius);
     }
     .tile:hover {
-        border: 2px solid var(--main-color);
+        background-color: var(--main-hover-color);
     }
     .tile h4 {
         margin: 0;

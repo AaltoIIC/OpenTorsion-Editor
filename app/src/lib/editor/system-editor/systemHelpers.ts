@@ -192,16 +192,19 @@ const hasDuplicates = (array: any[]) => {
     return uniqueElements.size !== array.length;
 }
 
-const isSystemNameUnique = (name: string) => {
-    let systemNames = Array.from(get(systems).values()).map(val => (
+const isSystemNameUnique = (name: string, excludeId: string | null = null) => {
+    let systemNames = Array.from(get(systems).entries())
+            .filter(([id, system]) => id !== excludeId)
+            .map(([id, val]) => (
             val.name
                 .replace(/\s+\(\d+\)$/, '')
                 .toUpperCase()
             ));
+    
     return !systemNames.includes(name.replace(/\s+\(\d+\)$/, '').toUpperCase());
 }
 
-export const handleSystemNameChange = (name: string) => {
+export const handleSystemNameChange = (name: string, excludeId: string | null = null) => {
     if (name === undefined) {
         notification.set(
         {
@@ -226,26 +229,103 @@ export const handleSystemNameChange = (name: string) => {
             duration: 3600000
         });
         return false;
+    } else if (!isSystemNameUnique(name, excludeId)) {
+        notification.set(
+            {
+                message: "System name has to be unique.",
+                type: "error",
+                duration: 3600000
+        });
+        return false;       
     } else {
         currentSystemJSON.update(json => {
             let newJson = {...json};
             newJson.json.name = name;
             return newJson;
         });
-        notification.set(null);
+
         return true
     }
 }
 
-// Handle JSON editing
-// Do not let invalid JSON to be set, notify user about errors
-export const handleJSONEditing = (text: string) => {
+// checks if system can be converted into openTorsion assembly
+export const checkIfOTCompatible = () => {
+    const currentJSON = get(currentSystemJSON).json;
+
+    const connectionStarts = currentJSON.structure.map(connection => connection[0].split('.')[0]),
+    connectionEnds = currentJSON.structure.map(connection => connection[1].split('.')[0]),
+    startingComponents = currentJSON.components
+        .filter(component => ( connectionStarts.includes(component.name) &&
+        !connectionEnds.includes(component.name))),
+    endComponents = currentJSON.components
+        .filter(component => ( !connectionStarts.includes(component.name) &&
+        connectionEnds.includes(component.name)));
+    
+    if (startingComponents.length > 1) {
+        notification.set(
+            {
+                message: "System can't consist of multiple connected pieces.",
+                type: "info",
+                duration: 3600000
+        });
+        return false;
+    }
+
+    for (let component of startingComponents) {
+        if (component.elements[0].type === 'ShaftDiscrete') {
+            notification.set(
+                {
+                    message: "System can't start with a shaft.",
+                    type: "info",
+                    duration: 3600000
+            });
+            return false;
+        }
+    }
+
+    for (let component of endComponents) {
+        if (component.elements.at(-1)?.type === 'ShaftDiscrete') {
+            notification.set(
+                {
+                    message: "System can't end with a shaft.",
+                    type: "info",
+                    duration: 3600000
+            });
+            return false;
+        }
+    }
+
+    for (let connection of currentJSON.structure) {
+        const [sourceCompName, sourceElemName] = connection[0].split('.'),
+        sourceComponent = currentJSON.components.find(comp => comp.name === sourceCompName),
+        [targetCompName, targetElemName] = connection[1].split('.'),
+        targetComponent = currentJSON.components.find(comp => comp.name === targetCompName),
+        sourceElemType = sourceComponent?.elements.find(elem => elem.name === sourceElemName)?.type,
+        targetElemType = targetComponent?.elements.find(elem => elem.name === targetElemName)?.type;
+
+        if (sourceElemType === 'ShaftDiscrete' && targetElemType === 'ShaftDiscrete') {
+            notification.set(
+                {
+                    message: "System can't contain two shaft elements connected.",
+                    type: "info",
+                    duration: 3600000
+            });
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// handle JSON editing
+// do not let invalid JSON to be set, notify user about errors
+export const handleJSONEditing = (text: string, excludeId: string | null = null) => {
     try {
         const json = JSON.parse(text);
         const newJson = {...get(currentSystemJSON).json}
         
         // Check name and set if it is valid
-        if (!handleSystemNameChange(json.name)) {
+        if (!handleSystemNameChange(json.name, excludeId)) {
             return false
         }
 
@@ -328,9 +408,7 @@ export const handleJSONEditing = (text: string) => {
             newJson.structure = json.structure;
         }
 
-
         currentSystemJSON.update(value => ({ ...value, json: newJson }));
-        notification.set(null);
         return true;
     } catch (e) {
         notification.set(
@@ -344,37 +422,44 @@ export const handleJSONEditing = (text: string) => {
     }
 }
 
-// Check if the connections in the structure are valid
+// csheck if the connections in the structure are valid
 // i.e. if they form a valid path (no loops or multiple connections)
 export const checkConnections = (structure: string[][]) => {
+    // a multiple connection az hogy nez ki?
 
-    let connections: Record<string, string> = {}
-    structure.forEach((connection: string[]) => {
-        connections[connection[0].split(".")[0]] = connection[1].split(".")[0]
-    })
+    // check if only valid inputs and outputs are present in structure
+    for (let connection of structure) {
+        const startingComponent = get(currentSystemJSON).json.components.find(component => (
+            component.name === connection[0].split('.')[0]
+        ));
+        
+        // if starting component of connection doesn't exist
+        if (!startingComponent) return false;
 
-    let startingComponents = Object.keys(connections).filter(key => !Object.values(connections).includes(key))
-    startingComponents.forEach((key: string) => {
-        let currentKey = key
-        while (connections[currentKey]) {
-            const nextKey = connections[currentKey]
-            delete connections[currentKey]
-            currentKey = nextKey
+        // if output element is not valid
+        if (!findComponentOutputs(startingComponent).includes(connection[0].split('.')[1])) {
+            return false;
         }
-    })
-    const isLoop = Object.keys(connections).length > 0
 
-    
-    // Check if there are any multiple connections
-    const sources = structure.map(connection => connection[0].split(".")[0])
-    const targets = structure.map(connection => connection[1].split(".")[0])
-    let areMultiples = (new Set(sources)).size !== sources.length || (new Set(targets)).size !== targets.length
+        const endingComponent = get(currentSystemJSON).json.components.find(component => (
+            component.name === connection[1].split('.')[0]
+        ));
 
-    // Check if all components exist in the components array
-    const components = get(currentSystemJSON).json.components.map(comp => comp.name)
-    const allComponentsExist = sources.every(comp => components.includes(comp)) && targets.every(comp => components.includes(comp))
+        // if ending component of connection doesn't exist
+        if (!endingComponent) return false;
 
-    return !isLoop && !areMultiples && allComponentsExist
+        // if input element is not the first element of its component
+        if (connection[1].split('.')[1] !== endingComponent.elements[0].name) {
+            return false;
+        }
+    }
+
+    // check if there are loops
+    if (!isStructureTree(structure)) {
+        return false;
+    }
+
+    return true;
 }
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {

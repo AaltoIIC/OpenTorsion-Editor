@@ -45,9 +45,7 @@
         font-size: 14px;
         transition: .3s;
         border-radius: var(--main-border-radius);
-        background-color: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(33px);
-        background-blend-mode: overlay;
+        background-color: rgb(255, 255, 255);
     }
     .inner {
         display: flex;

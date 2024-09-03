@@ -18,7 +18,11 @@
         saveSystem,
         createSystem
     } from '$lib/stores/stores';
-    import { handleJSONEditing } from '$lib/editor/system-editor/systemHelpers';
+    import {
+        handleJSONEditing,
+        handleSystemNameChange,
+        checkIfOTCompatible
+     } from '$lib/editor/system-editor/systemHelpers';
     import { importSystem, exportJSON } from "$lib/utils";
     import type { SystemType } from '$lib/types/types';
     import { goto } from '$app/navigation';
@@ -33,6 +37,7 @@
     let isJSONError = false,
         isNameError = false,
         isStructureError = false;
+    $: if (!(isJSONError || isNameError || isStructureError)) notification.set(null);
 
     // Initialize editor
     let isNewSystem = true;
@@ -66,6 +71,7 @@
     currentSystemJSON.subscribe((value) => {
         JSONEditorText = JSON.stringify(value.json, null, 2);
         systemName = value.json.name;
+        isStructureError = !checkIfOTCompatible();
     });
 
     // resize editor
@@ -79,14 +85,6 @@
     const resizeEditor = (event: MouseEvent) => {
         const parentRect = editorElement.getBoundingClientRect();
         jsonEditorHeight = parentRect.bottom - event.clientY + 8;
-    }
-
-    const handleNameChange = (text: string) => {
-        currentSystemJSON.update((value) => {
-            value.json.name = text;
-            return value;
-        });
-        systemName = text;
     }
 
     let dialogBox: DialogBox;
@@ -152,7 +150,7 @@
             <JSONEditor
                 bind:this={JSONEditorComponent}
                 bind:textContent={JSONEditorText}
-                onInput={(text) => {isJSONError = handleJSONEditing(text)}} />
+                onInput={(text) => {isJSONError = !handleJSONEditing(text, $currentSystemJSON.id)}} />
         </div>
         <a class="analyze-btn-cont" href="/analysis">
             <Button lightMode={true}>
@@ -187,10 +185,14 @@
                 Analysis
             </a>
         </div>
-        <NameField text="System" value={systemName} onInput={handleNameChange} />
+        <NameField
+            text="System"
+            value={systemName}
+            isError={isNameError}
+            onInput={(text) => isNameError = !handleSystemNameChange(text, $currentSystemJSON.id)} />
         <div class="buttons">
             <DropdownButton
-                isActive={true}
+                isActive={!(isJSONError || isNameError || isStructureError)}
                 onClick={() => exportJSON($currentSystemJSON.json)}
                 icon={'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>'}
                 options={["Download JSON"]}
@@ -199,7 +201,7 @@
                 Export
             </DropdownButton>
             <Button
-                isActive={true}
+                isActive={!(isJSONError || isNameError || isStructureError)}
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}
                 onClick={handleSave}>
                 Save
