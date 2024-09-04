@@ -2,7 +2,7 @@
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
     import { nthLinesInJSON } from '$lib/utils';
-    import { findComponentOutputs } from '../systemHelpers';
+    import { findComponentOutputs } from '$lib/editor/component-editor/componentHelpers';
     import TooltipHandle from './TooltipHandle.svelte';
     import { onMount } from 'svelte';
     import Component3dModel from '../../../Component3dModel.svelte';
@@ -126,7 +126,7 @@
     />
 </div>
 <div class="handle-wrapper right">
-    {#each findComponentOutputs(data) as output}
+    {#each findComponentOutputs(data.elements) as output}
         <TooltipHandle
             type="output"
             componentName={data.name}

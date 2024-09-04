@@ -1,6 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type { SystemType, ElementType } from "$lib/types/types";
+    import type {
+        SystemType,
+        ComponentType, 
+        ElementType
+    } from "$lib/types/types";
     import { threeRenderer } from "./stores/stores";
     import * as THREE from 'three';
 
@@ -127,60 +131,107 @@
         }
 
         // generate 3d model
-        let elements: ElementType[] = [];
+        const elements: ElementType[][] = [];
 
-        let currentBranchIndex = 0;
-        for (let connection of data.structure) {
-            connection[0] 
+        const addPart = (elemsList: ElementType[], component: ComponentType) => {
+            const connectedComponents: Record<string, string> = {};
+            data.structure
+                .filter(connection => connection[0].split('.')[0] === component.name)
+                .forEach(connection => {
+                    connectedComponents[connection[0].split('.')[1]] = connection[1].split('.')[0]
+                });
+
+            component.elements.forEach(el => {
+                // create copy of element and change name to include its component
+                const newElement: ElementType = {
+                    ...el,
+                    name: `${component.name}.${el.name}`
+                }
+                if (newElement.type === "GearElement" &&
+                    el.type === "GearElement" &&
+                    el.parent) {
+                    newElement.parent = `${component.name}.${el.parent}`;
+                }
+
+                elemsList.push(newElement);
+
+                if (connectedComponents[el.name]) {
+                    // check if there are any components connected to this element
+                    let connectedComponent = data.components
+                        .find(component => component.name === connectedComponents[el.name]);
+                    if (connectedComponent) addPart(elemsList, connectedComponent)
+                }
+
+            });
         }
 
-        type Junction = {
-            z: number,
-            endY: number
-        }
-        let currentZ = 0;
-        let currentY = 0;
-        let currentX = 0;
-        let branches = new Map<string, Junction>();
+        const connectionStarts = data.structure.map(connection => connection[0].split('.')[0]),
+        connectionEnds = data.structure.map(connection => connection[1].split('.')[0]),
+        startingComponents = data.components
+            .filter(component => ( connectionStarts.includes(component.name) &&
+            !connectionEnds.includes(component.name)));
         
-        elements.forEach(el => {
-            if (el.type === "Disk") {
-                createDisk(el.name, currentZ, currentY, currentX);
-                currentZ -= 6;
-            } else if (el.type === "ShaftDiscrete") {
-                createShaft(el.name, currentZ, currentY, currentX);
-                currentZ -= 20;
-            } else if (el.type === "GearElement") {
-                // update branches
-                if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
-                    // add element to branches with shared value across all gears with the same parent
-                    branches.set(el.name, branches.get(el.parent) as Junction);
-                    currentY += branchHeight;
-                    (branches.get(el.name) as Junction).endY = currentY;
-                    currentZ = (branches.get(el.parent) as Junction).z;
-                } else {
-                    branches.set(el.name, {z: currentZ, endY: currentY});
-                }
-
-                if ((currentY%(branchHeight*2)) !== 0) {
-                    currentX = branchHeight/1.5;
-                } else {
-                    currentX = 0;
-                }
-                createGear(el.name, currentZ, currentY, currentX);
-                currentZ -= 7;
-            }
-
-            if (currentZ < Zdimension) {
-                Zdimension = currentZ;
-            }
-            if (currentY > Ydimension) {
-                Ydimension = currentY;
-            }
+        startingComponents.forEach(component => {
+            let newPart: ElementType[] = []
+            addPart(newPart, component);
+            elements.push(newPart);
         });
+        console.log(data);
+        console.log(elements);
+        console.log("------------");
+
+        let currentX = 0;
+        elements.forEach(part => {
+            type Junction = {
+                z: number,
+                endY: number
+            }
+            let currentZ = 0;
+            let currentY = 0;
+            let Xaddition = 0;
+            let branches = new Map<string, Junction>();
+            part.forEach(el => {
+                if (el.type === "Disk") {
+                    createDisk(el.name, currentZ, currentY, currentX + Xaddition);
+                    currentZ -= 6;
+                } else if (el.type === "ShaftDiscrete") {
+                    createShaft(el.name, currentZ, currentY, currentX + Xaddition);
+                    currentZ -= 20;
+                } else if (el.type === "GearElement") {
+                    // update branches
+                    if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
+                        // add element to branches with shared value across all gears with the same parent
+                        branches.set(el.name, branches.get(el.parent) as Junction);
+                        currentY += branchHeight;
+                        (branches.get(el.name) as Junction).endY = currentY;
+                        currentZ = (branches.get(el.parent) as Junction).z;
+                    } else {
+                        branches.set(el.name, {z: currentZ, endY: currentY});
+                    }
+
+                    if ((currentY%(branchHeight*2)) !== 0) {
+                        Xaddition = branchHeight/1.5;
+                    } else {
+                        Xaddition = 0;
+                    }
+                    createGear(el.name, currentZ, currentY, currentX + Xaddition);
+                    currentZ -= 7;
+                }
+
+                if (currentZ < Zdimension) {
+                    Zdimension = currentZ;
+                }
+                if (currentY > Ydimension) {
+                    Ydimension = currentY;
+                }
+            });
+
+            currentX += 80;
+        });
+
         // set camera size (larger components apper smaller)
-        const maxDimension = Math.max(Ydimension, -Zdimension * 0.45);
-        const cameraSize = 70 + Math.min(maxDimension, 116);
+        const maxDimension = Math.max(Ydimension * 1.2, -Zdimension * 0.45);
+        const cameraSize = 70 + maxDimension;
         camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
 
         // add shadow plane

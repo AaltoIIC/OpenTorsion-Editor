@@ -50,7 +50,7 @@
                 accept=".json">
     </div>
     <div class="component-list">
-        {#each shownComponents as [id, component]}
+        {#each shownComponents as [id, component] (id)}
             <ComponentListItem id={id} data={component} />
         {/each}
         {#each basicComponents as component}

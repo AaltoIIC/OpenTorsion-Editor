@@ -54,10 +54,6 @@
         let newComponent: ComponentType;
         [data.componentId, newComponent] = createComponent();
         originalName = newComponent.name;
-        currentComponentJSON.set({
-            id: data.componentId,
-            json: newComponent
-        });
     }
 
     if (data.componentId) {
@@ -74,6 +70,7 @@
                     json: $customComponents.get(data.componentId) as ComponentType
                 });
             } else {
+                alert("hehe");
                 originalName = $currentComponentJSON.json.name;
             }
         } else {
@@ -148,8 +145,8 @@
             dialogBox.openDialog("You have unsaved changes. Do you want to discard them?",
                 "Discard changes","Cancel").then((value: boolean) => {
                     if (value) {
-                        goto(`/system-editor/${$currentSystemJSON.id}`);
                         resetCurrentComponent();
+                        goto(`/system-editor/${$currentSystemJSON.id}`);
                         notification.set(null);
                     }
                 });

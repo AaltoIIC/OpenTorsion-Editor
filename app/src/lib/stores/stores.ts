@@ -5,6 +5,7 @@ import persistentStore from './persistentStore';
 import { nameSystem } from '../editor/system-editor/systemHelpers';
 import { nameComponentDesign } from '../editor/component-editor/componentHelpers';
 import * as THREE from 'three';
+import _ from 'lodash';
 
 export const notification = writable<NotificationType | null>(null);
 export const highlightLinesInEditor = writable<((from: number, to: number) => void)>((from: number, to: number) => {});
@@ -36,9 +37,9 @@ export const createComponent = (component: ComponentType | null = null) => {
         } as ComponentType;
     }
 
-    customComponents.update((components) => {
-        components.set(id, component);
-        return components;
+    currentComponentJSON.set({
+        id: id,
+        json: component
     });
 
     return [id, component] as [string, ComponentType];
@@ -71,7 +72,7 @@ export const resetCurrentComponent = () => {
 
 export const saveCurrentComponent = () => {
     customComponents.update((components) => {
-        components.set(get(currentComponentJSON).id, get(currentComponentJSON).json);
+        components.set(get(currentComponentJSON).id, _.cloneDeep(get(currentComponentJSON).json));
         return components;
     });
 }

@@ -8,26 +8,7 @@ import { get, type Writable } from 'svelte/store';
 import type { Node, Edge } from '@xyflow/svelte';
 import { isComponentType } from "$lib/types/typeguards";
 import { isNameValid } from "$lib/utils";
-
-
-// Find possible output elements of a component
-export const findComponentOutputs = (component: ComponentType): string[] => {
-    const outputs: string[] = [];
-    for (let i = 0; i < component.elements.length; i++) {
-        const nextEl = component.elements[i+1];
-        if (i === component.elements.length - 1) {
-            outputs.push(component.elements[i].name);
-        } else if (nextEl.type === "GearElement" &&
-            nextEl.parent &&
-            component.elements.slice(0, i+1).map(el => el.name).includes(nextEl.parent)) {
-        
-            outputs.push(component.elements[i].name);
-        
-        }
-    }
-
-    return outputs;
-}
+import { findComponentOutputs } from "../component-editor/componentHelpers";
 
 // Update the currentSystemJSON with the given component being connected
 // to the last component in the structure
@@ -437,7 +418,7 @@ export const checkConnections = (structure: string[][]) => {
         if (!startingComponent) return false;
 
         // if output element is not valid
-        if (!findComponentOutputs(startingComponent).includes(connection[0].split('.')[1])) {
+        if (!findComponentOutputs(startingComponent.elements).includes(connection[0].split('.')[1])) {
             return false;
         }
 

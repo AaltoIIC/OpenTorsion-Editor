@@ -134,16 +134,16 @@ const elementOrderValid = (elements: ElementType[]) => {
     let valid = true;
     let message = "";
     
-    // component can't start or end with a shaft (but can consist only of a shaft)
-    if (elements.length > 1 && (elements.at(0)?.type === "ShaftDiscrete" ||
-        elements.at(-1)?.type === "ShaftDiscrete")) {
+    // component can't start with a shaft (but can consist only of a shaft)
+    if (elements.length > 1 && elements.at(0)?.type === "ShaftDiscrete") {
             valid = false;
-        message = "Component can't start or end with a shaft."
+        message = "Component can't start with a shaft."
     }
 
-    // component can't have two shafts connected
+    let outputElements = findComponentOutputs(elements);
     let prevElemType = "";
     for (let element of elements) {
+        // component can't have two shafts connected
         if (element.type === "ShaftDiscrete") {
             if (prevElemType === "ShaftDiscrete") {
                 valid = false;
@@ -151,6 +151,14 @@ const elementOrderValid = (elements: ElementType[]) => {
                 break;
             }
         }
+
+        // output elements can't be shafts
+        if (element.type === "ShaftDiscrete" && outputElements.includes(element.name)) {
+            valid = false;
+            message = "Output elements can't be shafts."
+            break;
+        }
+
         prevElemType = element.type;
     }
 
@@ -158,6 +166,24 @@ const elementOrderValid = (elements: ElementType[]) => {
         valid: valid,
         message: message
     };
+}
+
+// Find possible output elements of a component
+export const findComponentOutputs = (elements: ElementType[]): string[] => {
+    const outputs: string[] = [];
+    for (let i = 0; i < elements.length; i++) {
+        const nextEl = elements[i+1];
+        if (i === elements.length - 1) {
+            outputs.push(elements[i].name);
+        } else if (nextEl.type === "GearElement" &&
+            nextEl.parent &&
+            elements.slice(0, i+1).map(el => el.name).includes(nextEl.parent)) {
+        
+            outputs.push(elements[i].name);
+        
+        }
+    }
+    return outputs;
 }
 
 // edit an element in the list of elements
