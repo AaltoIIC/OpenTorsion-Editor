@@ -445,37 +445,30 @@ export const checkConnections = (structure: string[][]) => {
 
 export const nameComponentInstance = (componentType: string, components: ComponentType[]): string => {
     const compToNum = (comp: ComponentType) => {
-        const nameList = comp.name.split(" ")
-        const nameWithoutLastWord = nameList.slice(0, -1).join(' ')
+        const nameList = comp.name.split(" ");
+        const nameWithoutLastWord = nameList.slice(0, -1).join(' ');
         if (nameWithoutLastWord === componentType) {
-            return parseInt(nameList.at(-1) || '0')
+            return parseInt(nameList.at(-1) || '0');
         } else {
-            return null
+            return null;
         }
     }
-    const largestNum = components.map(compToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1)
+    const largestNum = components.map(compToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1);
 
     return `${componentType} ${largestNum ? largestNum + 1 : 1}`;
 }
 
 // function to automatically give a unique name to a new system
 export const nameSystem = (systems: SystemType[]) => {
-    let systemNames = systems.map(sys => sys.name as string);
-    let largestNum = 0;
-
-    // check if there is a component with the name "New System"
-    if (systemNames.includes('New System')) {
-        largestNum = 1;
+    const systemNames = systems.map(system => system.name);
+    let newSystemName = 'New System';
+    let i = 2;
+    while (systemNames.includes(newSystemName)) {
+        newSystemName = `New System (${i})`
+        i++;
     }
 
-    // check if there are components with the name "New System (n)"
-    const regex = new RegExp(/^New System \(\d+\)$/);
-    if (systemNames.filter(name => regex.test(name)).length > 0) {
-        largestNum = (systemNames.filter(name => regex.test(name))
-                    .map(name => parseInt(name.split(" (")[1].replace(')',''))).sort().at(-1) as number)
-    }
-    
-    return `New System${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
+    return newSystemName;
 }
 
 // checks if the given structure is a tree (contains no loops)

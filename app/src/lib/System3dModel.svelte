@@ -43,8 +43,42 @@
     addLight(scene, -100, -200, -100);
 
 
+    const createConnectionLine = (from: THREE.Vector3, to: THREE.Vector3) => {
+        const midpoint = new THREE.Vector3()
+            .addVectors(from, to)
+            .multiplyScalar(0.5);
+        const direction = new THREE.Vector3().subVectors(from, to);
+        direction.z = 0;
+        const distance = direction.length();
+
+        // create mesh
+        const width = 32;
+        const depth = 1;
+        const length = distance;
+        const boxGeometry = new THREE.BoxGeometry(width, length, depth);
+
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('../connection-texture.svg');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(1, length / width * 1.6);
+        const material = new THREE.MeshStandardMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        });
+
+        const angle = Math.atan2(direction.y, direction.x);
+        const lineMesh = new THREE.Mesh(boxGeometry, material);
+        lineMesh.rotation.z = angle + Math.PI / 2;
+        lineMesh.position.copy(midpoint);
+        scene.add(lineMesh);
+    }
+
+
     // functions to create elements
-    const createDisk = (name: string, z: number, y: number, x: number) => {
+    const createDisk = (name: string, x: number, y: number, z: number) => {
         const geometry = new THREE.CylinderGeometry( 17, 17, 6, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2, transparent: true });
         const disk = new THREE.Mesh(geometry, material);
@@ -57,7 +91,7 @@
         scene.add(disk);
     }
 
-    const createShaft = (name: string, z: number, y: number, x: number) => {
+    const createShaft = (name: string, x: number, y: number, z: number) => {
         const geometry = new THREE.CylinderGeometry( 4, 4, 20, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x000000, transparent: true });
         const shaft = new THREE.Mesh(geometry, material);
@@ -70,7 +104,7 @@
         scene.add(shaft);
     }
 
-    const createGear = (name: string, z: number, y: number, x: number) => {
+    const createGear = (name: string, x: number, y: number, z: number) => {
         const geometry = new THREE.CylinderGeometry( 18, 18, 7, 32 );
         const material = new THREE.MeshStandardMaterial({ color: 0x48e5c2, transparent: true });
         const gear = new THREE.Mesh(geometry, material);
@@ -176,9 +210,6 @@
             addPart(newPart, component);
             elements.push(newPart);
         });
-        console.log(data);
-        console.log(elements);
-        console.log("------------");
 
         let currentX = 0;
         elements.forEach(part => {
@@ -190,12 +221,13 @@
             let currentY = 0;
             let Xaddition = 0;
             let branches = new Map<string, Junction>();
+            let gearPositions = new Map<string, THREE.Vector3>();
             part.forEach(el => {
                 if (el.type === "Disk") {
-                    createDisk(el.name, currentZ, currentY, currentX + Xaddition);
+                    createDisk(el.name, currentX + Xaddition, currentY, currentZ);
                     currentZ -= 6;
                 } else if (el.type === "ShaftDiscrete") {
-                    createShaft(el.name, currentZ, currentY, currentX + Xaddition);
+                    createShaft(el.name, currentX + Xaddition, currentY, currentZ);
                     currentZ -= 20;
                 } else if (el.type === "GearElement") {
                     // update branches
@@ -205,16 +237,24 @@
                         currentY += branchHeight;
                         (branches.get(el.name) as Junction).endY = currentY;
                         currentZ = (branches.get(el.parent) as Junction).z;
+
+                        // calculate Xaddition
+                        if ((currentY%(branchHeight*2)) !== 0) {
+                            Xaddition = branchHeight/1.5;
+                        } else {
+                            Xaddition = 0;
+                        }
+
+                        // add connection line
+                        createConnectionLine(
+                            gearPositions.get(el.parent) as THREE.Vector3,
+                            new THREE.Vector3(currentX + Xaddition, currentY, currentZ-3.5));
+
                     } else {
                         branches.set(el.name, {z: currentZ, endY: currentY});
                     }
-
-                    if ((currentY%(branchHeight*2)) !== 0) {
-                        Xaddition = branchHeight/1.5;
-                    } else {
-                        Xaddition = 0;
-                    }
-                    createGear(el.name, currentZ, currentY, currentX + Xaddition);
+                    createGear(el.name, currentX + Xaddition, currentY, currentZ);
+                    gearPositions.set(el.name, new THREE.Vector3(currentX + Xaddition, currentY, currentZ-3.5));
                     currentZ -= 7;
                 }
 
@@ -230,9 +270,16 @@
         });
 
         // set camera size (larger components apper smaller)
-        const maxDimension = Math.max(Ydimension * 1.2, -Zdimension * 0.45);
+        const maxDimension = Math.max(Ydimension * 1.2, -Zdimension * 0.65);
         const cameraSize = 70 + maxDimension;
-        camera = new THREE.OrthographicCamera(-cameraSize / 2, cameraSize / 2, cameraSize / 2, -cameraSize / 2, 0.1, 1000);
+        camera = new THREE.OrthographicCamera(
+            -cameraSize / 2,
+            cameraSize / 2,
+            cameraSize / 2,
+            -cameraSize / 2,
+            0.1,
+            10000
+        );
 
         // add shadow plane
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000);

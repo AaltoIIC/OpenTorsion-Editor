@@ -228,21 +228,15 @@ export const removeParam = (elements: ElementType[], elementName: string, paramN
 
 // function to automatically give a unique name to a new component
 export const nameComponentDesign = (components: ComponentType[]) => {
-    let largestNum = 0;
-
-    // check if there is a component with the name "New Component"
-    if (components.map(component => component.name).includes('New Component')) {
-        largestNum = 1;
+    const compNames = components.map(comp => comp.name);
+    let newCompName = 'New Component';
+    let i = 2;
+    while (compNames.includes(newCompName)) {
+        newCompName = `New Component (${i})`
+        i++;
     }
 
-    // check if there are components with the name "New Component (n)"
-    const regex = new RegExp(/^New Component \(\d+\)$/);
-    if (components.filter(component => regex.test(component.name)).length > 0) {
-        largestNum = (components.filter(component => regex.test(component.name))
-                    .map(component => parseInt(component.name.split(" (")[1].replace(')',''))).sort().at(-1) as number)
-    }
-    
-    return `New Component${largestNum > 0 ? ` (${largestNum + 1})` : ''}`;
+    return newCompName;
 }
 
 // function to automatically give a unique name to a new element

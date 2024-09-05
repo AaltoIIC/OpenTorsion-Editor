@@ -26,7 +26,6 @@
     import { importSystem, exportJSON } from "$lib/utils";
     import type { SystemType } from '$lib/types/types';
     import { goto } from '$app/navigation';
-    import System3dModel from '$lib/System3dModel.svelte';
 
     let fileInput: HTMLInputElement;
     let JSONEditorComponent: SvelteComponent;
@@ -180,7 +179,7 @@
             <input type="file" class="hidden"
                 name="file"
                 bind:this={fileInput}
-                on:change={importSystem}
+                on:change={(e) => importSystem(e, false)}
                 accept=".json">
             <a href="/analysis">
                 Analysis

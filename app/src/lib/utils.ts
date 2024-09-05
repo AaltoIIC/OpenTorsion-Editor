@@ -39,7 +39,7 @@ export const exportJSON = (json: any) => {
 
 // function to import a JSON file into the system editor
 // to be used as an event handler for an input element
-export const importSystem = (event: Event) => {
+export const importSystem = (event: Event, createNew: boolean = true) => {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return
     const file = input.files[0];
@@ -51,7 +51,7 @@ export const importSystem = (event: Event) => {
                 if (isAlmostSystemType(newJSON)) {
                     // rename the system if it has the same name as an existing one
                     const systemNames = Array.from(get(systems).values())
-                        .map(val => val.name)
+                    .map(val => val.name)
 
                     if (systemNames.includes(newJSON.name)) {
                         let i = 2;
@@ -61,8 +61,13 @@ export const importSystem = (event: Event) => {
                         newJSON.name = newJSON.name + ` (${i})`;
                     }
 
-                    let [id, sys] = createSystem(makeSystem(newJSON));
-                    goto(`/system-editor/${id}`);
+                    if (createNew) {
+                        let [id, sys] = createSystem(makeSystem(newJSON));
+                        goto(`/system-editor/${id}`);
+                    }  else {
+                        currentSystemJSON.update(system => ({...system, json: makeSystem(newJSON)}));
+                    }
+            
                 } else if (isAlmostComponentType(newJSON)) {
                     notification.set({
                         message: "Imported JSON file is a component. Please import a system JSON file.",
