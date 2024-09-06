@@ -12,45 +12,93 @@
     <div class="main-header">
         <img class="main-logo" src="./logo.svg" alt="Co-Des logo">
     </div>
-    <div class="main-page-area">
-        <h2>Your Systems:</h2>
-        <div class="ddt-cont">
-            {#each Array.from($systems.entries()).reverse() as [id, system]}
-                <SystemTile id={id} system={system} />
-            {/each}
-            <NewSystemTile />
-            <ImportSystemTile />
+    <div class="main-page-content">
+        <div class="info-cont">
+
+        </div>
+        <div class="systems-outer">
+            <div class="title-cont">
+                <h2>Your Systems:</h2>
+                <div class="controls">
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>                      
+                    </button>
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                        </svg>                                       
+                    </button>
+                </div>
+            </div>
+            <div class="ddt-cont">
+                {#each Array.from($systems.entries()).reverse() as [id, system]}
+                    <SystemTile id={id} system={system} />
+                {/each}
+                <NewSystemTile />
+                <ImportSystemTile />
+            </div>
         </div>
     </div>
 </div>
 <style>
+    :global(body) {
+        background-color: rgb(245, 245, 245);
+        overflow-y: visible;
+    }
+    .main-page-content {
+        margin: 108px auto;
+        width: 975px;
+    }
+    .info-cont {
+        background-color: white;
+        border-radius: var(--main-border-radius);
+        width: 100%;
+        height: 300px;
+        margin: 26px 0;
+    }
+    .controls button {
+        background-color: var(--main-dark-color);
+        border: none;
+        border-radius: 40px;
+        width: 34.5px;
+        height: 34.5px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    .controls button svg {
+        width: 18px;
+        height: 18px;
+        margin: 0 0 -3.5px -0.5px;
+
+    }
+    .title-cont {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .title-cont h2 {
+        font-size: 18px;
+    }
     .main-header {
         border-radius: var(--main-border-radius);
-        background: rgb(30, 30, 30);
+        background: white;
         position: fixed;
         top:10px;
-        left: calc(50vw - 500px);
-        width: 1000px;
+        left: calc(50vw - 550px);
+        width: 1100px;
         height: 68px;
-    }
-    .screen {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgb(245, 245, 245);
+        box-shadow: var(--main-shadow);
     }
     .main-logo {
-        filter: invert();
         width: 114px;
         height: auto;
         margin: 24px 18px;
         display: block;
     }
-    .main-page-area {
-        width: 975px;
-        margin: 120px auto;
+    .systems-outer {
+        width: 100%;
+        margin: 0 auto;
     }
     .ddt-cont {
         display: flex;

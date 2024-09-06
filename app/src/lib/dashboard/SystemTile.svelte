@@ -46,7 +46,10 @@
 <div class="tile"
     on:click={() => {goto(`/system-editor/${id}`)}}>
     <div class="illustration-cont">
-        <System3dModel data={system} />
+        <System3dModel data={system} hoverable={false} size={175} />
+        {#if system.structure.length === 0}
+            <p class="empty-system-txt">No connected components</p>
+        {/if}
     </div>
     <div class="system-info">
         <div class="system-name-cont">
@@ -70,14 +73,25 @@
     .illustration-cont {
         width: 175px;
         height: 175px;
-        padding-top: 14px;
+        mask-image: linear-gradient(rgba(0,0,0,1) 86%, rgba(0,0,0,0) 100%);
+        position: relative;
+    }
+    .empty-system-txt {
+        font-size: 14px;
+        opacity: 0.7;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     span {
         font-size: 14px;
     }
     .tile {
         width: 175px;
-        height: 250px;
+        height: 228px;
         background-color: white;
         margin: 0 0 15px 15px;
         box-sizing: border-box;
@@ -96,6 +110,6 @@
         justify-content: space-between;
     }
     .system-info {
-        padding: 14px;
+        padding: 0 14px 14px 14px;
     }
 </style>

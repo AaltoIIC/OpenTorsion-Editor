@@ -147,7 +147,7 @@
         border-top-left-radius: var(--main-border-radius);
         border-bottom-left-radius: var(--main-border-radius);
         overflow: hidden;
-        mask-image: url(../edge-mask.png);
+        mask-image: linear-gradient(90deg, rgba(0,0,0,1) 86%, rgba(0,0,0,0) 100%);
         mask-size: cover;
     }
     button {

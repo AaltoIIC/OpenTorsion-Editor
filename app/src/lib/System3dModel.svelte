@@ -10,6 +10,7 @@
 
     export let data: SystemType;
     export let hoverable = true;
+    export let size = 200;
 
     let el: HTMLCanvasElement;
     let context: CanvasRenderingContext2D | null;
@@ -17,31 +18,8 @@
 
     // creating THREE.js scene
     const scene = new THREE.Scene();
-    const ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add( ambientLight );
-    
-    // function to add light scource to scene
-    const addLight = (scene: THREE.Scene, x: number, y: number, z: number, shadows=false) => {
-        const light = new THREE.DirectionalLight( 0xffffff, 1 );
-        light.position.set( x, y, z );
-        if (shadows) {
-            light.castShadow = true;
-            light.shadow.camera.near = 0.05;
-            light.shadow.camera.far = 500;
-            light.shadow.camera.left = -400;
-            light.shadow.camera.right = 400;
-            light.shadow.camera.top = 400;
-            light.shadow.camera.bottom = -400;
-            light.shadow.mapSize.width = 2048;
-            light.shadow.mapSize.height = 2048;
-            light.shadow.radius = 12;
-        }
-        scene.add( light );
-    }
-    addLight(scene, 0, 200, 0, true);
-    addLight(scene, 100, 200, 200);
-    addLight(scene, -100, -200, -100);
-
 
     const createConnectionLine = (from: THREE.Vector3, to: THREE.Vector3) => {
         const midpoint = new THREE.Vector3()
@@ -58,7 +36,9 @@
         const boxGeometry = new THREE.BoxGeometry(width, length, depth);
 
         const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('../connection-texture.svg');
+        const texture = textureLoader.load('../connection-texture.svg', () => {
+            render();
+        });
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set(1, length / width * 1.6);
@@ -130,21 +110,17 @@
         scene.add(gear);
     }
 
-    // keep track of dimensions of component
-    let Zdimension = 0;
-    let Ydimension = 0;
-
     // function to render scene and update canvas
     const render = () => {
         if (context && $threeRenderer) {
-            context.canvas.width = el.clientWidth;
-            context.canvas.height = el.clientHeight;
+            context.canvas.width = size;
+            context.canvas.height = size;
             let dpr = window.devicePixelRatio || 1;
             $threeRenderer.setSize(
                 (context.canvas.width / dpr)*2,
                 (context.canvas.height / dpr)*2,
                 false);
-
+            
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
             $threeRenderer.render(scene, camera);
             context.drawImage($threeRenderer.domElement, 0, 0, context.canvas.width, context.canvas.height);
@@ -155,6 +131,10 @@
     // rendering scene after mounting
     let camera: THREE.OrthographicCamera;
     let branchHeight = 34;
+    // keep track of dimensions of component
+        let Zdimension = 0,
+        Ydimension = 0,
+        Xdimesion = 0;
     onMount(() => {
         // create renderer if it doesn't exist
         if (!$threeRenderer) {
@@ -264,13 +244,21 @@
                 if (currentY > Ydimension) {
                     Ydimension = currentY;
                 }
+                if (currentX + Xaddition > Xdimesion) {
+                    Xdimesion = currentX + Xaddition;
+                }
             });
 
             currentX += 80;
         });
 
+        // add light to scene
+        addLight(scene, 0, 200, 0, true);
+        addLight(scene, 100, 200, 200);
+        addLight(scene, -100, -200, -100);
+
         // set camera size (larger components apper smaller)
-        const maxDimension = Math.max(Ydimension * 1.2, -Zdimension * 0.65);
+        const maxDimension = Math.max(Ydimension * 1.2, -Zdimension * 0.65, Xdimesion * 0.9);
         const cameraSize = 70 + maxDimension;
         camera = new THREE.OrthographicCamera(
             -cameraSize / 2,
@@ -282,7 +270,7 @@
         );
 
         // add shadow plane
-        const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+        const planeGeometry = new THREE.PlaneGeometry(2000, -Zdimension + 12);
         const planeMaterial = new THREE.ShadowMaterial({
             opacity: 0.15
         });
@@ -291,7 +279,7 @@
         plane.name = "shadowPlane";
         plane.rotation.x = - Math.PI / 2;
         plane.position.y = -21;
-        plane.position.z = 0;
+        plane.position.z = Zdimension/2;
 
         scene.add(plane);
 
@@ -299,7 +287,7 @@
         setCameraPosition();
         window.addEventListener('resize', resize);
         context = el.getContext('2d');
-        
+
         render();
     });
 
@@ -308,17 +296,40 @@
         camera.updateProjectionMatrix();
     };
 
+    // function to add light scource to scene
+    // to be called after model is added to scene
+    const addLight = (scene: THREE.Scene, x: number, y: number, z: number, shadows=false) => {
+        const light = new THREE.DirectionalLight( 0xffffff, 1 );
+        light.position.set( x, y, z );
+
+        let shadowBlur = 12;
+        if (shadows) {
+            light.castShadow = true;
+            light.shadow.camera.near = 0.05;
+            light.shadow.camera.far = 500;
+            light.shadow.camera.left = Zdimension - shadowBlur;
+            light.shadow.camera.right = -Zdimension + shadowBlur;
+            light.shadow.camera.top = -Zdimension + shadowBlur;
+            light.shadow.camera.bottom = Zdimension - shadowBlur;
+            light.shadow.mapSize.width = (-Zdimension+shadowBlur)*5;
+            light.shadow.mapSize.height = (-Zdimension+shadowBlur)*5;
+            light.shadow.radius = shadowBlur;
+        }
+        scene.add( light );
+    }
+
+
     // function to (re)set camera position
     const setCameraPosition = () => {
-        const Xdepth =  Ydimension ? branchHeight/2 : 0
+        const maxDim = Math.max(Ydimension, -Zdimension, Xdimesion);
         camera.position.set(
-            70 + Xdepth/2,
-            85 + Ydimension/2,
-            88 + Zdimension/2);
+            7*maxDim + Xdimesion/2,
+            8.5*maxDim + Ydimension/2,
+            8.8*maxDim + Zdimension/2);
         // look at the middle of component
         camera.lookAt(
-            Xdepth/2,
-            Ydimension/2,
+            Xdimesion/2,
+            0,
             Zdimension/2);
         
         render();
@@ -330,23 +341,22 @@
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const Xdepth =  Ydimension ? branchHeight/2 : 0
+        const maxDim = Math.max(Ydimension, -Zdimension, Xdepth);
         const currentCamZ = (x / width) * (Zdimension+320) * 2
-        camera.position.set( 70 + Xdepth/2, 85 + Ydimension/2, -160 + currentCamZ );
-        camera.lookAt( Xdepth/2, Ydimension/2, Zdimension/2 );
+        camera.position.set( 7*maxDim + Xdepth/2, 8.5*maxDim + Ydimension/2, 8.8*maxDim + currentCamZ);
+        camera.lookAt( Xdepth/2, 0, Zdimension/2 );
 
         render();
     }
 </script>
 <canvas bind:this={el}
+    width={size}
+    height={size}
     on:mousemove={hoverable ? handleMouseMove : undefined}
     on:mouseleave={hoverable ? setCameraPosition : undefined}
     class="{isLoaded ? 'loaded' : 'loading'}"
 ></canvas>
 <style>
-    canvas {
-        width: 100%;
-        height: 100%;
-    }
     .loading {
         animation-name: placeHolderShimmer;
         animation-duration: 1s;
