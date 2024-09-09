@@ -8,7 +8,7 @@ from OpenTorsion_plotting.plotting import plot_campbell
 # Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from openTorsion_parser.parser import parse
+from OpenTorsion_parser.parser import parse
 
 json_path = './system.json'
 with open(json_path) as input_json:

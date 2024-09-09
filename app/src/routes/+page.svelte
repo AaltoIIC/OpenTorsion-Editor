@@ -43,9 +43,14 @@
     </div>
 </div>
 <style>
-    :global(body) {
+    .screen {
         background-color: rgb(245, 245, 245);
-        overflow-y: visible;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow-y: scroll;
     }
     .main-page-content {
         margin: 108px auto;

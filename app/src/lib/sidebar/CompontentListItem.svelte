@@ -11,6 +11,7 @@
     import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import DialogBox from "$lib/DialogBox.svelte";
+    import Button from "$lib/Button.svelte";
     
     let dialogBox: SvelteComponent;
 
@@ -82,12 +83,14 @@
             <p>{id ? "Custom Component" : "Generic Component"}</p>
         </div>
         <div>
-            <button
-                on:click={onAdd}>Add
+            <Button
+                onClick={onAdd}
+                color={"rgb(30, 30, 30)"}>
+                Add
                 <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>        
-            </button>
+                </svg>  
+            </Button>
         </div>
     </div>
 </div>
@@ -107,7 +110,7 @@
     .add-icon {
         width: 18px;
         height: 18px;
-        margin: 0 0 -4px 0;
+        margin: 0 0 -4.5px 0;
         stroke: rgba(255, 255, 255, 0.9);
         stroke-width: 2px;
         stroke-linejoin: round;

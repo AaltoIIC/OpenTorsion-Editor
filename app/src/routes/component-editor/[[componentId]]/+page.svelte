@@ -297,7 +297,6 @@
     .top-menu .buttons {
         margin-right: 16px;
     }
-
     .main-screen {
         position: fixed;
         top: 0;
