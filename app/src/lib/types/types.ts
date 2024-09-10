@@ -12,17 +12,18 @@ export interface ExcitationType {
 interface BaseElementType {
     name: string;
     type: string;
-    damping: number;
     excitation?: ExcitationType;
 }
 
 export interface DiskElementType extends BaseElementType {
     type: "Disk";
+    damping: number;
     inertia: number;
 }
 
 export interface ShaftElementType extends BaseElementType {
     type: "ShaftDiscrete";
+    damping: number;
     stiffness: number;
 }
 

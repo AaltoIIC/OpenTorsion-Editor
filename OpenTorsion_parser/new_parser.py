@@ -5,7 +5,13 @@ def find_component_by_name(name, components):
         if component['name'] == name:
             return component
 
-# returns OpenTorsion assembly from json
+'''
+Returns tuple of assembly and excitation_dict
+
+assembly: OpenTorsion Assembly object
+excitation_dict: keys are node coordinates and value is excitation at that coordinate. 
+excitation value is list of tuples [(multiplier, excitation as percentage of the torque)]
+'''
 def parse(json):
     structure = json['structure']
     components = json['components']
@@ -15,7 +21,13 @@ def parse(json):
                     'shafts': {},
                     'gears': {}
                 }
-    excitations = []
+    # system excitation
+    excitation_dict = {}
+    def add_excitation (node, excitation):
+        if node in excitation_dict:
+            excitation_dict[node] = excitation_dict[node] + excitation
+        else:
+            excitation_dict[node] = excitation
 
     def add_part(component):
         nonlocal i
@@ -32,17 +44,20 @@ def parse(json):
 
             # add element and excitation to elements and excitations variables
             if element['type'] == 'Disk':
-                elements['disks'][elem_name] = ot.Disk(
-                    i,
-                    I=element['inertia'],
-                    c=element['damping']
-                )
+                # if there's already a disk on the same node, combine them
+                last_disk_key = list(elements['disks'])[-1] if elements['disks'] else None
+                if (last_disk_key and elements['disks'][list(elements['disks'])[-1]].node == i):
+                    elements['disks'][last_disk_key].I += element['inertia']
+                    elements['disks'][last_disk_key].c += element['damping']
+                else:
+                    elements['disks'][elem_name] = ot.Disk(
+                        i,
+                        I=element['inertia'],
+                        c=element['damping']
+                    )
+                
                 if 'excitation' in element:
-                    excitations.append(
-                        {
-                            'node': i,
-                            'value': element['excitation']
-                        })
+                    add_excitation(i, element['excitation']['values'])
             elif element['type'] == 'ShaftDiscrete':
                 elements['shafts'][elem_name] = ot.Shaft(
                     i,
@@ -51,11 +66,7 @@ def parse(json):
                     c=element['damping']
                 )
                 if 'excitation' in element:
-                    excitations.append(
-                        {
-                            'node': i,
-                            'value': element['excitation']
-                        })
+                    add_excitation(i, element['excitation']['values'])
 
                 i += 1
             elif element['type'] == 'GearElement':
@@ -70,16 +81,11 @@ def parse(json):
                 elements['gears'][elem_name] = ot.Gear(
                     i,
                     I=element['inertia'],
-                    c=element['damping'],
                     R=gear_length,
                     parent=parent_gear
                 )
                 if 'excitation' in element:
-                    excitations.append(
-                        {
-                            'node': i,
-                            'value': element['excitation']
-                        })
+                    add_excitation(i, element['excitation']['values'])
             
             # call add_part on connected components
             if element['name'] in connected_components:
@@ -97,7 +103,10 @@ def parse(json):
     if len(starting_components) > 1:
         raise ValueError("JSON contains more than one group of connected components.")
     elif len(starting_components) == 0:
-        raise ValueError("JSON contains no connected components.")
+        if (len(components) == 1):
+            starting_components = [components[0]['name']]
+        else:
+            raise ValueError("JSON contains no connected components.")
 
     starting_component = find_component_by_name(starting_components[0], components)
 
@@ -109,12 +118,4 @@ def parse(json):
         gear_elements=(elements['gears'].values() or None)
     )
 
-    # create system excitation
-    system_excitation = None
-    '''ot.SystemExcitation(
-        assembly.check_dof(),
-        
-    )'''
-    print(assembly.eigenmodes())
-
-    return (assembly, system_excitation)
+    return (assembly, excitation_dict)

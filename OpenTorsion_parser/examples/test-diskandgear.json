@@ -1,18 +1,7 @@
 {
-  "name": "windmill",
+  "name": "test",
   "date": "2024-09-10T08:19:21.329Z",
   "components": [
-    {
-      "name": "Windmill Turbine 1",
-      "elements": [
-        {
-          "name": "Disk 1",
-          "type": "Disk",
-          "inertia": 9200000,
-          "damping": 0
-        }
-      ]
-    },
     {
       "name": "Windmill Rotor 1",
       "elements": [
@@ -70,13 +59,14 @@
       ]
     },
     {
-      "name": "Shaft 1",
+      "name": "New Component 1",
       "elements": [
         {
-          "name": "Shaft 1",
-          "type": "ShaftDiscrete",
+          "name": "Gear 1",
+          "type": "GearElement",
           "damping": 0,
-          "stiffness": 368000000
+          "inertia": 5720,
+          "diameter": 0.23
         }
       ]
     }
@@ -84,11 +74,7 @@
   "structure": [
     [
       "Windmill Rotor 1.Disk 2",
-      "Shaft 1.Shaft 1"
-    ],
-    [
-      "Shaft 1.Shaft 1",
-      "Windmill Turbine 1.Disk 1"
+      "New Component 1.Gear 1"
     ]
   ]
 }

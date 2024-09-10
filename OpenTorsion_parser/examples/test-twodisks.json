@@ -1,5 +1,5 @@
 {
-  "name": "windmill",
+  "name": "test",
   "date": "2024-09-10T08:19:21.329Z",
   "components": [
     {
@@ -68,26 +68,11 @@
           }
         }
       ]
-    },
-    {
-      "name": "Shaft 1",
-      "elements": [
-        {
-          "name": "Shaft 1",
-          "type": "ShaftDiscrete",
-          "damping": 0,
-          "stiffness": 368000000
-        }
-      ]
     }
   ],
   "structure": [
     [
       "Windmill Rotor 1.Disk 2",
-      "Shaft 1.Shaft 1"
-    ],
-    [
-      "Shaft 1.Shaft 1",
       "Windmill Turbine 1.Disk 1"
     ]
   ]

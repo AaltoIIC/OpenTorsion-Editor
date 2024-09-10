@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="ddt-cont">
-                {#each Array.from($systems.entries()).reverse() as [id, system]}
+                {#each Array.from($systems.entries()).reverse() as [id, system] (id)}
                     <SystemTile id={id} system={system} />
                 {/each}
                 <NewSystemTile />

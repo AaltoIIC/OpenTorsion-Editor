@@ -6,10 +6,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from OpenTorsion_parser.new_parser import parse
 
-json_path = './examples/windmill.json'
+json_path = './examples/test-twodisks.json'
 
 with open(json_path) as input_json:
     input_data = json.load(input_json)
-    assembly = parse(input_data)
+    assembly, excitations = parse(input_data)
+    print(excitations)
     plot_tools = ot.Plots(assembly)
     plot_tools.plot_assembly()

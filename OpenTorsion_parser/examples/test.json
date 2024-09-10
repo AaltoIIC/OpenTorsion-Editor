@@ -1,0 +1,46 @@
+{
+  "name": "test",
+  "date": "2024-09-10T08:19:21.329Z",
+  "components": [
+    {
+      "name": "New Component (3) 1",
+      "elements": [
+        {
+          "name": "Disk 1",
+          "type": "Disk",
+          "damping": 0,
+          "inertia": 10000
+        },
+        {
+          "name": "Shaft 1",
+          "type": "ShaftDiscrete",
+          "damping": 0,
+          "stiffness": 4490000000
+        },
+        {
+          "name": "Disk 2",
+          "type": "Disk",
+          "damping": 0,
+          "inertia": 6000
+        }
+      ]
+    },
+    {
+      "name": "New Component (4) 1",
+      "elements": [
+        {
+          "name": "Disk 1",
+          "type": "Disk",
+          "damping": 0,
+          "inertia": 6000
+        }
+      ]
+    }
+  ],
+  "structure": [
+    [
+      "New Component (3) 1.Disk 2",
+      "New Component (4) 1.Disk 1"
+    ]
+  ]
+}

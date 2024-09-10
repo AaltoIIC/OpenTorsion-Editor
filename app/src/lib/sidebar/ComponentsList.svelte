@@ -2,7 +2,7 @@
     import type { ComponentType } from "$lib/types/types";
     import DropdownButton from "$lib/DropdownButton.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
-    import { basicComponents } from "../editor/basicComponents";
+    import { basicComponents } from "../editor/component-editor/basicComponents";
     import { customComponents, currentSystemJSON } from "$lib/stores/stores";
     import { importComponent } from "$lib/utils";
     import { goto } from "$app/navigation";

@@ -284,6 +284,7 @@ export const checkIfOTCompatible = () => {
         sourceElemType = sourceComponent?.elements.find(elem => elem.name === sourceElemName)?.type,
         targetElemType = targetComponent?.elements.find(elem => elem.name === targetElemName)?.type;
 
+        // shafts can't be connected to shafts
         if (sourceElemType === 'ShaftDiscrete' && targetElemType === 'ShaftDiscrete') {
             notification.set(
                 {
@@ -293,6 +294,29 @@ export const checkIfOTCompatible = () => {
             });
             return false;
         }
+
+        // disks can't be connected to gears
+        if (sourceElemType === 'Disk' && targetElemType === 'GearElement') {
+            notification.set(
+                {
+                    message: "System can't contain a disk connected to a gear element.",
+                    type: "info",
+                    duration: 3600000
+            });
+            return false;
+        }
+
+        // gears can only be connected to shafts
+        if (sourceElemType === 'GearElement' && targetElemType !== 'ShaftDiscrete') {
+            notification.set(
+                {
+                    message: "System can't contain a gear element connected to a non-shaft element.",
+                    type: "info",
+                    duration: 3600000
+            });
+            return false;
+        }
+
     }
 
     return true;

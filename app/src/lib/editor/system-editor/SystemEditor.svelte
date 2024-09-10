@@ -127,11 +127,26 @@
     // function to check if a connection is valid
     const checkConnectionConstraints = (connection: Connection | Edge) => {
       if (!connection.sourceHandle || !connection.targetHandle) return false;
+
+      const sourceType = findElement(connection.sourceHandle)?.type;
+      const targetType = findElement(connection.targetHandle)?.type;
       let isValid = true;
       
-      // don't allow connections between two shafts
-      if (findElement(connection.sourceHandle)?.type === 'ShaftDiscrete' &&
-          findElement(connection.targetHandle)?.type === 'ShaftDiscrete') {
+      // if source is a shaft, target must be disk or gear
+      if (sourceType === 'ShaftDiscrete' &&
+          !(targetType === 'Disk' || targetType === 'GearElement')) {
+        isValid = false;
+      }
+
+      // if source is a disk, target must be shaft or disk
+      if (sourceType === 'Disk' &&
+          !(targetType === 'ShaftDiscrete' || targetType === 'Disk')) {
+        isValid = false;
+      }
+
+      // if source is a gear, target must be shaft
+      if (sourceType === 'GearElement' &&
+          targetType !== 'ShaftDiscrete') {
         isValid = false;
       }
 

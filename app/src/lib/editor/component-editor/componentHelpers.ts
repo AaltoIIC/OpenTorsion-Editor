@@ -128,6 +128,17 @@ export const checkElementOrder = (elements: ElementType[]) => {
     }
 }
 
+const hasValidParent = (childElement: ElementType, elements: ElementType[]) => {
+    return (
+        childElement.type === "GearElement" &&
+        childElement.parent &&
+        childElement.parent !== childElement.name &&
+        elements.find(el => (
+            el.type === "GearElement" && el.name === childElement.parent
+        )) !== undefined
+    );
+}
+
 // function to check if the order of elements in a component is valid
 // (doesn't catch all invalid orders)
 const elementOrderValid = (elements: ElementType[]) => {
@@ -141,15 +152,30 @@ const elementOrderValid = (elements: ElementType[]) => {
     }
 
     let outputElements = findComponentOutputs(elements);
-    let prevElemType = "";
+    let prevElem: ElementType | undefined;
     for (let element of elements) {
-        // component can't have two shafts connected
-        if (element.type === "ShaftDiscrete") {
-            if (prevElemType === "ShaftDiscrete") {
-                valid = false;
-                message = "Two shafts can't be connected."
-                break;
-            }
+        // shaft can't be connected to another shaft
+        if (element.type === "ShaftDiscrete" && prevElem?.type === "ShaftDiscrete") {
+            valid = false;
+            message = "Two shafts can't be connected."
+            break;
+        }
+
+        // disk element can't be connected to a gear element
+        if (element.type === "Disk" && prevElem?.type === "GearElement") {
+            valid = false;
+            message = "Disk element can't be connected to a gear element."
+            break;
+        }
+
+        // gear element can only be connected to a shaft
+        if (element.type === "GearElement" &&
+                !hasValidParent(element, elements) &&
+                (prevElem?.type  === "Disk" || prevElem?.type === "GearElement")
+            ) {
+            valid = false;
+            message = "Gear element can only be connected to a shaft."
+            break;
         }
 
         // output elements can't be shafts
@@ -159,7 +185,7 @@ const elementOrderValid = (elements: ElementType[]) => {
             break;
         }
 
-        prevElemType = element.type;
+        prevElem = element;
     }
 
     return {
@@ -270,7 +296,7 @@ export const possibleParams = {
         optional: ["excitation"]
     },
     gear: {
-        required: ["name", "type", "damping", "inertia", "diameter"],
+        required: ["name", "type", "inertia", "diameter"],
         optional: ["parent", "excitation", "teeth"]
     }
 }
@@ -295,7 +321,6 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
         return {
             name: nameElement('GearElement', elements),
             type: "GearElement",
-            damping: 0,
             inertia: 5.72e+03,
             diameter: 0.23
         }
