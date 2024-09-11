@@ -152,7 +152,7 @@
                 bind:textContent={JSONEditorText}
                 onInput={(text) => {isJSONError = !handleJSONEditing(text, $currentSystemJSON.id)}} />
         </div>
-        <a class="analyze-btn-cont" href="/analysis">
+        <a class="analyze-btn-cont" href={`/analysis/${$currentSystemJSON.id}`}>
             <Button lightMode={true}>
                 Analyze DDT
                 <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -181,7 +181,7 @@
                 bind:this={fileInput}
                 on:change={(e) => importSystem(e, false)}
                 accept=".json">
-            <a href="/analysis">
+            <a href={`/analysis/${$currentSystemJSON.id}`}>
                 Analysis
             </a>
         </div>

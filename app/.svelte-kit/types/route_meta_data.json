@@ -1,6 +1,8 @@
 {
 	"/": [],
-	"/analysis": [],
+	"/analysis/[systemId]": [
+		"src/routes/analysis/[systemId]/+page.ts"
+	],
 	"/component-editor/[[componentId]]": [
 		"src/routes/component-editor/[[componentId]]/+page.ts"
 	],

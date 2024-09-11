@@ -5,23 +5,11 @@
     import { createSystem, removeSystem } from "$lib/stores/stores";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import System3dModel from "$lib/System3dModel.svelte";
+    import { formatDate } from "$lib/utils";
 
     export let id: string;
     export let system: SystemType;
     let dialogBox: DialogBox;
-
-    const formatDate = (isoString: string) => {
-        const date = new Date(isoString);
-        
-        const pad = (num: number) => num.toString().padStart(2, '0');
-        const day = pad(date.getDate());
-        const month = pad(date.getMonth() + 1);
-        const year = date.getFullYear();
-        const hours = pad(date.getHours());
-        const minutes = pad(date.getMinutes());
-
-        return `${day}.${month}.${year} ${hours}:${minutes}`;
-    }
 
     const handleMenu = (option: string) => {
         if (option === "Duplicate") {

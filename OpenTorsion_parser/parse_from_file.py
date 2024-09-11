@@ -4,7 +4,7 @@ import sys
 import os
 # Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from OpenTorsion_parser.new_parser import parse
+from OpenTorsion_parser.parser import parse
 
 json_path = './examples/test-twodisks.json'
 

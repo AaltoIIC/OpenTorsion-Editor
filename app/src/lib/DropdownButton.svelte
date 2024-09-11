@@ -99,6 +99,7 @@
         z-index: 10000002;
         opacity: 0;
         border-radius: var(--main-border-radius);
+        overflow: hidden;
     }
     .open .main-dropdown {
         visibility: visible;

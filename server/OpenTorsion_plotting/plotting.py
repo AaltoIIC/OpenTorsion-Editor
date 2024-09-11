@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as patches
 
+"""
+This code includes modifications based on the original code from OpenTorsion.
+Modifications are made so that OpenTorsion plots can be converted to HTML using mpld3.
+"""
+
 def plot_eigenmodes(plot_tools, modes = 3):
     """
     Updated eigenmode plot. Geared systems not supported.
@@ -32,7 +37,7 @@ def plot_eigenmodes(plot_tools, modes = 3):
         axs[i].plot([nodes,nodes],[np.abs(eigenvector_rotated),-np.abs(eigenvector_rotated)],'--',color='black')
         axs[i].set_ylim([-1.1,1.1])
 
-    plt.show()
+    
     return fig_modes
 
 def plot_campbell(plot_tools,
