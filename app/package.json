@@ -25,6 +25,7 @@
 	"type": "module",
 	"dependencies": {
 		"@xyflow/svelte": "^0.1.13",
+		"html2pdf.js": "^0.10.2",
 		"lodash": "^4.17.21",
 		"prismjs": "^1.29.0",
 		"svelte-jsoneditor": "^0.23.7",

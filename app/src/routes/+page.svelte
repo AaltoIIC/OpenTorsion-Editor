@@ -3,7 +3,11 @@
     import ImportSystemTile from "$lib/dashboard/ImportSystemTile.svelte";
     import SystemTile from "$lib/dashboard/SystemTile.svelte";
     import { systems } from "$lib/stores/stores";
+    import { notification } from "$lib/stores/stores";
 
+    setTimeout(() => {
+        notification.set(null);
+    }, 1000);
 </script>
 <svelte:head>
     <title>Dashboard | Co-Des Interface</title>
@@ -41,8 +45,26 @@
             </div>
         </div>
     </div>
+    <footer>
+        <p>Co-Des Interface</p>
+        <p>2024, Aalto IIC</p>
+    </footer>
 </div>
 <style>
+    footer {
+        height: 68px;
+        width: 100%;
+        background-color: var(--main-dark-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+    footer p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+    }
     .screen {
         background-color: rgb(245, 245, 245);
         position: fixed;
@@ -94,6 +116,7 @@
         width: 1100px;
         height: 68px;
         box-shadow: var(--main-shadow);
+        z-index: 10000;
     }
     .main-logo {
         width: 114px;
@@ -109,25 +132,7 @@
         display: flex;
         justify-content: start;
         flex-wrap: wrap;
-        height: calc(100vh - 200px);
-        overflow-x: hidden;
-        overflow-y: scroll;
-        mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%,
-            rgba(0,0,0,1) 4%,
-            rgba(0,0,0,1) 96%,
-            rgba(0,0,0,0) 100%);
+        height: fit-content;
         padding: 10px 0;
     }
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.15);
-    }
-
 </style>

@@ -9,7 +9,6 @@
     import * as THREE from 'three';
 
     export let data: SystemType;
-    export let hoverable = true;
     export let size = 200;
 
     let el: HTMLCanvasElement;
@@ -334,26 +333,10 @@
         
         render();
     }   
-
-    // animation on hover
-    const handleMouseMove = (event: MouseEvent) => {
-        const width = el.clientWidth;
-        const rect = el.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const Xdepth =  Ydimension ? branchHeight/2 : 0
-        const maxDim = Math.max(Ydimension, -Zdimension, Xdepth);
-        const currentCamZ = (x / width) * (Zdimension+320) * 2
-        camera.position.set( 7*maxDim + Xdepth/2, 8.5*maxDim + Ydimension/2, 8.8*maxDim + currentCamZ);
-        camera.lookAt( Xdepth/2, 0, Zdimension/2 );
-
-        render();
-    }
 </script>
 <canvas bind:this={el}
     width={size}
     height={size}
-    on:mousemove={hoverable ? handleMouseMove : undefined}
-    on:mouseleave={hoverable ? setCameraPosition : undefined}
     class="{isLoaded ? 'loaded' : 'loading'}"
 ></canvas>
 <style>

@@ -7,7 +7,6 @@
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
     import { formatDate } from "$lib/utils";
-
     // load the system data from the store
     export let data;
     if ($systems.get(data.systemId)) {
@@ -21,15 +20,20 @@
         });
     }
 
-
-    let plots: Record<string, string> = {};
+    let isError = false;
+    let plots: Record<string, string> | undefined;
     const plotStyles = `
         text {
             font-family: 'Roboto Mono', monospace !important;
         }
     `
 
-    const callCampbell = () => {
+    const downloadAnalysisResults = () => {
+        
+    }
+
+    const runAnalysis = () => {
+        isError = false;
         let url = "http://127.0.0.1:5000/analysis";
         let data = $currentSystemJSON.json;
         fetch(url, {
@@ -41,61 +45,195 @@
         }).then(response => response.json())
         .then(data => {
             plots = data as {} as Record<string, string>;
-        })
+        }).catch((error) => {
+            isError = true;
+        });
     }
 
     onMount(() => {
-        callCampbell();
-    });
+        runAnalysis();
+    })
 
 </script>
-<Sidebar>
-    <div class="illustration-cont">
-        <System3dModel
-            data={$currentSystemJSON.json}
-            size={320}
-        />
-    </div>
-    <h2>{$currentSystemJSON.json.name}</h2>
-    <p>{formatDate($currentSystemJSON.json.date)}</p>
-    <a href="/system-editor">Go back</a>
-    <Button color="var(--main-dark-color)">
-        Download Analysis Results
-        <svg class="icon-down" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
-        </svg>          
-    </Button>
-</Sidebar>
+<svelte:head>
+    <title>Analysis | Co-Des Interface</title>
+</svelte:head>
 <main>
     <div class="tiles-cont">
-        {#each Object.entries(plots) as [plot, value]}
-            <div class="tile main-response">
-                <iframe title={plot}
-                        srcdoc={value}
-                        style="width: 100%; height: 100%; border: none;">  
-                </iframe>
+        {#if plots}
+            {#each Object.entries(plots) as [plot, value]}
+                <div class="tile main-response" id={plot.replaceAll(' ', '')}>
+                    <p>{plot}</p>
+                    <iframe title={plot}
+                            srcdoc={value}
+                            style="width: 100%; height: 100%; border: none;">  
+                    </iframe>
+                </div>
+            {/each}
+        {:else if isError}
+            <div class="error-cont">
+                <p>There was an error while fetching the analysis results.</p>
+                <Button
+                    icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>'
+                    onClick={runAnalysis}
+                    color="var(--main-dark-color)"
+                    >
+                    Retry
+                </Button>
             </div>
-        {/each}
+        {:else}
+            <div class="tile loading">
+            </div>
+            <div class="tile loading">
+            </div>
+        {/if}
     </div>
 </main>
+<div class="main-top-bar">
+    <div class="links">
+        <a href={`/system-editor/${$currentSystemJSON.id}`}>
+            <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>              
+            Back to System Editor
+        </a>
+    </div>
+    <h4>Analysis of {$currentSystemJSON.json.name}</h4>
+    <Button
+        icon='<svg class="icon-down" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'
+        onClick={downloadAnalysisResults}
+        isActive={plots !== undefined && !isError}>
+        Download Analysis Results       
+    </Button>
+</div>
+<Sidebar>
+    <div class="system-info">
+        <System3dModel
+            data={$currentSystemJSON.json}
+            size={240}
+        />
+        <h2>{$currentSystemJSON.json.name}</h2>
+        <p>Created at {formatDate($currentSystemJSON.json.date)}</p>
+        <p>{$currentSystemJSON.json.components.reduce(
+            (prevSum, currentComp) => (prevSum + currentComp.elements.length),
+            0)}
+            elements
+        </p>
+        <p>{$currentSystemJSON.json.components.length} components</p>
+    </div>
+    <h4 class="plots-header">Analysis Plots:</h4>
+    <ul class="main-menu">
+        {#if plots}
+            {#each Object.keys(plots) as plotName}
+                <li>
+                    <a href={`#${plotName.replaceAll(' ', '')}`}>{plotName}</a>
+                </li>
+            {/each}
+        {:else if !isError}
+            <li class="loading"></li>
+        {/if}
+    </ul>
+</Sidebar>
 <style>
-    .icon-down {
-        width: 16px;
-        height: 16px;
-        margin: 0 -2px -4px 0;
+    .error-cont {
+        color: white;
+        background: var(--main-error-color);
+        border-radius: var(--main-border-radius);
+        padding: 20px;
+        width: max-content;
+        text-align: center;
+        margin: calc(50vh - 162px) auto;
     }
-    .illustration-cont {
-        width: 320px;
-        height: 320px;
-        margin: 20px;
+    .error-cont p {
+        color: white;
+        font-size: 14px;
+        margin: 0 0 8px 0;
+    }
+    li.loading {
+        width: 100%;
+        height: 100px;
+        border-radius: var(--main-border-radius);
+    }
+    .loading {
+        animation-name: placeHolderShimmer;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+    }
+    .plots-header {
+        margin: 32px 40px 0 40px;
+        font-size: 16px;
+        font-weight: 550;
+    }
+    .main-menu {
+        padding: 0 54px;
+    }
+    .main-menu li {
+        margin: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        list-style-type: none;
+    }
+    .main-menu li a {
+        color: rgba(0, 0, 0, 0.6);
+        text-decoration: none;
+    }
+    .system-info {
+        width: 280px;
+        padding: 0 20px 20px 20px;
+        box-sizing: border-box;
+        margin: 40px 40px 0 40px;
+        font-size: 14px;
+        border-radius: var(--main-border-radius);
+        border: solid 3px var(--main-grey-color);
+    }
+    .system-info h2, .system-info p {
+        margin: 0;
+    }
+    .system-info h2 {
+        font-size: 18px;
+    }
+    .links {
+        height: fit-content;
+        align-self: center;
+    }
+    .links a {
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+    }
+    .icon-back {
+        width: 20px;
+        height: 20px;
+        margin: 0 -2px -5px 0;
+    }
+    .main-top-bar h4 {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 550;
+    }
+    .main-top-bar {
+        width: calc(100vw - 360px);
+        height: 68px;
+        background: var(--main-dark-color);
+        position: fixed;
+        top: 0;
+        left: 360px;
+        z-index: 100;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        font-weight: 400;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 16px;
+        box-sizing: border-box;
     }
     main {
         width: calc(100vw - 360px);
-        height: fit-content;
-        min-height: 100vh;
+        height: calc(100vh - 68px);
         position: absolute;
-        top: 0;
         left: 360px;
+        bottom: 0;
+        overflow-y: scroll;
         background: var(--main-grey-color);
     }
     .tiles-cont {
@@ -108,8 +246,17 @@
         width: 648px;
         height: 500px;
         overflow: hidden;
-        margin: 0 auto;
-        padding: 0 0 42px 42px;
+        margin: 26px auto;
+        padding: 22px 0 42px 42px;
+        position: relative;
     }
-
+    .tile p {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        font-size: 16px;
+        font-weight: 550;
+        color: rgba(0, 0, 0, 0.9);
+        transform: translateX(-50%);
+    }
 </style>

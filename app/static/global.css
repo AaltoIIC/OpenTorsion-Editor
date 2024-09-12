@@ -21,6 +21,11 @@ body {
     height: 100vh;
     overflow: hidden;
     font-family: 'Inter', sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
 }
 h1, h2, h3, h4, p, a {
     font-family: 'Inter', sans-serif;
@@ -44,4 +49,16 @@ h1, h2, h3, h4, p, a {
             transparent 85%);
         background-position: 468px 0;
     }
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.15);
 }
