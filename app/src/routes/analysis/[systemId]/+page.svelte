@@ -1,11 +1,12 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
-    import { onMount } from "svelte";
+    import { onMount, type SvelteComponent } from "svelte";
     import { currentSystemJSON, systems } from "$lib/stores/stores";
     import type { SystemType } from "$lib/types/types";
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
+    import PdfTemplate from "$lib/analysis/PdfTemplate.svelte";
     import { formatDate } from "$lib/utils";
     // load the system data from the store
     export let data;
@@ -21,15 +22,26 @@
     }
 
     let isError = false;
-    let plots: Record<string, string> | undefined;
+    type Plot = {
+        name: string;
+        html: string;
+        iframe?: HTMLIFrameElement;
+    };
+    let plots: Plot[] | undefined;
     const plotStyles = `
         text {
             font-family: 'Roboto Mono', monospace !important;
         }
     `
-
+    let html2pdf: any;
+    let illustrationContext: CanvasRenderingContext2D;
+    // plots[0].iframe?.contentDocument?.querySelector('.mpld3-figure')
+    let pdfComponent: SvelteComponent;
     const downloadAnalysisResults = () => {
-        
+        let svgs = plots?.map(({ iframe }) => {
+            return iframe?.contentDocument?.querySelector('.mpld3-figure')?.outerHTML;
+        });
+        pdfComponent.downloadPdf(svgs);
     }
 
     const runAnalysis = () => {
@@ -44,7 +56,7 @@
             body: JSON.stringify(data)
         }).then(response => response.json())
         .then(data => {
-            plots = data as {} as Record<string, string>;
+            plots = data as Plot[];
         }).catch((error) => {
             isError = true;
         });
@@ -53,7 +65,6 @@
     onMount(() => {
         runAnalysis();
     })
-
 </script>
 <svelte:head>
     <title>Analysis | Co-Des Interface</title>
@@ -61,12 +72,13 @@
 <main>
     <div class="tiles-cont">
         {#if plots}
-            {#each Object.entries(plots) as [plot, value]}
-                <div class="tile main-response" id={plot.replaceAll(' ', '')}>
-                    <p>{plot}</p>
-                    <iframe title={plot}
-                            srcdoc={value}
-                            style="width: 100%; height: 100%; border: none;">  
+            {#each plots as { name, html, iframe }}
+                <div class="tile main-response" id={name.replaceAll(' ', '')}>
+                    <p>{name}</p>
+                    <iframe title={name}
+                            srcdoc={html}
+                            style="width: 100%; height: 100%; border: none;"
+                            bind:this={iframe}>  
                     </iframe>
                 </div>
             {/each}
@@ -111,6 +123,7 @@
         <System3dModel
             data={$currentSystemJSON.json}
             size={240}
+            bind:context={illustrationContext}
         />
         <h2>{$currentSystemJSON.json.name}</h2>
         <p>Created at {formatDate($currentSystemJSON.json.date)}</p>
@@ -124,9 +137,9 @@
     <h4 class="plots-header">Analysis Plots:</h4>
     <ul class="main-menu">
         {#if plots}
-            {#each Object.keys(plots) as plotName}
+            {#each plots as {name}}
                 <li>
-                    <a href={`#${plotName.replaceAll(' ', '')}`}>{plotName}</a>
+                    <a href={`#${name.replaceAll(' ', '')}`}>{name}</a>
                 </li>
             {/each}
         {:else if !isError}
@@ -134,6 +147,7 @@
         {/if}
     </ul>
 </Sidebar>
+<PdfTemplate bind:this={pdfComponent} />
 <style>
     .error-cont {
         color: white;

@@ -12,7 +12,7 @@
     export let size = 200;
 
     let el: HTMLCanvasElement;
-    let context: CanvasRenderingContext2D | null;
+    export let context: CanvasRenderingContext2D | null = null;
     let isLoaded = false;
 
     // creating THREE.js scene
@@ -110,7 +110,7 @@
     }
 
     // function to render scene and update canvas
-    const render = () => {
+    export const render = () => {
         if (context && $threeRenderer) {
             context.canvas.width = size;
             context.canvas.height = size;
