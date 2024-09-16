@@ -1,7 +1,7 @@
 <script lang="ts">
     import { currentSystemJSON, highlightLinesInEditor } from '$lib/stores/stores';
     import type { ComponentType } from '$lib/types/types';
-    import { nthLinesInJSON } from '$lib/utils';
+    import { nthLinesInJSON, trimText } from '$lib/utils';
     import { findComponentOutputs } from '$lib/editor/component-editor/componentHelpers';
     import TooltipHandle from './TooltipHandle.svelte';
     import { onMount } from 'svelte';
@@ -108,7 +108,7 @@
                 hoverable={isSelected}
                 highlightedElement={highlightedElement} />
         </div>
-        <p>{data.name}</p>
+        <p>{trimText(data.name, 20)}</p>
         <button class="remove-button"
             on:click={remove}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

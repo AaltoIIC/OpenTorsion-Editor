@@ -7,7 +7,7 @@
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
     import PdfTemplate from "$lib/analysis/PdfTemplate.svelte";
-    import { formatDate } from "$lib/utils";
+    import { formatDate, trimText } from "$lib/utils";
     // load the system data from the store
     export let data;
     if ($systems.get(data.systemId)) {
@@ -28,20 +28,16 @@
         iframe?: HTMLIFrameElement;
     };
     let plots: Plot[] | undefined;
-    const plotStyles = `
-        text {
-            font-family: 'Roboto Mono', monospace !important;
-        }
-    `
-    let html2pdf: any;
-    let illustrationContext: CanvasRenderingContext2D;
-    // plots[0].iframe?.contentDocument?.querySelector('.mpld3-figure')
+
+
     let pdfComponent: SvelteComponent;
+    let pdfReady = false;
+    let pdfText = "Download Analysis Results";
     const downloadAnalysisResults = () => {
-        let svgs = plots?.map(({ iframe }) => {
-            return iframe?.contentDocument?.querySelector('.mpld3-figure')?.outerHTML;
+        pdfText = "Downloading...";
+        pdfComponent.downloadPdf().then(() => {
+            pdfText = "Download Analysis Results";
         });
-        pdfComponent.downloadPdf(svgs);
     }
 
     const runAnalysis = () => {
@@ -110,12 +106,12 @@
             Back to System Editor
         </a>
     </div>
-    <h4>Analysis of {$currentSystemJSON.json.name}</h4>
+    <h4>Analysis of {trimText($currentSystemJSON.json.name, 20)}</h4>
     <Button
         icon='<svg class="icon-down" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'
         onClick={downloadAnalysisResults}
-        isActive={plots !== undefined && !isError}>
-        Download Analysis Results       
+        isActive={plots !== undefined && !isError && pdfReady}>
+        {pdfText}     
     </Button>
 </div>
 <Sidebar>
@@ -123,9 +119,8 @@
         <System3dModel
             data={$currentSystemJSON.json}
             size={240}
-            bind:context={illustrationContext}
         />
-        <h2>{$currentSystemJSON.json.name}</h2>
+        <h2>{trimText($currentSystemJSON.json.name, 16)}</h2>
         <p>Created at {formatDate($currentSystemJSON.json.date)}</p>
         <p>{$currentSystemJSON.json.components.reduce(
             (prevSum, currentComp) => (prevSum + currentComp.elements.length),
@@ -147,7 +142,11 @@
         {/if}
     </ul>
 </Sidebar>
-<PdfTemplate bind:this={pdfComponent} />
+<PdfTemplate
+    data={$currentSystemJSON.json}
+    plots={plots}
+    bind:this={pdfComponent}
+    bind:ready={pdfReady} />
 <style>
     .error-cont {
         color: white;

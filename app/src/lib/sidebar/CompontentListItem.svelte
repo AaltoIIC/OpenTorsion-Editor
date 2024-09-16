@@ -6,12 +6,16 @@
     import {
         currentSystemJSON,
         removeComponent,
-        createComponent
+        createComponent,
+
+        resetCurrentComponent
+
     } from "$lib/stores/stores";
     import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import DialogBox from "$lib/DialogBox.svelte";
     import Button from "$lib/Button.svelte";
+    import { trimText } from "$lib/utils";
     
     let dialogBox: SvelteComponent;
 
@@ -45,12 +49,12 @@
 
     const handleMenu = (option: string) => {
         if (option === "Duplicate") {
-            createComponent({...data, name: `Copy of ${data.name}`});
+            createComponent({...data, name: `Copy of ${data.name}`}, true);
         } else if (option === "Edit") {
             goto(`/component-editor/${id}`);
         } else if (option === "Delete") {
-            dialogBox.openDialog(`Are you sure you want to delete the ${data.name} component?`,
-                "Yes", "No").then((result: Boolean) => {
+            dialogBox.openDialog(`Are you sure you want to delete ${data.name} component?`,
+                "Yes", "No", "danger").then((result: Boolean) => {
                 if (result) {
                     removeComponent(id);
                 }
@@ -70,7 +74,7 @@
     <div class="component-info">
         <div>
             <h4>
-                <span>{data.name}</span>
+                <span>{trimText(data.name, 19)}</span>
                 <DropdownMenu
                     options={id ? ["Duplicate", "Edit", "Delete"] : ["Duplicate"]}
                     optionIcons={[

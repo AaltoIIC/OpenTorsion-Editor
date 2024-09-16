@@ -19,7 +19,7 @@ export const getComponent = (id: string): ComponentType | null => {
     return (get(customComponents).get(id) || null);
 }
 
-export const createComponent = (component: ComponentType | null = null) => {
+export const createComponent = (component: ComponentType | null = null, saveComponent: boolean = false) => {
     const componentIds = Array.from(get(customComponents).keys())
         .filter(compId => compId.startsWith(`${get(currentSystemJSON).id}-`))
         .map(compId => compId.split('-')[1]);
@@ -41,6 +41,9 @@ export const createComponent = (component: ComponentType | null = null) => {
         id: id,
         json: component
     });
+    if (saveComponent) {
+        saveCurrentComponent();
+    }
 
     return [id, component] as [string, ComponentType];
 }

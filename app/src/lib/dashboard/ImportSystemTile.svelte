@@ -22,7 +22,7 @@
         </Button>
     </div>
 </div>
-<input type="file" class="file-input"
+<input type="file" style:display="none"
     name="DDT-file"
     bind:this={fileInput}
     on:change={importSystem}
@@ -32,9 +32,6 @@
         width: 18px;
         height: 18px;
         margin: 0 -2px -4.2px 0;
-    }
-    .file-input {
-        display: none;
     }
     .main-tile {
         width: 175px;

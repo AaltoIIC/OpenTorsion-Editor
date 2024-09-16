@@ -6,6 +6,7 @@
     import DropdownMenu from "$lib/DropdownMenu.svelte";
     import System3dModel from "$lib/System3dModel.svelte";
     import { formatDate } from "$lib/utils";
+    import { trimText } from "$lib/utils";
 
     export let id: string;
     export let system: SystemType;
@@ -21,7 +22,7 @@
             goto(`/system-editor/${id}`);
         } else if (option === "Delete") {
             dialogBox.openDialog(`Are you sure you want to delete ${system.name}?`,
-                "Yes", "No").then((result: Boolean) => {
+                "Yes", "No", "danger").then((result: Boolean) => {
                 if (result) {
                     removeSystem(id);
                 }
@@ -34,14 +35,14 @@
 <div class="tile"
     on:click={() => {goto(`/system-editor/${id}`)}}>
     <div class="illustration-cont">
-        <System3dModel data={system} hoverable={false} size={175} />
-        {#if system.structure.length === 0}
-            <p class="empty-system-txt">No connected components</p>
+        <System3dModel data={system} size={175} />
+        {#if system.components.length === 0}
+            <p class="empty-system-txt">No components</p>
         {/if}
     </div>
     <div class="system-info">
         <div class="system-name-cont">
-            <h4>{system.name}</h4>
+            <h4>{trimText(system.name, 14)}</h4>
             <DropdownMenu
                 options={["Duplicate", "Edit", "Delete"]}
                 optionIcons={[

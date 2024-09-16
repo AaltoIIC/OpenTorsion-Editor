@@ -12,7 +12,7 @@
     export let size = 200;
 
     let el: HTMLCanvasElement;
-    export let context: CanvasRenderingContext2D | null = null;
+    let context: CanvasRenderingContext2D | null = null;
     let isLoaded = false;
 
     // creating THREE.js scene
@@ -184,11 +184,21 @@
             .filter(component => ( connectionStarts.includes(component.name) &&
             !connectionEnds.includes(component.name)));
         
-        startingComponents.forEach(component => {
-            let newPart: ElementType[] = []
-            addPart(newPart, component);
-            elements.push(newPart);
-        });
+        if (startingComponents.length > 0) {
+            startingComponents.forEach(component => {
+                let newPart: ElementType[] = []
+                addPart(newPart, component);
+                elements.push(newPart);
+            });
+        } else {
+            data.components.forEach(component => {
+                let newPart: ElementType[] = []
+                addPart(newPart, component);
+                elements.push(newPart);
+            });
+        }
+
+
 
         let currentX = 0;
         elements.forEach(part => {

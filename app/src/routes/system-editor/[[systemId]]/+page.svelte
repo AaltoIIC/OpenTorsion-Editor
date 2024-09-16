@@ -152,14 +152,17 @@
                 bind:textContent={JSONEditorText}
                 onInput={(text) => {isJSONError = !handleJSONEditing(text, $currentSystemJSON.id)}} />
         </div>
-        <a class="analyze-btn-cont" href={`/analysis/${$currentSystemJSON.id}`}>
-            <Button lightMode={true}>
-                Analyze DDT
+        <div class="analyze-btn-cont">
+            <Button
+                lightMode={true}
+                isActive={!(isJSONError || isNameError || isStructureError)}
+                onClick={() => {goto(`/analysis/${$currentSystemJSON.id}`)}}>
+                Analyze System
                 <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>              
             </Button>
-        </a>
+        </div>
     </div>
     <div class="top-menu">
         <div class="links">
@@ -181,7 +184,7 @@
                 bind:this={fileInput}
                 on:change={(e) => importSystem(e, false)}
                 accept=".json">
-            <a href={`/analysis/${$currentSystemJSON.id}`}>
+            <a href={!(isJSONError || isNameError || isStructureError) ? `/analysis/${$currentSystemJSON.id}` : ''}>
                 Analysis
             </a>
         </div>

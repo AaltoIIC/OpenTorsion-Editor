@@ -208,6 +208,8 @@ export const isNameUnique = (name: string,
 }
 
 export const formatDate = (isoString: string) => {
+    if (isNaN(Date.parse(isoString))) return '';
+    
     const date = new Date(isoString);
     
     const pad = (num: number) => num.toString().padStart(2, '0');
@@ -218,4 +220,9 @@ export const formatDate = (isoString: string) => {
     const minutes = pad(date.getMinutes());
 
     return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+
+export const trimText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength - 3) + '...';
 }
