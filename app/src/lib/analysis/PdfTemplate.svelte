@@ -69,7 +69,7 @@
         </div>
         {#if ready && plots}
             {#each plots as {name, iframe}}
-            <div style="background: white; border-radius: var(--main-border-radius); width: 648px; height: 500px; overflow: hidden; margin: 26px auto; padding: 22px 0 42px 42px; position: relative;">
+            <div style="background: white; border-radius: 0.5em; width: 648px; height: 500px; overflow: hidden; margin: 26px auto; padding: 22px 0 42px 42px; position: relative;">
                 <p style="position: absolute; top: 8px; left: 50%; font-size: 16px; font-weight: 550; color: rgba(0, 0, 0, 0.9); transform: translateX(-50%);">
                     {name}
                 </p>
@@ -98,7 +98,7 @@
         box-sizing: border-box;
         justify-content: space-between;
         align-items: center;
-        background-color: var(--main-dark-color);
+        background-color: rgb(30, 30, 30);
     }
     footer p {
         color: rgba(255, 255, 255, 0.9);
@@ -113,7 +113,7 @@
         width: 1000px;
         height: fit-content;
         padding: 0;
-        background-color: var(--main-grey-color);
+        background-color: rgb(245, 245, 245);
     }
     .info-cont {
         display: flex;
@@ -122,7 +122,7 @@
         gap: 1em;
         width: fit-content;
         text-align: left;
-        border: solid 3px var(--main-grey-color);
+        border: solid 3px rgb(245, 245, 245);
     }
     .info-text {
         width: 220px;
@@ -137,7 +137,7 @@
     }
     .box {
         background-color: white;
-        border-radius: var(--main-border-radius);
+        border-radius: 0.5em;
         width: fit-content;
     }
     .main-text {
@@ -157,5 +157,9 @@
         box-sizing: border-box;
         display: flex;
         justify-content: space-between;
+    }
+    h1, h2, h4, p {
+        font-family: 'Inter', sans-serif;
+        color: rgba(0, 0, 0, 0.8);
     }
 </style>

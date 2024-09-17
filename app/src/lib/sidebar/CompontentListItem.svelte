@@ -74,7 +74,7 @@
     <div class="component-info">
         <div>
             <h4>
-                <span>{trimText(data.name, 19)}</span>
+                <span class="comp-name">{trimText(data.name, 19)}</span>
                 <DropdownMenu
                     options={id ? ["Duplicate", "Edit", "Delete"] : ["Duplicate"]}
                     optionIcons={[
@@ -126,6 +126,10 @@
         justify-content: space-between;
         padding: 8px;
         flex-grow: 1;
+    }
+    .comp-name {
+        max-width: 200px;
+        overflow: hidden;
     }
     .component-list-item {
         display: flex;

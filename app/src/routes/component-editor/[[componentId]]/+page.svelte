@@ -24,14 +24,16 @@
     import { goto } from '$app/navigation';
     import Button from '$lib/Button.svelte';
     import DropdownButton from '$lib/DropdownButton.svelte';
-    import { exportJSON } from '$lib/utils';
+    import { exportJSON, importComponent } from '$lib/utils';
     import NameField from '$lib/NameField.svelte';
+    import TopBar from '$lib/TopBar.svelte';
     import {
         handleJSONEditing,
         handleNameChange,
         checkElementOrder
     } from '$lib/editor/component-editor/componentHelpers';
     
+    let fileInput: HTMLInputElement;
 
     let componentEditor: any;
     let isNameError = false;
@@ -70,7 +72,6 @@
                     json: $customComponents.get(data.componentId) as ComponentType
                 });
             } else {
-                alert("hehe");
                 originalName = $currentComponentJSON.json.name;
             }
         } else {
@@ -170,7 +171,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <title>Create New | Co-Des Interface</title>
+    <title>Component Editor | Co-Des Interface</title>
 </svelte:head>
 <div class="main-screen">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -199,22 +200,40 @@
                 onInput={(text) => {isError = !handleJSONEditing(text, originalName)}} />
         </div>
     </div>
-    <div class="top-menu">
-        <div class="links">
+    <TopBar>
+        <svelte:fragment slot="links">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span on:click={handleBack}>
+            <span on:click={handleBack} class="link-element">
                 <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>              
-                Back to System Editor
+                Back
             </span>
-        </div>
-        <NameField text="Component"
-                isError={isNameError} 
-                bind:value={componentName}
-                onInput={text => {isNameError = !handleNameChange(text, originalName)}} />
-        <div class="buttons">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span class="link-element"
+                on:click={() => fileInput.click()}>
+                Import
+            </span>
+            <input type="file"
+                style:display="none"
+                name="file"
+                bind:this={fileInput}
+                on:change={(e) => importComponent(e, false)}
+                accept=".json">
+            <a class="link-element"
+                href={isError ? '' : `/analysis/${$currentComponentJSON.id}`}>
+                Analysis
+            </a>
+        </svelte:fragment>
+        <svelte:fragment slot="name">
+            <NameField text="Component"
+                    isError={isNameError} 
+                    bind:value={componentName}
+                    onInput={text => {isNameError = !handleNameChange(text, originalName)}} />
+        </svelte:fragment>
+        <svelte:fragment slot="buttons">
             <DropdownButton
                 isActive={!isError}
                 onClick={() => exportJSON($currentComponentJSON.json)}
@@ -230,8 +249,8 @@
                 icon={'<svg class="icon-save" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>'}>
                 Save Component
             </Button>
-        </div>
-    </div>
+        </svelte:fragment>
+    </TopBar>
     <Sidebar>
         <ElementsList />
     </Sidebar>
@@ -254,8 +273,14 @@
     .json-editor {
         height: var(--json-editor-height);
     }
-
-
+    .link-element {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        font-weight: 400;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+    }
     .main-editor-area {
         position: absolute;
         top: 68px;
@@ -270,33 +295,7 @@
         height: 20px;
         margin: 0 -2px -5px 0;
     }
-    .top-menu span {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 14px;
-        font-weight: 400;
-        text-decoration: none;
-        display: inline-block;
-        margin: 0 16px;
-        cursor: pointer;
-    }
-    .top-menu {
-        position: absolute;
-        top: 0;
-        left: 360px;
-        height: 68px;
-        width: calc(100vw - 360px);
-        background-color: rgb(34,34,34);
-        display: flex;
-        justify-content: space-between;
-        vertical-align: middle;
-    }
-    .top-menu .buttons, .top-menu .links {
-        height: fit-content;
-        align-self: center;
-    }
-    .top-menu .buttons {
-        margin-right: 16px;
-    }
+    
     .main-screen {
         position: fixed;
         top: 0;

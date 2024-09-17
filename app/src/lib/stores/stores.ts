@@ -85,7 +85,6 @@ export const saveCurrentComponent = () => {
 
 export const systems = persistentStore<Map<string, SystemType>>('systems', new Map<string, SystemType>());
 
-
 export const saveSystem = (id: string, system: SystemType) => {
     if (Array.from(get(systems).keys()).includes(id)) {
         systems.update((systems) => {
@@ -137,26 +136,16 @@ export const removeSystem = (id: string) => {
 }
 
 
-export const currentSystemJSON = writable<{id: string, json: SystemType}>({
-    id: '',
-    json: {
-        name: "",
-        date: "",
-        components: [],
-        structure: []
-    } as SystemType
+export const currentSystemJSON = persistentStore<{id: string, json: SystemType}>('currentSystemJSON',
+    {
+        id: '',
+        json: {
+            name: "",
+            date: "",
+            components: [],
+            structure: []
+        } as SystemType
 });
-
-// autosave current system
-currentSystemJSON.subscribe(value => {
-    if (value.id && value.json.name) {
-        systems.update((systems) => {
-            systems.set(value.id, value.json);
-            return systems;
-        });
-    }
-});
-
 
 // generate unique string of 6 characters
 const generateId = (ids: string[]) => {

@@ -2,18 +2,22 @@
     import { goto } from "$app/navigation";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import { onMount, type SvelteComponent } from "svelte";
-    import { currentSystemJSON, systems } from "$lib/stores/stores";
+    import { currentSystemJSON, systems, customComponents } from "$lib/stores/stores";
     import type { SystemType } from "$lib/types/types";
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
     import PdfTemplate from "$lib/analysis/PdfTemplate.svelte";
     import { formatDate, trimText } from "$lib/utils";
-    // load the system data from the store
+    
+    // load the system or component data from the store
     export let data;
-    if ($systems.get(data.systemId)) {
+    if (data.id.contains('-') && $customComponents.get(data.id)) {
+        
+
+    } else if ($systems.get(data.id)) {
         currentSystemJSON.set({
-            id: data.systemId,
-            json: $systems.get(data.systemId) as SystemType
+            id: data.id,
+            json: $systems.get(data.id) as SystemType
         })
     } else {
         onMount(() => {

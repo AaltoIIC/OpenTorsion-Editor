@@ -92,6 +92,13 @@
                 handleDrag(e);
             }
         })
+        window.addEventListener('keydown', (e) => {
+            if (isSelected && (e.key === 'Delete' || e.key === 'Backspace')) {
+                isSelected = false;
+                $highlightLinesInEditor(-1, -1);
+                remove();
+            }
+        })
 
     })
 </script>
@@ -108,7 +115,7 @@
                 hoverable={isSelected}
                 highlightedElement={highlightedElement} />
         </div>
-        <p>{trimText(data.name, 20)}</p>
+        <p>{trimText(data.name, 32)}</p>
         <button class="remove-button"
             on:click={remove}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

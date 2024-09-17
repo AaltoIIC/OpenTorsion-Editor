@@ -61,7 +61,14 @@
       }
 
       // get component data and give it a unique name
-      const componentData = JSON.parse(event.dataTransfer.getData('application/svelteflow')) as ComponentType;
+      let componentData: ComponentType;
+      try {
+        componentData = JSON.parse(event.dataTransfer.getData('application/svelteflow')) as ComponentType;
+      } catch (error) {
+        console.error('Error parsing component data', error);
+        return;
+      }
+
       componentData.name = nameComponentInstance(componentData.name, $currentSystemJSON.json.components);
       
       // add new component to system JSON
@@ -171,6 +178,7 @@
     connectionLineType={ConnectionLineType.SmoothStep}
     isValidConnection={checkConnectionConstraints}
     onconnect={handleNewConnection}
+    deleteKey={null}
     defaultEdgeOptions={{
       animated: true,
       deletable: true,

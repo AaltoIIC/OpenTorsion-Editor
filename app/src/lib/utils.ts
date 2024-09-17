@@ -4,6 +4,7 @@ import {
     notification,
     createComponent,
     currentSystemJSON,
+    currentComponentJSON,
     systems
 } from "./stores/stores";
 import { goto } from "$app/navigation";
@@ -91,7 +92,7 @@ export const importSystem = (event: Event, createNew: boolean = true) => {
 
 // function to import a component from a json file to the list of components
 // to be used as an event handler for an input element
-export const importComponent = (event: Event) => {
+export const importComponent = (event: Event, createNew: boolean = true) => {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return
     const file = input.files[0];
@@ -112,7 +113,15 @@ export const importComponent = (event: Event) => {
                         }
                         newJSON.name = newJSON.name + ` (${i})`;
                     }
-                    createComponent(makeComponent(newJSON));                    
+
+                    // add the component to the list of components or update the current component
+                    if (createNew) {
+                        createComponent(makeComponent(newJSON), true); 
+                    } else {
+                        currentComponentJSON.update(
+                            component => ({...component, json: makeComponent(newJSON)})
+                        );
+                    }
                 } else if (isAlmostSystemType(newJSON)) {
                     notification.set({
                         message: "Imported JSON file is a system. Please import a component JSON file.",

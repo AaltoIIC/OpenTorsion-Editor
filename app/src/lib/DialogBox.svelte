@@ -25,12 +25,16 @@
 
     const handleConfirm = () => {
         isOpen = false;
-        resolvePromise(true);
+        if (resolvePromise) {
+            resolvePromise(true);
+        }
     };
 
     const handleDeny = () => {
         isOpen = false;
-        resolvePromise(false);
+        if (resolvePromise) {
+            resolvePromise(false);
+        }
     };
 
     onMount(() => {
