@@ -30,6 +30,7 @@
 		"prismjs": "^1.29.0",
 		"svelte-jsoneditor": "^0.23.7",
 		"svelte-portal": "^2.2.1",
-		"three": "^0.167.1"
+		"three": "^0.167.1",
+		"three-csg-ts": "^3.2.0"
 	}
 }

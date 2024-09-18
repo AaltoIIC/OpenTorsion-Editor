@@ -1,6 +1,6 @@
 <div class="main-header">
     <a href="/">
-        <img class="main-logo" src="./logo.svg" alt="Co-Des logo">
+        <img class="main-logo" src="./../logo.svg" alt="Co-Des logo">
     </a>
 </div>
 <style>
