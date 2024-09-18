@@ -96,7 +96,7 @@
                     if (value) {
                         // create a new system
                         let newSystem: SystemType, systemId: string;
-                        [systemId, newSystem] = createSystem();
+                        [systemId, newSystem] = createSystem(null, true);
                         currentSystemJSON.set({id: systemId, json: newSystem});
                         newComponent();
                         goto(`/component-editor/${data.componentId}`, { replaceState: true });

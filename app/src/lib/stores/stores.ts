@@ -86,22 +86,17 @@ export const saveCurrentComponent = () => {
 export const systems = persistentStore<Map<string, SystemType>>('systems', new Map<string, SystemType>());
 
 export const saveSystem = (id: string, system: SystemType) => {
-    if (Array.from(get(systems).keys()).includes(id)) {
-        systems.update((systems) => {
-            systems.set(id, system);
-            return systems;
-        });
-    }
+    systems.update((systems) => {
+        systems.set(id, _.cloneDeep(system));
+        return systems;
+    });
 }
 
 export const getSystem = (id: string): SystemType | null => {
-    if (Array.from(get(systems).keys()).includes(id)) {
-        return get(systems).get(id) || null;
-    }
-    return null;
+    return _.cloneDeep(get(systems).get(id)) || null;
 }
 
-export const createSystem = (system: SystemType|null = null) => {
+export const createSystem = (system: SystemType|null = null, saveSystem: boolean = false) => {
     const id = generateId(Array.from(get(systems).keys()));
     if (!system) {
         system = {
@@ -110,11 +105,15 @@ export const createSystem = (system: SystemType|null = null) => {
             components: [],
             structure: []
         } as SystemType;
+    } else {
+        system = system;
     }
-    systems.update((value) => {
-        value.set(id, system);
-        return value;
-    });
+    if (saveSystem) {
+        systems.update((value) => {
+            value.set(id, system);
+            return value;
+        });
+    }
 
     return [id, system] as [string, SystemType];
 }

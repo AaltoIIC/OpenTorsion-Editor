@@ -178,11 +178,11 @@ const isSystemNameUnique = (name: string, excludeId: string | null = null) => {
             .filter(([id, system]) => id !== excludeId)
             .map(([id, val]) => (
             val.name
-                .replace(/\s+\(\d+\)$/, '')
+                .replace(' ', '')
                 .toUpperCase()
             ));
     
-    return !systemNames.includes(name.replace(/\s+\(\d+\)$/, '').toUpperCase());
+    return !systemNames.includes(name.replace(' ', '').toUpperCase());
 }
 
 export const handleSystemNameChange = (name: string, excludeId: string | null = null) => {

@@ -30,6 +30,7 @@
     import { importSystem, exportJSON } from "$lib/utils";
     import type { SystemType } from '$lib/types/types';
     import { goto } from '$app/navigation';
+    import _ from 'lodash';
 
     let fileInput: HTMLInputElement;
     let JSONEditorComponent: SvelteComponent;
@@ -37,13 +38,13 @@
         highlightLinesInEditor.set(JSONEditorComponent.highlightLines)
     });
 
-    // Handle invalid JSON
+    // handle invalid JSON
     let isJSONError = false,
         isNameError = false,
         isStructureError = false;
     $: if (!(isJSONError || isNameError || isStructureError)) notification.set(null);
 
-    // Initialize editor
+    // initialize editor
     let isNewSystem = true;
     let systemName: string;
     export let data;
@@ -54,13 +55,13 @@
             if ($currentSystemJSON.id !== data.systemId) {
                 currentSystemJSON.set({
                     id: data.systemId,
-                    json: $systems.get(data.systemId) as SystemType
+                    json: getSystem(data.systemId) as SystemType
                 });
             } else {
                 currentSystemJSON.set($currentSystemJSON);
             }
         } else {
-            // If system does not exist, redirect to home
+            // if system does not exist, redirect to home
             onMount(() => {
                 goto('/');
             });
@@ -98,7 +99,8 @@
 
     let dialogBox: DialogBox;
     const handleBack = () => {
-        if ($currentSystemJSON.json === getSystem($currentSystemJSON.id)) {
+        if ($currentSystemJSON.json.components.length === 0 ||
+            _.isEqual($currentSystemJSON.json, getSystem($currentSystemJSON.id))) {
             goto('/');
             return;
         } else {
@@ -198,10 +200,11 @@
         </svelte:fragment>
         <svelte:fragment slot="name">
             <NameField
-            text="System"
-            value={systemName}
-            isError={isNameError}
-            onInput={(text) => isNameError = !handleSystemNameChange(text, $currentSystemJSON.id)} />
+                text="System"
+                value={systemName}
+                isError={isNameError}
+                onInput={(text) => isNameError = !handleSystemNameChange(text, $currentSystemJSON.id)}
+            />
         </svelte:fragment>
         <svelte:fragment slot="buttons">
             <DropdownButton

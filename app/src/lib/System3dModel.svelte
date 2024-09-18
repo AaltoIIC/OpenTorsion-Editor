@@ -287,6 +287,7 @@
         plane.receiveShadow = true;
         plane.name = "shadowPlane";
         plane.rotation.x = - Math.PI / 2;
+        
         plane.position.y = -21;
         plane.position.z = Zdimension/2;
 
@@ -310,18 +311,18 @@
     const addLight = (scene: THREE.Scene, x: number, y: number, z: number, shadows=false) => {
         const light = new THREE.DirectionalLight( 0xffffff, 1 );
         light.position.set( x, y, z );
-
+        const maxDim = Math.max(Ydimension, -Zdimension, Xdimesion+10);
         let shadowBlur = 12;
         if (shadows) {
             light.castShadow = true;
             light.shadow.camera.near = 0.05;
             light.shadow.camera.far = 500;
-            light.shadow.camera.left = Zdimension - shadowBlur;
-            light.shadow.camera.right = -Zdimension + shadowBlur;
-            light.shadow.camera.top = -Zdimension + shadowBlur;
-            light.shadow.camera.bottom = Zdimension - shadowBlur;
-            light.shadow.mapSize.width = (-Zdimension+shadowBlur)*5;
-            light.shadow.mapSize.height = (-Zdimension+shadowBlur)*5;
+            light.shadow.camera.left = -maxDim - shadowBlur;
+            light.shadow.camera.right = maxDim + shadowBlur;
+            light.shadow.camera.top = maxDim + shadowBlur;
+            light.shadow.camera.bottom = -maxDim - shadowBlur;
+            light.shadow.mapSize.width = (maxDim+shadowBlur)*5;
+            light.shadow.mapSize.height = (maxDim+shadowBlur)*5;
             light.shadow.radius = shadowBlur;
         }
         scene.add( light );

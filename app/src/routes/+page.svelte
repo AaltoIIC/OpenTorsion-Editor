@@ -5,6 +5,7 @@
     import { systems } from "$lib/stores/stores";
     import { notification } from "$lib/stores/stores";
     import { importSystem } from "$lib/utils";
+    import Header from "$lib/Header.svelte";
 
     setTimeout(() => {
         notification.set(null);
@@ -16,9 +17,7 @@
     <title>Dashboard | Co-Des Interface</title>
 </svelte:head>
 <div class="screen">
-    <div class="main-header">
-        <img class="main-logo" src="./logo.svg" alt="Co-Des logo">
-    </div>
+    <Header />
     <div class="main-page-content">
         <div class="info-cont">
 
@@ -117,23 +116,6 @@
     }
     .title-cont h2 {
         font-size: 18px;
-    }
-    .main-header {
-        border-radius: var(--main-border-radius);
-        background: white;
-        position: fixed;
-        top:10px;
-        left: calc(50vw - 550px);
-        width: 1100px;
-        height: 68px;
-        box-shadow: var(--main-shadow);
-        z-index: 10000;
-    }
-    .main-logo {
-        width: 114px;
-        height: auto;
-        margin: 24px 18px;
-        display: block;
     }
     .systems-outer {
         width: 100%;

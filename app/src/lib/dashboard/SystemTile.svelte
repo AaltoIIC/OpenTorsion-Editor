@@ -17,7 +17,7 @@
             let copy = { ...system,
                 name: `Copy of ${system.name}`,
                 date: new Date().toISOString() };
-            createSystem(copy);
+            createSystem(copy, true);
         } else if (option === "Edit") {
             goto(`/system-editor/${id}`);
         } else if (option === "Delete") {
