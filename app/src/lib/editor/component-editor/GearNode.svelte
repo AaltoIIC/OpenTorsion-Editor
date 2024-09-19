@@ -3,11 +3,14 @@
     import type { ElementType } from '$lib/types/types';
     import { possibleParams } from './componentHelpers';
     import DragAndDropHandle from './DragAndDropHandle.svelte';
+    import { onMount } from 'svelte';
    
     $$restProps
 
+    let nodeElement: any;
     let layoverElement: any;
     export let data: {
+        new: boolean;
         nodeNo: string;
         data: ElementType;
     };
@@ -24,10 +27,20 @@
         event.dataTransfer.setData('application/svelteflow', JSON.stringify(message));
         event.dataTransfer.effectAllowed = 'move';
     };
+
+    onMount(() => {
+        if (data.new) {
+            layoverElement.show(
+                nodeElement.getBoundingClientRect().left,
+                nodeElement.getBoundingClientRect().top + 60
+            ) 
+        }
+    });
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="gear-outer"
+    bind:this={nodeElement}
     on:mouseenter={() => onHover = true}
     on:mouseleave={() => onHover = false}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->

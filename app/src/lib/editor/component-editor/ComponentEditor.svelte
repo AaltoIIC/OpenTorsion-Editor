@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { currentComponentJSON } from '../../stores/stores';
-    import { renderNodes, defaultElement, checkElementOrder } from './componentHelpers';
+    import { updateComponentEditor, defaultElement, checkElementOrder } from './componentHelpers';
     import {
       SvelteFlow,
       Controls,
@@ -42,14 +42,10 @@
     const edges = writable([]);
 
     currentComponentJSON.subscribe(value => {
-      if (!value.json.elements) {
-        console.error('Malformed JSON');
-      } else {
-        nodes.set(renderNodes(value.json.elements));
-        setTimeout(() => {
-            fitView();
-        }, 0);
-      }
+      nodes.set(updateComponentEditor(nodes));
+      setTimeout(() => {
+        fitView();
+      }, 0);
     });
 
     // drag and drop logic

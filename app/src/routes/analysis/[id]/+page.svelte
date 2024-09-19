@@ -1,9 +1,10 @@
+
 <script lang="ts">
     import { goto } from "$app/navigation";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import { onMount, type SvelteComponent } from "svelte";
-    import { currentSystemJSON, systems, customComponents } from "$lib/stores/stores";
-    import type { SystemType } from "$lib/types/types";
+    import { currentSystemJSON, createSystem, systems, customComponents } from "$lib/stores/stores";
+    import type { SystemType, ComponentType } from "$lib/types/types";
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
     import PdfTemplate from "$lib/analysis/PdfTemplate.svelte";
@@ -11,14 +12,26 @@
     
     // load the system or component data from the store
     export let data;
+    let isComponent = false;
     if (data.id.includes('-') && $customComponents.get(data.id)) {
-        
+        // create temporary system with the component if id is a component id
+        isComponent = true;
+        const [id, tempSys] = createSystem();
+        tempSys.name = $customComponents.get(data.id)?.name || "Component";
+        tempSys.components = [$customComponents.get(data.id) as ComponentType];
+
+        currentSystemJSON.set({
+            id: id,
+            json: tempSys
+        }) 
     } else if (data.id && $systems.get(data.id)) {
+        // load the system from the store
         currentSystemJSON.set({
             id: data.id,
             json: $systems.get(data.id) as SystemType
         })
     } else {
+        // redirect to home if the system or component is not found
         onMount(() => {
             goto("/");
         });
@@ -45,7 +58,7 @@
 
     const runAnalysis = () => {
         isError = false;
-        let url = "http://127.0.0.1:5000/analysis";
+        let url = "/api/analysis";
         let data = $currentSystemJSON.json;
         fetch(url, {
             method: 'POST',
@@ -105,14 +118,28 @@
 </main>
 <div class="main-top-bar">
     <div class="links">
-        <a href={`/system-editor/${$currentSystemJSON.id}`}>
-            <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>              
-            Back to System Editor
-        </a>
+        {#if isComponent}
+            <a href={`/component-editor/${data.id}`}>
+                <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+                Back to Component Editor
+            </a>
+        {:else}
+            <a href={`/system-editor/${$currentSystemJSON.id}`}>
+                <svg class="icon-back" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+                Back to System Editor
+            </a>
+        {/if}
     </div>
-    <h4>Analysis of {trimText($currentSystemJSON.json.name, 20)}</h4>
+    <h4>Analysis of {(
+        isComponent ?
+            trimText($currentSystemJSON.json.components[0].name, 20)
+            : 
+            trimText($currentSystemJSON.json.name, 20)
+        )}</h4>
     <Button
         icon='<svg class="icon-down" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'
         onClick={downloadAnalysisResults}
@@ -126,14 +153,24 @@
             data={$currentSystemJSON.json}
             size={240}
         />
-        <h2>{trimText($currentSystemJSON.json.name, 16)}</h2>
-        <p>Created at {formatDate($currentSystemJSON.json.date)}</p>
-        <p>{$currentSystemJSON.json.components.reduce(
-            (prevSum, currentComp) => (prevSum + currentComp.elements.length),
-            0)}
-            elements
-        </p>
-        <p>{$currentSystemJSON.json.components.length} components</p>
+        {#if isComponent}
+            <h2>{trimText($currentSystemJSON.json.components[0].name, 20)}</h2>
+            <p>Analyzed at {formatDate($currentSystemJSON.json.date)}</p>
+            <p>{$currentSystemJSON.json.components.reduce(
+                (prevSum, currentComp) => (prevSum + currentComp.elements.length),
+                0)}
+                elements
+            </p>
+        {:else}
+            <h2>{trimText($currentSystemJSON.json.name, 20)}</h2>
+            <p>Created at {formatDate($currentSystemJSON.json.date)}</p>
+            <p>{$currentSystemJSON.json.components.reduce(
+                (prevSum, currentComp) => (prevSum + currentComp.elements.length),
+                0)}
+                elements
+            </p>
+            <p>{$currentSystemJSON.json.components.length} components</p>
+        {/if}
     </div>
     <h4 class="plots-header">Analysis Plots:</h4>
     <ul class="main-menu">

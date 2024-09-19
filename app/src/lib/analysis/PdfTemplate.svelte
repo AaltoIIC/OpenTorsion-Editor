@@ -54,7 +54,7 @@
             <div class="info-cont box">
                 <System3dModel data={data} size={220} />
                 <div class="info-text">
-                    <h4>{trimText(data.name, 16)}</h4>
+                    <h4>{trimText(data.name, 20)}</h4>
                     <p>{formatDate(data.date)}</p>
                     <p>{data.components.reduce(
                         (prevSum, currentComp) => (prevSum + currentComp.elements.length),
@@ -62,7 +62,7 @@
                         elements
                     </p>
                     <p>
-                        {data.components.length} components
+                        {data.components.length} {data.components.length > 1 ? 'components' : 'component'}
                     </p>
                 </div>
             </div>

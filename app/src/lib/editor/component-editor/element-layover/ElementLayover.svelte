@@ -84,6 +84,14 @@
     let isEditing = false;
     let x = 0;
     let y = 0;
+    export const show = (parentX, parentY) => {
+        x = parentX;
+        y = parentY;
+        isEditing = true;
+        setTimeout(() => {
+            setNameFieldWidth();
+        }, 0);
+    }
     export let nodeOnHover = false;
     $: isOpen = (x !== 0) && (isEditing || nodeOnHover || onHover);
 
