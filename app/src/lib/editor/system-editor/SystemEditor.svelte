@@ -173,7 +173,8 @@
     edgeTypes={edgeTypes}
     {nodes}
     {edges}
-    on:dragover={onDragOver} on:drop={onDrop}
+    on:dragover={onDragOver}
+    on:drop={onDrop}
     fitView
     connectionLineType={ConnectionLineType.SmoothStep}
     isValidConnection={checkConnectionConstraints}

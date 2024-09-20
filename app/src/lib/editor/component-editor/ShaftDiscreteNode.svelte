@@ -4,9 +4,9 @@
     import { possibleParams } from './componentHelpers';
     import DragAndDropHandle from './DragAndDropHandle.svelte';
     import { onMount } from 'svelte';
-    
+   
     $$restProps
-    
+
     export let data: {
         new: boolean;
         nodeNo: string;
@@ -29,25 +29,24 @@
     };
 
     onMount(() => {
-        setTimeout(() => {
-            if (data.new) {
+        if (data.new) {
+            setTimeout(() => {
                 layoverElement.show(
-                    nodeElement.getBoundingClientRect().left,
-                    nodeElement.getBoundingClientRect().top + 60
-                ) 
-            }
-        }, 200);
+                    nodeElement.getBoundingClientRect().left + 48,
+                    nodeElement.getBoundingClientRect().top + 30
+                );
+            }, 200);
+        }
     });
-
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="disk-outer"
+<div class="shaft-outer"
     bind:this={nodeElement}
     on:mouseenter={() => onHover = true}
     on:mouseleave={() => onHover = false}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="disk"
+    <div class="shaft"
         on:click={() => (layoverElement ? layoverElement.nodeClick() : '')}
         on:dragstart={onDragStart}
         draggable={true}></div>
@@ -56,24 +55,33 @@
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data.data}
-        possibleParams={possibleParams.disk} />
+        possibleParams={possibleParams.shaft} />
     <DragAndDropHandle elementName={data.data.name} />
 </div>
 <style>
-    .disk {
-        height: 80px;
-        width: 20px;
-        background-color: var(--main-color);
-        background-image: linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
-        margin: 0;
-        border-radius: 1.6px;
-        border: solid 1px rgba(0, 0, 0, 0.04);
+    .shaft {
+        height: 14px;
+        width: 72px;
+        background-color: var(--main-color-light);
+        background-image:
+            linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)),
+            linear-gradient(
+                90deg,
+                rgba(0, 0, 0, 0.05) 0%,
+                rgba(0, 0, 0, 0) 10%,
+                rgba(0, 0, 0, 0) 90%,
+                rgba(0, 0, 0, 0.05) 100%
+            )
+            ;
+        margin: 33px auto;
+        border-top: solid 1px rgba(0, 0, 0, 0.04);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.04);
         box-shadow: rgba(149, 157, 165, 0.2) 0px 1.6px 4.8px;
+        z-index: -1;
         transition: .3s;
         cursor: pointer;
-        z-index: -1;
     }
-    .disk:hover {
+    .shaft:hover {
         filter: brightness(1.05);
     }
     p {
@@ -81,9 +89,6 @@
         color: rgba(0, 0, 0, 0.6);
         text-align: center;
         font-family: "Roboto Mono", monospace;
-        margin: 1px 0 0 0;
-    }
-    .disk-outer {
-        position: relative;
+        margin:  2px 0 0 0;
     }
 </style>

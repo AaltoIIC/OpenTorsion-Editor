@@ -59,21 +59,19 @@
     }
 
     if (data.componentId) {
-        if (Array.from($customComponents.keys()).includes(data.componentId)) {
+        if ($currentComponentJSON.id == data.componentId) {
+            // component is already loaded
+            originalName = $currentComponentJSON.json.name;
+        } else if (Array.from($customComponents.keys()).includes(data.componentId)) {
             isNewComponent = false;
             // load the system corresponding to the component
             setCurrentSystem(data.componentId.split('-')[0]);
 
-            // if component has unsaved changes in currentComponentJSON, don't load saved version
-            if ($currentComponentJSON.id !== data.componentId) {
-                originalName = $customComponents.get(data.componentId)?.name as string;
-                currentComponentJSON.set({
-                    id: data.componentId,
-                    json: $customComponents.get(data.componentId) as ComponentType
-                });
-            } else {
-                originalName = $currentComponentJSON.json.name;
-            }
+            originalName = $customComponents.get(data.componentId)?.name as string;
+            currentComponentJSON.set({
+                id: data.componentId,
+                json: $customComponents.get(data.componentId) as ComponentType
+            });
         } else {
             // component with name in url does not exist
             onMount(() => {

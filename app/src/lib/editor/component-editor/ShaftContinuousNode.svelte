@@ -30,10 +30,12 @@
 
     onMount(() => {
         if (data.new) {
-            layoverElement.show(
-                nodeElement.getBoundingClientRect().left,
-                nodeElement.getBoundingClientRect().top + 30
-            ) 
+            setTimeout(() => {
+                layoverElement.show(
+                    nodeElement.getBoundingClientRect().left + 48,
+                    nodeElement.getBoundingClientRect().top + 30
+                );
+            }, 200);
         }
     });
 </script>
@@ -60,7 +62,7 @@
     .shaft {
         height: 14px;
         width: 72px;
-        background-color: var(--main-color);
+        background-color: var(--main-color-dark);
         background-image:
             linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)),
             linear-gradient(

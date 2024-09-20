@@ -333,21 +333,21 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
 
 // function to update the nodes in the component editor
 // based on currentComponentJSON
-export const updateComponentEditor = (nodes: Writable<Node[]>) => {
-    let currentJSON = get(currentComponentJSON).json;
-    let newNodes: Node[] = [];
-
+export const updateComponentEditor = (nodes: Node[]) => {
+    const currentJSON = get(currentComponentJSON).json;
+    const newNodes: any[] = [];
     
     // if elements is empty, add "Component is empty" node 
     if (currentJSON.elements.length === 0) {
         newNodes.push({
-            id: 'empty',
+            id: `empty`,
             type: 'empty',
             dragHandle: '.none',
             data: {label: ''},
             position: { x: 0, y: 150 }
         });
     }
+
     
     let currentX = 0;
     let currentY = 150;
@@ -366,7 +366,7 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
         if (el.type === "Disk") {
             
             newNodes.push({
-                id: el.name,
+                id: `${index + 1}`,
                 type: 'disk',
                 dragHandle: '.none',
                 data: {
@@ -384,7 +384,7 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
         } else if (el.type === "ShaftDiscrete") {
 
             newNodes.push({
-                id: el.name,
+                id: `${index + 1}`,
                 type: 'shaft',
                 dragHandle: '.none',
                 data: {
@@ -399,7 +399,8 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
             });
             currentX += 72;
 
-            if (currentJSON.elements[index + 1] && currentJSON.elements[index + 1].type !== "ShaftDiscrete") {
+            if (currentJSON.elements[index + 1] &&
+                currentJSON.elements[index + 1].type !== "ShaftDiscrete") {
                 nodeNo += 1;
             }
         } else if (el.type === "GearElement") {
@@ -421,7 +422,7 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
             }
 
             newNodes.push({
-                id: el.name,
+                id: `${index + 1}`,
                 type: 'gear',
                 dragHandle: '.none',
                 data: {
@@ -430,7 +431,7 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
                     data: _.pick(el, [
                         ...possibleParams['gear'].required,
                         ...possibleParams['gear'].optional
-                    ] )
+                    ])
                 },
                 position: { x: currentX, y: currentY }
             });
@@ -441,12 +442,11 @@ export const updateComponentEditor = (nodes: Writable<Node[]>) => {
 
     // set the new flag for newly added nodes
     newNodes.forEach(node => {
-        if (get(nodes).length !== 0 &&
-            !get(nodes).find(n => n.id === node.id)) {
+        if (nodes.length !== 0 &&
+            !nodes.find(n => n.id === node.id)) {
             node.data.new = true;
         }
     });
-
 
     // add gearboxes
     let gearboxes: any[] = [];

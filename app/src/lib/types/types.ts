@@ -15,16 +15,10 @@ interface BaseElementType {
     excitation?: ExcitationType;
 }
 
-export interface DiskElementType extends BaseElementType {
+export interface DiskType extends BaseElementType {
     type: "Disk";
     damping: number;
     inertia: number;
-}
-
-export interface ShaftElementType extends BaseElementType {
-    type: "ShaftDiscrete";
-    damping: number;
-    stiffness: number;
 }
 
 export interface GearElementType extends BaseElementType {
@@ -35,7 +29,20 @@ export interface GearElementType extends BaseElementType {
     teeth?: number;
 }
 
-export type ElementType = DiskElementType | ShaftElementType | GearElementType;
+export interface ShaftDiscreteType extends BaseElementType {
+    type: "ShaftDiscrete";
+    damping: number;
+    stiffness: number;
+}
+
+export interface ShaftContinuousType extends BaseElementType {
+    type: "ShaftContinuous";
+    damping: number;
+    length: number;
+    diameter: number;
+}
+
+export type ElementType = DiskType | GearElementType | ShaftDiscreteType | ShaftContinuousType;
 
 export interface ComponentType {
     name: string;

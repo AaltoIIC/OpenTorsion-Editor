@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { currentComponentJSON } from '../../stores/stores';
-    import { updateComponentEditor, defaultElement, checkElementOrder } from './componentHelpers';
+    import { updateComponentEditor, defaultElement } from './componentHelpers';
     import {
       SvelteFlow,
       Controls,
@@ -9,14 +9,15 @@
       BackgroundVariant,
       useSvelteFlow,
 
-      type NodeTypes
+      type NodeTypes,
+      type Node
 
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
 
     import EmptyNode from './EmptyNode.svelte';
     import DiskNode from './DiskNode.svelte';
-    import ShaftNode from './ShaftNode.svelte';
+    import ShaftNode from './ShaftDiscreteNode.svelte';
     import GearNode from './GearNode.svelte';
     import GearboxNode from './GearboxNode.svelte';
     const { fitView } = useSvelteFlow();
@@ -36,16 +37,16 @@
         dragHandle: '.none',
         data: { label: 'Node' },
         position: { x: 0, y: 150 }
-      }
+      } as {} as Node
     ]);
 
     const edges = writable([]);
 
     currentComponentJSON.subscribe(value => {
-      nodes.set(updateComponentEditor(nodes));
+      nodes.update(value => updateComponentEditor(value));
       setTimeout(() => {
         fitView();
-      }, 0);
+      }, 10);
     });
 
     // drag and drop logic
@@ -84,7 +85,9 @@
   nodes={nodes}
   edges={edges}
   nodeTypes={nodeTypes}
-  on:dragover={onDragOver} on:drop={onDrop} 
+  on:dragover={onDragOver}
+  on:drop={onDrop}
+  deleteKey={null}
   fitView
 >
   <Controls />

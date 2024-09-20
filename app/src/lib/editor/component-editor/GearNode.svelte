@@ -30,10 +30,12 @@
 
     onMount(() => {
         if (data.new) {
-            layoverElement.show(
-                nodeElement.getBoundingClientRect().left,
-                nodeElement.getBoundingClientRect().top + 60
-            ) 
+            setTimeout(() => {
+                layoverElement.show(
+                    nodeElement.getBoundingClientRect().left,
+                    nodeElement.getBoundingClientRect().top + 60
+                );
+            }, 200);
         }
     });
 </script>

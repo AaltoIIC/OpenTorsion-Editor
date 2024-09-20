@@ -36,7 +36,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_18992: string;
+	export const EFC_7928: string;
 	export const FNM_ARCH: string;
 	export const FNM_COREPACK_ENABLED: string;
 	export const FNM_DIR: string;
@@ -144,7 +144,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_18992: string;
+		EFC_7928: string;
 		FNM_ARCH: string;
 		FNM_COREPACK_ENABLED: string;
 		FNM_DIR: string;

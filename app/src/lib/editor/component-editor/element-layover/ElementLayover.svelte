@@ -84,9 +84,10 @@
     let isEditing = false;
     let x = 0;
     let y = 0;
-    export const show = (parentX, parentY) => {
+    export const show = (parentX: number, parentY: number) => {
         x = parentX;
         y = parentY;
+
         isEditing = true;
         setTimeout(() => {
             setNameFieldWidth();
@@ -95,7 +96,7 @@
     export let nodeOnHover = false;
     $: isOpen = (x !== 0) && (isEditing || nodeOnHover || onHover);
 
-    export const nodeClick = () =>{
+    export const nodeClick = () => {
         isEditing = true;
         setNameFieldWidth();
         
@@ -111,6 +112,19 @@
         x = event.clientX;
         y = event.clientY;
     };
+
+    // update transform based on the position of the layover
+    const transform = ['0', '0'];
+    $: if (x > window.innerWidth/2) {
+        transform[0] = 'calc(-100% - 15px)';
+    } else {
+        transform[0] = '15px';
+    }
+    $: if (y > window.innerHeight/2) {
+        transform[1] = 'calc(-100% - 15px)';
+    } else {
+        transform[1] = '15px';
+    }
 
     const closeLayover = () => {
         if (isEditing) {
@@ -145,6 +159,9 @@
         if (event.key === 'Escape') {
             closeLayover();
         }
+        if (isEditing && (event.key === 'Delete' || event.key === 'Backspace')) {
+            deleteElement();
+        }
     };
 
     onMount(() => {
@@ -171,7 +188,11 @@
 <Portal target="body">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="main-layover-cont {isOpen ? 'active' : ''}"
-        style="top: {y + 15}px; left: {x + 15}px; border: {isEditing ? 'solid 1px var(--main-color)' : 'solid 1px rgba(0, 0, 0, 0.06)'};"
+        style={`top: ${y}px;
+                left: ${x}px;
+                border: ${isEditing ? 'solid 1px var(--main-color)' : 'solid 1px rgba(0, 0, 0, 0.06)'};
+                transform: translate(${transform[0]},${transform[1]});
+            `}
         on:mouseenter={() => {onHover = true}}
         on:mouseleave={() => {onHover = false}}>
         <div class="name-cont {isEditing ? 'editing' : ''}">
