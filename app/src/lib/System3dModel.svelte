@@ -215,7 +215,7 @@
                 if (el.type === "Disk") {
                     createDisk(el.name, currentX + Xaddition, currentY, currentZ);
                     currentZ -= 6;
-                } else if (el.type === "ShaftDiscrete") {
+                } else if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
                     createShaft(el.name, currentX + Xaddition, currentY, currentZ);
                     currentZ -= 20;
                 } else if (el.type === "GearElement") {

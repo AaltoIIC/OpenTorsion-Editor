@@ -55,7 +55,7 @@
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data.data}
-        possibleParams={possibleParams.shaft} />
+        possibleParams={possibleParams.ShaftContinuous} />
     <DragAndDropHandle elementName={data.data.name} />
 </div>
 <style>

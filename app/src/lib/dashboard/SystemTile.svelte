@@ -22,7 +22,7 @@
             goto(`/system-editor/${id}`);
         } else if (option === "Delete") {
             dialogBox.openDialog(`Are you sure you want to delete ${system.name}?`,
-                "Yes", "No", "danger").then((result: Boolean) => {
+                "Yes", "No").then((result: Boolean) => {
                 if (result) {
                     removeSystem(id);
                 }

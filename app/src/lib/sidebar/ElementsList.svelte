@@ -29,7 +29,7 @@
     <div class="element-list">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:dragstart={(e) => onDragStart(e, 'disk')}
+            on:dragstart={(e) => onDragStart(e, 'Disk')}
             draggable={true}
             on:dragover={(e) => {e.preventDefault()}} on:drop={(e) => {e.preventDefault()}}>
             <div class="main-illustration-cont">
@@ -39,18 +39,11 @@
             <div class="element-info">
                 <div>
                     <h4>Disk</h4>
-                    <p>
-                        {#each possibleParams['disk'].required as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                        {#each possibleParams['disk'].optional as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                    </p>
+                    <p>Disk</p>
                 </div>
                 <div>
                     <Button
-                        onClick={() => addEl('disk')}    
+                        onClick={() => addEl('Disk')}    
                         color="var(--main-dark-color)"
                         icon={`<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
@@ -67,7 +60,7 @@
         
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="element-list-item"
-            on:dragstart={(e) => onDragStart(e, 'gear')}
+            on:dragstart={(e) => onDragStart(e, 'GearElement')}
             draggable={true}
             on:dragover={(e) => {e.preventDefault()}} on:drop={(e) => {e.preventDefault()}}>
             <div class="main-illustration-cont">
@@ -77,18 +70,11 @@
             <div class="element-info">
                 <div>
                     <h4>Gear</h4>
-                    <p>
-                        {#each possibleParams['gear'].required as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                        {#each possibleParams['gear'].optional as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                    </p>
+                    <p>GearElement</p>
                 </div>
                 <div>
                     <Button
-                        onClick={() => addEl('gear')}    
+                        onClick={() => addEl('GearElement')}    
                         color="var(--main-dark-color)"
                         icon={`<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
@@ -115,14 +101,7 @@
             <div class="element-info">
                 <div>
                     <h4>Shaft <span class="light-txt">(Discrete)</span></h4>
-                    <p>
-                        {#each possibleParams['shaft'].required as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                        {#each possibleParams['shaft'].optional as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                    </p>
+                    <p>ShaftDiscrete</p>
                 </div>
                 <div>
                     <Button
@@ -153,14 +132,7 @@
             <div class="element-info">
                 <div>
                     <h4>Shaft <span class="light-txt">(Continuous)</span></h4>
-                    <p>
-                        {#each possibleParams['shaft'].required as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                        {#each possibleParams['shaft'].optional as param}
-                            <span class="param">{param}</span>
-                        {/each}
-                    </p>
+                    <p>ShaftContinuous</p>
                 </div>
                 <div>
                     <Button
@@ -184,15 +156,6 @@
     .light-txt {
         color: rgba(0, 0, 0, 0.4);
     }
-    .param {
-        font-family: 'Roboto Mono', monospace;
-        margin: 1.5px;
-        padding: 2px;
-        border-radius: 5px;
-        background-color: var(--main-grey-color);
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.6);
-    }
     .element-info p {
         margin: 0;
         padding: 0;
@@ -202,6 +165,9 @@
         flex-wrap: wrap;
         white-space: normal;
         width: 100%;
+        font-family: 'Roboto Mono', monospace;
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 12px;
     }
     .element-cont {
         -moz-user-select: -moz-none;
@@ -219,18 +185,11 @@
     .element-info h4 {
         margin: 0;
     }
-    .element-info button {
-        background-color: rgb(34, 34, 34);
-        font-family: "Inter", sans-serif;
-        font-weight: 550;
-        border-radius: 100px;
-        padding: 10px 12px;
-    }
     .disk {
         height: 80px;
         width: 20px;
         background-color: var(--main-color);
-        margin: 20px 40px;
+        margin: 8px 40px;
         box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
@@ -240,7 +199,7 @@
         height: 18px;
         width: 72px;
         background-color: var(--main-color-light);
-        margin: 51px 14px;
+        margin: 39px 14px;
         box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
@@ -252,7 +211,7 @@
     .gear {
         height: 60px;
         width: 20px;
-        margin: 30px 40px;
+        margin: 18px 40px;
         box-sizing: border-box;
         border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
@@ -276,7 +235,7 @@
         box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         width: calc(100% - 12px);
         margin: 0 5px 5px 5px;
-        height: 124px;
+        height: 100px;
         overflow: hidden;
         transition: .2s;
         cursor: grab;
@@ -293,7 +252,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 6px;
+        padding: 12px;
         width: calc(100% - 100px);
     }
     .element-upper {
@@ -315,17 +274,5 @@
         background: var(--main-grey-color);
         height: calc(100vh - 126px);
         padding-top: 5px;
-    }
-    button {
-        color: rgba(255, 255, 255, 0.9);
-        padding: 8px;
-        font-weight: 500;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 50px;
-        cursor: grab;
-        transition: .2s;
-    }
-    button:hover {
-        border: 1px solid rgba(255, 255, 255, 0.8);
     }
 </style>

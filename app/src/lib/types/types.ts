@@ -39,7 +39,9 @@ export interface ShaftContinuousType extends BaseElementType {
     type: "ShaftContinuous";
     damping: number;
     length: number;
-    diameter: number;
+    innerDiameter: number;
+    outerDiameter: number;
+    density?: number;
 }
 
 export type ElementType = DiskType | GearElementType | ShaftDiscreteType | ShaftContinuousType;

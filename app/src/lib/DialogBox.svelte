@@ -10,14 +10,12 @@
     let confirmText = "";
     let denyText = "";  
     let resolvePromise: (value: boolean) => void;
-    let type = 'info';
 
-    export const openDialog = (dialog: string, confirm: string, deny: string, dialogType: string = 'info'): Promise<boolean> => {
+    export const openDialog = (dialog: string, confirm: string, deny: string): Promise<boolean> => {
         dialogText = dialog;
         confirmText = confirm;
         denyText = deny;
         isOpen = true;
-        type = dialogType;
         return new Promise((resolve) => {
             resolvePromise = resolve;
         });
@@ -64,7 +62,7 @@
 </script>
 <Portal target="body">
     {#if isOpen}
-        <div class={`main-dialogbox is-${type}`} bind:this={dialogbox}>
+        <div class="main-dialogbox" bind:this={dialogbox}>
             <button class="btn-close" on:click={handleDeny}>
                 <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -107,9 +105,9 @@
         right: 10px;
     }
     .icon-close {
-        width: 14px;
-        height: 14px;
-        color: white;
+        width: 18px;
+        height: 18px;
+        color: rgba(0, 0, 0, 0.2);
         cursor: pointer;
     }
     .option-icon {
@@ -138,22 +136,17 @@
         box-shadow: var(--main-box-shadow);
         text-align: center;
         z-index: 10000000000;
-        padding: 20px 30px 12px 30px;
+        padding: 22px 32px 16px 32px;
         transition: .3s;
         opacity: 0;
         border-radius: var(--main-border-radius);
-    }
-    .is-danger {
-        background-color: var(--main-error-color);
-    }
-    .is-info {
-        background-color: var(--main-color-dark);
+        background-color: white;
     }
     .main-dialogbox p {
         font-size: 14px;
         font-weight: 450;
         margin: 0;
-        color: white;
+        color: rgb(0, 0, 0, 0.7);
     }
     .viewport-cover {
         position: fixed;

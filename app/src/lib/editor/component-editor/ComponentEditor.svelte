@@ -17,23 +17,25 @@
 
     import EmptyNode from './EmptyNode.svelte';
     import DiskNode from './DiskNode.svelte';
-    import ShaftNode from './ShaftDiscreteNode.svelte';
+    import ShaftDiscreteNode from './ShaftDiscreteNode.svelte';
+    import ShaftContinuousNode from './ShaftContinuousNode.svelte';
     import GearNode from './GearNode.svelte';
     import GearboxNode from './GearboxNode.svelte';
     const { fitView } = useSvelteFlow();
 
     const nodeTypes = {
-      'disk': DiskNode,
-      'shaft': ShaftNode,
-      'gear': GearNode,
-      'gearbox': GearboxNode,
-      'empty': EmptyNode
+      'Disk': DiskNode,
+      'ShaftDiscrete': ShaftDiscreteNode,
+      'ShaftContinuous': ShaftContinuousNode,
+      'GearElement': GearNode,
+      'Gearbox': GearboxNode,
+      'Empty': EmptyNode
     } as {} as NodeTypes;   
   
     const nodes = writable([
       {
         id: '1',
-        type: 'empty',
+        type: 'Empty',
         dragHandle: '.none',
         data: { label: 'Node' },
         position: { x: 0, y: 150 }

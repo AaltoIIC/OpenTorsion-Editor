@@ -1,9 +1,11 @@
 <script lang="ts">
     import type { ExcitationType } from "$lib/types/types";
+    import { camelToTitle } from "$lib/utils";
 
     export let isEditing: boolean;
     export let paramName: string;
     export let paramValue: string | number | ExcitationType | undefined;
+    export let paramUnit: string | undefined;
     export let onChange: (key: string, value: any) => void;
     export let required: boolean = false;
 
@@ -15,6 +17,7 @@
         }
     }
 
+    let displayName: string | undefined = camelToTitle(paramName);
     let displayValue: string | undefined = makeString(paramValue);
     let isUndef: boolean;
     $: isUndef = typeof paramValue === 'undefined';
@@ -97,7 +100,9 @@
         <svg class="icon-add" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        {paramName}<span class="param-colon">:</span>
+        {displayName}<span class="param-unit {paramUnit ? '' : 'empty'}">{
+                paramUnit ? `(${paramUnit})` : ''
+        }</span><span class="param-colon">:</span>
     </span>
     <span class="param-val-outer">
         <input type="text"
@@ -121,6 +126,14 @@
     </span>
 </p>
 <style>
+    .param-unit {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.5);
+        margin-left: 4px;
+    }
+    .param-unit.empty {
+        display: none;
+    }
     .main-prop-cont {
         -moz-user-select: -moz-none;
         -khtml-user-select: none;
@@ -138,7 +151,7 @@
     .def-cont:hover {
         background-color: rgba(0, 0, 0, 0.04);
     }
-    .undef-cont .param-val-outer, .undef-cont .param-colon {
+    .undef-cont .param-val-outer, .undef-cont .param-colon, .undef-cont .param-unit {
         display: none;
     }
     .icon-add {

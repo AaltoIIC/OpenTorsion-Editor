@@ -56,7 +56,7 @@
         bind:this={layoverElement}
         nodeOnHover={onHover}
         params={data.data}
-        possibleParams={possibleParams.disk} />
+        possibleParams={possibleParams.Disk} />
     <DragAndDropHandle elementName={data.data.name} />
 </div>
 <style>

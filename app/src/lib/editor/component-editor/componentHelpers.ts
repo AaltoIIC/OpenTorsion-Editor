@@ -268,59 +268,76 @@ export const nameComponentDesign = (components: ComponentType[]) => {
 
 // function to automatically give a unique name to a new element
 export const nameElement = (type: string, elements: ElementType[]) => {
-    const typeToName: { [key: string]: string } = {
-        "Disk": "Disk",
-        "ShaftDiscrete": "Shaft",
-        "GearElement": "Gear"
-    }
     const elemToNum = (el: ElementType) => {
         const nameList = el.name.split(" ")
         const nameWithoutLastWord = nameList.slice(0, -1).join(' ')
-        if (nameWithoutLastWord === typeToName[type]) {
+        if (nameWithoutLastWord === type) {
             return parseInt(nameList.at(-1) || '0')
         } else {
             return null
         }
     }
     const largestNum = elements.map(elemToNum).filter(el => el !== null).sort((a, b) => a - b).at(-1)
-    return `${typeToName[type]} ${largestNum ? largestNum + 1 : 1}`;
+    return `${type} ${largestNum ? largestNum + 1 : 1}`;
 }
 
 // object with possible parameters for each element type
 export const possibleParams = {
-    disk: {
+    Disk: {
         required: ["name", "type", "damping", "inertia"],
         optional: ["excitation"]
     },
-    shaft: {
+    ShaftDiscrete: {
         required: ["name", "type", "damping", "stiffness"],
         optional: ["excitation"]
     },
-    gear: {
+    ShaftContinuous: {
+        required: ["name", "type", "damping", "length", "innerDiameter", "outerDiameter"],
+        optional: ["density","excitation"]
+    },
+    GearElement: {
         required: ["name", "type", "inertia", "diameter"],
-        optional: ["parent", "excitation", "teeth"]
+        optional: ["parent", "teeth", "excitation"]
     }
+}
+export const paramUnits: Record<string, string> = {
+    "damping": "Nms/rad",
+    "inertia": "kgm²",
+    "stiffness": "Nm/rad",
+    "length": "mm",
+    "innerDiameter": "mm",
+    "outerDiameter": "mm",
+    "density": "kg/m³"
 }
 
 // function to construct a default element based on the type
 export const defaultElement = (elements: ElementType[], type: string): ElementType => {
-    if (type === "disk") {
+    if (type === "Disk") {
         return {
             name: nameElement('Disk', elements),
             type: "Disk",
             damping: 0,
             inertia: 5.72e+03
         }
-    } else if (type === "shaft") {
+    } else if (type === "ShaftDiscrete") {
         return {
-            name: nameElement('ShaftDiscrete', elements),
+            name: nameElement('Shaft', elements),
             type: "ShaftDiscrete",
             damping: 0,
             stiffness: 4.49e+09
         }
-    } else if (type === "gear") {
+    }  else if (type === "ShaftContinuous") {
         return {
-            name: nameElement('GearElement', elements),
+            name: nameElement('Shaft', elements),
+            type: "ShaftContinuous",
+            damping: 0,
+            length: 100,
+            innerDiameter: 14,
+            outerDiameter: 20
+        }
+    } else if (type === "GearElement") {
+        return {
+            name: nameElement('Gear', elements),
             type: "GearElement",
             inertia: 5.72e+03,
             diameter: 0.23
@@ -341,13 +358,12 @@ export const updateComponentEditor = (nodes: Node[]) => {
     if (currentJSON.elements.length === 0) {
         newNodes.push({
             id: `empty`,
-            type: 'empty',
+            type: 'Empty',
             dragHandle: '.none',
             data: {label: ''},
             position: { x: 0, y: 150 }
         });
     }
-
     
     let currentX = 0;
     let currentY = 150;
@@ -367,32 +383,32 @@ export const updateComponentEditor = (nodes: Node[]) => {
             
             newNodes.push({
                 id: `${index + 1}`,
-                type: 'disk',
+                type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: nodeNo.toString(),
                     new: false,
                     data: _.pick(el, [
-                        ...possibleParams['disk'].required,
-                        ...possibleParams['disk'].optional
+                        ...possibleParams[el.type].required,
+                        ...possibleParams[el.type].optional
                     ] )
                 },
                 position: { x: currentX, y: currentY }
             });
             currentX += 21;
 
-        } else if (el.type === "ShaftDiscrete") {
+        } else if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
 
             newNodes.push({
                 id: `${index + 1}`,
-                type: 'shaft',
+                type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: `${nodeNo}-${nodeNo+1}`,
                     new: false,
                     data: _.pick(el, [
-                        ...possibleParams['shaft'].required,
-                        ...possibleParams['shaft'].optional
+                        ...possibleParams[el.type].required,
+                        ...possibleParams[el.type].optional
                     ])
                 },
                 position: { x: currentX, y: currentY }
@@ -423,14 +439,14 @@ export const updateComponentEditor = (nodes: Node[]) => {
 
             newNodes.push({
                 id: `${index + 1}`,
-                type: 'gear',
+                type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: nodeNo.toString(),
                     new: false,
                     data: _.pick(el, [
-                        ...possibleParams['gear'].required,
-                        ...possibleParams['gear'].optional
+                        ...possibleParams[el.type].required,
+                        ...possibleParams[el.type].optional
                     ])
                 },
                 position: { x: currentX, y: currentY }

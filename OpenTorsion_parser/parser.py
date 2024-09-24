@@ -69,6 +69,20 @@ def parse(json):
                     add_excitation(i, element['excitation']['values'])
 
                 i += 1
+            elif element['type'] == 'ShaftContinuous':
+                density = element['density'] if 'density' in element else None
+                elements['shafts'][elem_name] = ot.Shaft(
+                    i,
+                    i+1,
+                    L=element['length'],
+                    idl=element['innerDiameter'],
+                    odl=element['outerDiameter'],
+                    rho=density
+                )
+                if 'excitation' in element:
+                    add_excitation(i, element['excitation']['values'])
+
+                i += 1
             elif element['type'] == 'GearElement':
                 gear_length = element['teeth'] if 'teeth' in element else element['diameter']
                 parent_gear = None

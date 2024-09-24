@@ -3,7 +3,7 @@
     import Portal from "svelte-portal";
     import type { ElementType, ExcitationType } from '$lib/types/types';
     import { isExcitationType } from '$lib/types/typeguards';
-    import { editElement } from '../componentHelpers';
+    import { editElement, paramUnits } from '../componentHelpers';
     import { currentComponentJSON, highlightLinesInEditor } from '../../../stores/stores';
     import { nthLinesInJSON } from '$lib/utils';
     import LayoverProperty from './LayoverProperty.svelte';
@@ -159,9 +159,6 @@
         if (event.key === 'Escape') {
             closeLayover();
         }
-        if (isEditing && (event.key === 'Delete' || event.key === 'Backspace')) {
-            deleteElement();
-        }
     };
 
     onMount(() => {
@@ -221,6 +218,7 @@
                     <LayoverProperty
                         paramName={paramName}
                         paramValue={paramValue}
+                        paramUnit={paramUnits[paramName]}
                         isEditing={isEditing}
                         required={possibleParams.required.includes(paramName)}
                         onChange={handleParamChange}
@@ -323,12 +321,12 @@
     .main-layover-cont {
         display: none;
         position: absolute;
-        width: 210px;
+        width: 268px;
         height: fit-content;
         background-color: rgba(255, 255, 255, 1);
         border: solid 1px rgba(0, 0, 0, 0.06);
         z-index: 1000000;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        box-shadow: var(--main-shadow);
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         color: rgba(0, 0, 0, 0.9);
