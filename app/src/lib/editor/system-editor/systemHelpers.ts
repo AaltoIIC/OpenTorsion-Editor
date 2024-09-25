@@ -252,8 +252,9 @@ export const checkIfOTCompatible = () => {
         return false;
     }
 
+    const shafts: any[] = ['ShaftDiscrete', 'ShaftContinuous'];
     for (let component of startingComponents) {
-        if (component.elements[0].type === 'ShaftDiscrete') {
+        if (shafts.includes(component.elements[0].type)) {
             notification.set(
                 {
                     message: "System can't start with a shaft.",
@@ -265,7 +266,7 @@ export const checkIfOTCompatible = () => {
     }
 
     for (let component of endComponents) {
-        if (component.elements.at(-1)?.type === 'ShaftDiscrete') {
+        if (shafts.includes(component.elements.at(-1)?.type)) {
             notification.set(
                 {
                     message: "System can't end with a shaft.",
@@ -285,7 +286,7 @@ export const checkIfOTCompatible = () => {
         targetElemType = targetComponent?.elements.find(elem => elem.name === targetElemName)?.type;
 
         // shafts can't be connected to shafts
-        if (sourceElemType === 'ShaftDiscrete' && targetElemType === 'ShaftDiscrete') {
+        if (shafts.includes(sourceElemType) && shafts.includes(targetElemType)) {
             notification.set(
                 {
                     message: "System can't contain two shaft elements connected.",
@@ -307,7 +308,7 @@ export const checkIfOTCompatible = () => {
         }
 
         // gears can only be connected to shafts
-        if (sourceElemType === 'GearElement' && targetElemType !== 'ShaftDiscrete') {
+        if (sourceElemType === 'GearElement' && !shafts.includes(targetElemType)) {
             notification.set(
                 {
                     message: "System can't contain a gear element connected to a non-shaft element.",
@@ -430,7 +431,6 @@ export const handleJSONEditing = (text: string, excludeId: string | null = null)
 // csheck if the connections in the structure are valid
 // i.e. if they form a valid path (no loops or multiple connections)
 export const checkConnections = (structure: string[][]) => {
-    // a multiple connection az hogy nez ki?
 
     // check if only valid inputs and outputs are present in structure
     for (let connection of structure) {

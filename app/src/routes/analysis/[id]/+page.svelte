@@ -3,7 +3,13 @@
     import { goto } from "$app/navigation";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import { onMount, type SvelteComponent } from "svelte";
-    import { currentSystemJSON, createSystem, systems, customComponents } from "$lib/stores/stores";
+    import {
+        currentSystemJSON,
+        currentComponentJSON,
+        createSystem,
+        systems,
+        customComponents
+    } from "$lib/stores/stores";
     import type { SystemType, ComponentType } from "$lib/types/types";
     import System3dModel from "$lib/System3dModel.svelte";
     import Button from "$lib/Button.svelte";
@@ -13,8 +19,20 @@
     // load the system or component data from the store
     export let data;
     let isComponent = false;
-    if (data.id.includes('-') && $customComponents.get(data.id)) {
-        // create temporary system with the component if id is a component id
+    if (data.id.includes('-') && $currentComponentJSON.id === data.id) {
+        // load the component from the store
+        // create temporary system with the component
+        isComponent = true;
+        const [id, tempSys] = createSystem();
+        tempSys.name = $currentComponentJSON.json.name;
+        tempSys.components = [$currentComponentJSON.json];
+
+        currentSystemJSON.set({
+            id: id,
+            json: tempSys
+        })
+    } else if (data.id.includes('-') && $customComponents.get(data.id)) {
+        // create temporary system with the component
         isComponent = true;
         const [id, tempSys] = createSystem();
         tempSys.name = $customComponents.get(data.id)?.name || "Component";
@@ -24,13 +42,13 @@
             id: id,
             json: tempSys
         }) 
-    } else if (data.id && $systems.get(data.id)) {
+    } else if (data.id && $currentSystemJSON.id !== data.id && $systems.get(data.id)) {
         // load the system from the store
         currentSystemJSON.set({
             id: data.id,
             json: $systems.get(data.id) as SystemType
         })
-    } else {
+    } else if ($currentSystemJSON.id !== data.id) {
         // redirect to home if the system or component is not found
         onMount(() => {
             goto("/");

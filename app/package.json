@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "concurrently \"node server.js\" \"vite dev\" \"python ../server/app.py\"",
+		"dev": "set NODE_ENV=development && concurrently \"vite dev\" \"python ../server/app.py\"",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -30,7 +30,6 @@
 		"concurrently": "^9.0.1",
 		"express": "^4.21.0",
 		"html2pdf.js": "^0.10.2",
-		"http-proxy-middleware": "^3.0.2",
 		"lodash": "^4.17.21",
 		"prismjs": "^1.29.0",
 		"svelte-jsoneditor": "^0.23.7",

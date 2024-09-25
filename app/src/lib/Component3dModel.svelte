@@ -221,14 +221,15 @@
 
     // animation on hover
     const handleMouseMove = (event: MouseEvent) => {
-
         const width = el.clientWidth;
         const rect = el.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const Xdepth =  Ydimension ? branchHeight/2 : 0
-        const currentCamZ =  (x / width) * (Zdimension-480)
 
-        camera.position.set( 70 + Xdepth/2, 85 + Ydimension/2, 160 + currentCamZ );
+        const extraZ = 100;
+        const currentCamZ =  (1 - (x / width)) * (Zdimension-2*extraZ) + extraZ;
+
+        camera.position.set( 70 + Xdepth/2, 85 + Ydimension/2, currentCamZ );
         camera.lookAt( Xdepth/2, Ydimension/2, Zdimension/2 );
 
         render();

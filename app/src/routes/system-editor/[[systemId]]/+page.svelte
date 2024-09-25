@@ -49,24 +49,21 @@
     let systemName: string;
     export let data;
     if (data.systemId) {
-        if ($systems.get(data.systemId)) {
+        if ($currentSystemJSON.id === data.systemId) {
             isNewSystem = false;
-            // if system has unsaved changes in currentSystemJSON, don't load saved version
-            if ($currentSystemJSON.id !== data.systemId) {
-                currentSystemJSON.set({
-                    id: data.systemId,
-                    json: getSystem(data.systemId) as SystemType
-                });
-            } else {
-                currentSystemJSON.set($currentSystemJSON);
-            }
+            currentSystemJSON.set($currentSystemJSON);
+        } else if ($systems.get(data.systemId)) {
+            isNewSystem = false;
+            currentSystemJSON.set({
+                id: data.systemId,
+                json: getSystem(data.systemId) as SystemType
+            });
         } else {
             // if system does not exist, redirect to home
             onMount(() => {
                 goto('/');
             });
         }
-
     } else {
         let newSystem: SystemType;
         [data.systemId, newSystem] = createSystem();
@@ -164,8 +161,12 @@
         <div class="analyze-btn-cont">
             <Button
                 lightMode={true}
+                color="var(--main-dark-color)"
                 isActive={!(isJSONError || isNameError || isStructureError)}
-                onClick={() => {goto(`/analysis/${$currentSystemJSON.id}`)}}>
+                onClick={() => {goto(`/analysis/${$currentSystemJSON.id}`)}}
+                icon={`<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                    </svg>`}>
                 Analyze System
                 <svg class="icon-analyze" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -239,11 +240,7 @@
     .icon-analyze {
         width: 16px;
         height: 16px;
-        margin: 0 0 -2.5px 0;
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.9);;
-        stroke-width: 2px;
-        stroke-linejoin: round;
+        margin: 0 0 -3px 0;
     }
     .hidden {
         display: none;

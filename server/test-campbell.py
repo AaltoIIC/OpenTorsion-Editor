@@ -13,7 +13,7 @@ from OpenTorsion_parser.parser import parse
 json_path = './system.json'
 with open(json_path) as input_json:
     input_data = json.load(input_json)
-    assembly = parse(input_data)
+    assembly = parse(input_data)[0]
     plot_tools = ot.Plots(assembly)
 
 #figure = plot_eigenmodes(plot_tools, modes=3)

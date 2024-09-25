@@ -145,9 +145,10 @@ const hasValidParent = (childElement: ElementType, elements: ElementType[]) => {
 const elementOrderValid = (elements: ElementType[]) => {
     let valid = true;
     let message = "";
+    const shafts: any[] = ["ShaftDiscrete", "ShaftContinuous"];
     
     // component can't start with a shaft (but can consist only of a shaft)
-    if (elements.length > 1 && elements.at(0)?.type === "ShaftDiscrete") {
+    if (elements.length > 1 && shafts.includes(elements.at(0)?.type)) {
             valid = false;
         message = "Component can't start with a shaft."
     }
@@ -156,7 +157,7 @@ const elementOrderValid = (elements: ElementType[]) => {
     let prevElem: ElementType | undefined;
     for (let element of elements) {
         // shaft can't be connected to another shaft
-        if (element.type === "ShaftDiscrete" && prevElem?.type === "ShaftDiscrete") {
+        if (shafts.includes(element.type) && shafts.includes(prevElem?.type)) {
             valid = false;
             message = "Two shafts can't be connected."
             break;
@@ -180,7 +181,9 @@ const elementOrderValid = (elements: ElementType[]) => {
         }
 
         // output elements can't be shafts
-        if (element.type === "ShaftDiscrete" && outputElements.includes(element.name)) {
+        if (elements.length > 1 &&
+            shafts.includes(element.type) &&
+            outputElements.includes(element.name)) {
             valid = false;
             message = "Output elements can't be shafts."
             break;

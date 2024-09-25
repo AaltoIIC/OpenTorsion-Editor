@@ -17,7 +17,7 @@ CORS(app)
 # Dictionary to store plot metadata 
 plot_storage = {}
 
-@app.route('/analysis', methods=['POST'])
+@app.route('/api/analysis', methods=['POST'])
 def handle_analysis():
     data = request.json
     try:
@@ -39,19 +39,19 @@ def handle_analysis():
 
         # eigenmodes
         if (assembly.gear_elements is None):
-            nof_modes = min( assembly.eigenmodes()[1].shape[0], 3)
-            eigenmodes = plot_eigenmodes(plot_tools, modes=nof_modes)
-            plots.append({
-                "name": "Eigenmodes",
-                "html": mpld3.fig_to_html(eigenmodes)
-            })
+            try:
+                nof_modes = min( assembly.eigenmodes()[1].shape[0], 3)
+                eigenmodes = plot_eigenmodes(plot_tools, modes=nof_modes)
+                plots.append({
+                    "name": "Eigenmodes",
+                    "html": mpld3.fig_to_html(eigenmodes)
+                })
+            except:
+                pass
 
-        # Create html file 
-        
-    
         return jsonify(plots)
     except Exception as e:
-        print("Error analyzing system: ", e)
+        print(f'Analysis failed: {e}')
         return Response(str(e), status=400)
 
 if __name__ == '__main__':

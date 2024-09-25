@@ -70,7 +70,7 @@ def parse(json):
 
                 i += 1
             elif element['type'] == 'ShaftContinuous':
-                density = element['density'] if 'density' in element else None
+                density = element['density'] if 'density' in element else 8000
                 elements['shafts'][elem_name] = ot.Shaft(
                     i,
                     i+1,

@@ -135,25 +135,26 @@
     const checkConnectionConstraints = (connection: Connection | Edge) => {
       if (!connection.sourceHandle || !connection.targetHandle) return false;
 
+      const shafts: any[] = ['ShaftDiscrete', 'ShaftContinuous'];
       const sourceType = findElement(connection.sourceHandle)?.type;
       const targetType = findElement(connection.targetHandle)?.type;
       let isValid = true;
       
       // if source is a shaft, target must be disk or gear
-      if (sourceType === 'ShaftDiscrete' &&
+      if (shafts.includes(sourceType) &&
           !(targetType === 'Disk' || targetType === 'GearElement')) {
         isValid = false;
       }
 
       // if source is a disk, target must be shaft or disk
       if (sourceType === 'Disk' &&
-          !(targetType === 'ShaftDiscrete' || targetType === 'Disk')) {
+          !(shafts.includes(targetType) || targetType === 'Disk')) {
         isValid = false;
       }
 
       // if source is a gear, target must be shaft
       if (sourceType === 'GearElement' &&
-          targetType !== 'ShaftDiscrete') {
+          !shafts.includes(targetType)) {
         isValid = false;
       }
 

@@ -201,8 +201,8 @@
         background-color: var(--main-color-light);
         margin: 39px 14px;
         box-sizing: border-box;
-        border-radius: 2px;
         border: solid 2px rgba(0, 0, 0, 0.04);
+        border-radius: 2px;
         box-shadow: var(--main-shadow);
     }
     .shaft.continuous {
