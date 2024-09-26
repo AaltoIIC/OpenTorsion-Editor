@@ -17,7 +17,7 @@ Features include:
 
 Usage doesn't require you to register, but your systems and components are saved locally in the browser.
 
-**For a detailed usage guide, refer to the [User Guide](https://github.com/AaltoIIC/Co-Des-Interface "User Guide").**
+**For a detailed usage guide, refer to the [User Guide](https://github.com/AaltoIIC/Co-Des-Interface/wiki/User-Guide "User Guide").**
 
 ## Documentation:
 **For users:**
