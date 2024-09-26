@@ -12,7 +12,9 @@ Features include:
 
 ## Usage:
 **The app will be deployed shortly.**
+
 Usage doesn't require you to register, but your systems and components are saved locally in the browser.
+
 **For a detailed usage guide, refer to the [User Guide](https://github.com/AaltoIIC/Co-Des-Interface "User Guide").**
 
 ## Contact:
