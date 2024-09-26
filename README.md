@@ -14,12 +14,15 @@ Features include:
 
 ## Usage:
 **The app will be deployed shortly.**
+
 Usage doesn't require you to register, but your systems and components are saved locally in the browser.
+
 **For a detailed usage guide, refer to the [User Guide](https://github.com/AaltoIIC/Co-Des-Interface "User Guide").**
 
 ## Documentation:
 **For users:**
 - The [User Guide](https://github.com/AaltoIIC/Co-Des-Interface/wiki/User-Guide "User Guide") on the [Wiki page](https://github.com/AaltoIIC/Co-Des-Interface/wiki "Wiki page") gives an overview of the application as well as a description of specific features.
+
 **For developers:**
 - The [Developer Docs](https://github.com/AaltoIIC/Co-Des-Interface/wiki/Developer-Docs "Developer Docs") on the [Wiki page](https://github.com/AaltoIIC/Co-Des-Interface/wiki "Wiki page") describes how the app is structured and provides instructions on development.
 
