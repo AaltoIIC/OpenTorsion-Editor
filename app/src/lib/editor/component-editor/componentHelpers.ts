@@ -474,7 +474,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
         if (value.count > 1) {
             gearboxes.push({
                 id: `gearbox-${value.x}`,
-                type: 'gearbox',
+                type: 'Gearbox',
                 draggable: false,
                 data: {
                     height: value.endY - value.startY,

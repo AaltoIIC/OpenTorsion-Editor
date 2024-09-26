@@ -5,7 +5,7 @@
     import { onMount, type SvelteComponent } from "svelte";
     import {
         currentSystemJSON,
-        currentComponentJSON,
+        getSystem,
         createSystem,
         systems,
         customComponents
@@ -19,19 +19,7 @@
     // load the system or component data from the store
     export let data;
     let isComponent = false;
-    if (data.id.includes('-') && $currentComponentJSON.id === data.id) {
-        // load the component from the store
-        // create temporary system with the component
-        isComponent = true;
-        const [id, tempSys] = createSystem();
-        tempSys.name = $currentComponentJSON.json.name;
-        tempSys.components = [$currentComponentJSON.json];
-
-        currentSystemJSON.set({
-            id: id,
-            json: tempSys
-        })
-    } else if (data.id.includes('-') && $customComponents.get(data.id)) {
+    if (data.id.includes('-') && $customComponents.has(data.id)) {
         // create temporary system with the component
         isComponent = true;
         const [id, tempSys] = createSystem();
@@ -41,15 +29,15 @@
         currentSystemJSON.set({
             id: id,
             json: tempSys
-        }) 
-    } else if (data.id && $currentSystemJSON.id !== data.id && $systems.get(data.id)) {
+        })
+    } else if (data.id && $systems.has(data.id)) {
         // load the system from the store
         currentSystemJSON.set({
             id: data.id,
-            json: $systems.get(data.id) as SystemType
+            json: getSystem(data.id) as SystemType
         })
-    } else if ($currentSystemJSON.id !== data.id) {
-        // redirect to home if the system or component is not found
+    } else {
+        // redirect home if the system or component is not found
         onMount(() => {
             goto("/");
         });

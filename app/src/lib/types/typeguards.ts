@@ -38,7 +38,11 @@ export function isElementType(obj: any): obj is ElementType {
            (obj.excitation === undefined || typeof obj.excitation === 'object') &&
            (obj.stiffness === undefined || typeof obj.stiffness === 'number') &&
            (obj.diameter === undefined || typeof obj.diameter === 'number') &&
-           (obj.teeth === undefined || typeof obj.teeth === 'number');
+           (obj.teeth === undefined || typeof obj.teeth === 'number') &&
+           (obj.parent === undefined || typeof obj.parent === 'string') &&
+           (obj.innerDiameter === undefined || typeof obj.innerDiameter === 'number') &&
+           (obj.outerDiameter === undefined || typeof obj.outerDiameter === 'number') &&
+           (obj.density === undefined || typeof obj.density === 'number');
 }
 
 // Checks if an object is a description of a system
@@ -76,5 +80,9 @@ const isAlmostElementType = (obj: any) => {
            (obj.excitation === undefined || typeof obj.excitation === 'object') &&
            (obj.stiffness === undefined || typeof obj.stiffness === 'number') &&
            (obj.diameter === undefined || typeof obj.diameter === 'number') &&
-           (obj.teeth === undefined || typeof obj.teeth === 'number');
+           (obj.teeth === undefined || typeof obj.teeth === 'number') &&
+           (obj.parent === undefined || typeof obj.parent === 'string') &&
+           (obj.innerDiameter === undefined || typeof obj.innerDiameter === 'number') &&
+           (obj.outerDiameter === undefined || typeof obj.outerDiameter === 'number') &&
+           (obj.density === undefined || typeof obj.density === 'number');
 }

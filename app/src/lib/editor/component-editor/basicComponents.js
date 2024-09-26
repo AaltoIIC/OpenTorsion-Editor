@@ -1,7 +1,6 @@
 export const basicComponents = [
     {
        name: "Windmill Turbine",
-       icon: "windmill-turbine.png",
        json: {
               name: "Windmill Turbine",
               elements: [
@@ -16,7 +15,6 @@ export const basicComponents = [
     },
     {
         name: "Windmill Rotor",
-        icon: "windmill-rotor.png",
         json: {
             name: "Windmill Rotor",
             elements: [
@@ -76,7 +74,6 @@ export const basicComponents = [
     },
     {
         name: "Shaft",
-        icon: "shaft.png",
         json: {
             name: "Shaft",
             elements: [

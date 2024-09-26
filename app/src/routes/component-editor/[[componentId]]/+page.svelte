@@ -3,6 +3,7 @@
     import {
       SvelteFlowProvider
     } from '@xyflow/svelte';
+    import _ from 'lodash';
     import type { ComponentType, SystemType } from '$lib/types/types';
     import ComponentEditor from "$lib/editor/component-editor/ComponentEditor.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
@@ -47,7 +48,6 @@
 
     export let data;
     let originalName: string;
-    let isNewComponent = true;
     let dialogBox: SvelteComponent;
 
     // initialize the current component JSON
@@ -63,7 +63,6 @@
             // component is already loaded
             originalName = $currentComponentJSON.json.name;
         } else if (Array.from($customComponents.keys()).includes(data.componentId)) {
-            isNewComponent = false;
             // load the system corresponding to the component
             setCurrentSystem(data.componentId.split('-')[0]);
 
@@ -131,21 +130,23 @@
             type: "success",
             duration: 3000
         });
-        goto(`/system-editor/${$currentSystemJSON.id}`);
+        goto(`/system-editor/${$currentComponentJSON.id.split('-')[0]}`);
     }
 
     // handle pressing the back button
     const handleBack = () => {
-        if ($currentComponentJSON.json.elements.length === 0) {
+        if ($currentComponentJSON.json.elements.length === 0 ||
+        _.isEqual($currentComponentJSON.json, $customComponents.get($currentComponentJSON.id))
+        ) {
             resetCurrentComponent();
             notification.set(null);
-            goto(`/system-editor/${$currentSystemJSON.id}`);
+            goto(`/system-editor/${$currentComponentJSON.id.split('-')[0]}`);
         } else {
             dialogBox.openDialog("You have unsaved changes. Do you want to discard them?",
                 "Discard changes","Cancel").then((value: boolean) => {
                     if (value) {
                         resetCurrentComponent();
-                        goto(`/system-editor/${$currentSystemJSON.id}`);
+                        goto(`/system-editor/${$currentComponentJSON.id.split('-')[0]}`);
                         notification.set(null);
                     }
                 });
@@ -162,6 +163,22 @@
     const resizeEditor = (event: MouseEvent) => {
         const parentRect = editorElement.getBoundingClientRect();
         jsonEditorHeight = parentRect.bottom - event.clientY + 8;
+    }
+
+    // handle analysis button
+    const handleAnalysis = () => {
+        if (isError) return;
+        if (_.isEqual($currentComponentJSON.json, $customComponents.get($currentComponentJSON.id))) {
+            goto(`/analysis/${$currentComponentJSON.id}`);
+        } else {
+            dialogBox.openDialog("You have unsaved changes. Do you want to save them before proceeding?",
+                "Save changes","Cancel").then((value: boolean) => {
+                    if (value) {
+                        saveCurrentComponent();
+                        goto(`/analysis/${$currentComponentJSON.id}`);
+                    }
+                });
+        }
     }
 
 </script>
@@ -220,10 +237,12 @@
                 bind:this={fileInput}
                 on:change={(e) => importComponent(e, false)}
                 accept=".json">
-            <a class="link-element"
-                href={isError ? '' : `/analysis/${$currentComponentJSON.id}`}>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span class="link-element"
+                on:click={handleAnalysis}>
                 Analysis
-            </a>
+            </span>
         </svelte:fragment>
         <svelte:fragment slot="name">
             <NameField text="Component"
