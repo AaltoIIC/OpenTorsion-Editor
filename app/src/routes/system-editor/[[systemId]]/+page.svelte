@@ -145,7 +145,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <title>System Editor | Co-Des Interface</title>
+    <title>System Editor | OpenTorsion Editor</title>
 </svelte:head>
 <div class="main-screen">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -243,7 +243,7 @@
             </Button>
         </svelte:fragment>
     </TopBar>
-    <Sidebar>
+    <Sidebar page="system editor">
         <ComponentsList />
     </Sidebar>
 </div>
@@ -265,11 +265,12 @@
     }
     .resize-slider {
         width: 100%;
-        height: 8px;
+        height: 6px;
         background: rgb(240, 240, 240);
-        border: none !important;
         border-radius: 0;
         cursor: n-resize;
+        border-top: var(--main-border);
+        border-bottom: var(--main-border);
     }
     .flow-editor {
         height: var(--flow-editor-height);

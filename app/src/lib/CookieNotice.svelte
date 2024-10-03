@@ -40,11 +40,11 @@
         height: fit-content;
         color: rgba(0, 0, 0, 0.9);
         z-index: 10000;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         padding: 12px;
         font-size: 14px;
         transition: .3s;
         border-radius: var(--main-border-radius);
+        border: var(--main-border);
         background-color: rgb(255, 255, 255);
     }
     .inner {

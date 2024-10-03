@@ -232,7 +232,6 @@
     }
     .element-list-item {
         display: flex;
-        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         width: calc(100% - 12px);
         margin: 0 5px 5px 5px;
         height: 100px;
@@ -240,7 +239,7 @@
         transition: .2s;
         cursor: grab;
         border-radius: var(--main-border-radius);
-        background-color: white;
+        border: var(--main-border);
     }
     .element-list-item:active {
         cursor: grabbing;
@@ -262,7 +261,6 @@
         padding: 0 5px;
         vertical-align: middle;
         margin-top: 25px;
-        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         z-index: 10;
         position: relative;
     }
@@ -271,8 +269,9 @@
     }
     .element-list {
         width: 100%;
-        background: var(--main-grey-color);
+        background: white;
         height: calc(100vh - 126px);
         padding-top: 5px;
+        border-top: var(--main-border);
     }
 </style>

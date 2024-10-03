@@ -14,7 +14,7 @@
     let fileInput: HTMLInputElement;
 </script>
 <svelte:head>
-    <title>Dashboard | Co-Des Interface</title>
+    <title>Dashboard | OpenTorsion Editor</title>
 </svelte:head>
 <div class="screen">
     <Header />
@@ -55,7 +55,7 @@
         </div>
     </div>
     <footer>
-        <p>Co-Des Interface</p>
+        <p>OpenTorsion Editor</p>
         <p>2024, Aalto IIC</p>
     </footer>
 </div>
@@ -75,7 +75,7 @@
         font-size: 14px;
     }
     .screen {
-        background-color: rgb(245, 245, 245);
+        background-color: white;
         position: fixed;
         top: 0;
         left: 0;
@@ -93,6 +93,7 @@
         width: 100%;
         height: 300px;
         margin: 26px 0;
+        border: var(--main-border);
     }
     .controls button {
         background-color: var(--main-dark-color);

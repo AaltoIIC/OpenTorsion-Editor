@@ -93,12 +93,12 @@
         width: 162px;
         padding: 0;
         background-color: white;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         transition: opacity 0.2s;
         visibility: hidden;
         z-index: 10000002;
         opacity: 0;
         border-radius: var(--main-border-radius);
+        border: var(--main-border);
         overflow: hidden;
     }
     .open .main-dropdown {

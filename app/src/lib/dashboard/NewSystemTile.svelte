@@ -31,6 +31,7 @@
         cursor: pointer;
         margin: 0 0 15px 15px;
         position: relative;
+        border: var(--main-border);
     }
     .main-tile:hover {
         background-color: var(--main-hover-color);

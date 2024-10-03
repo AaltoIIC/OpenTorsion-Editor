@@ -78,7 +78,7 @@
             {/each}
         {/if}
         <footer>
-            <p>Co-Des interface</p>
+            <p>OpenTorsion Editor</p>
             <p>2024, Aalto IIC</p>
         </footer>
     </div>
@@ -122,7 +122,7 @@
         gap: 1em;
         width: fit-content;
         text-align: left;
-        border: solid 3px rgb(245, 245, 245);
+        border: solid 1px rgb(235, 235, 235);
     }
     .info-text {
         width: 220px;

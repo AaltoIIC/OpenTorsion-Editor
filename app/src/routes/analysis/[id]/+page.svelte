@@ -85,7 +85,7 @@
     })
 </script>
 <svelte:head>
-    <title>Analysis | Co-Des Interface</title>
+    <title>Analysis | OpenTorsion Editor</title>
 </svelte:head>
 <main>
     <div class="tiles-cont">
@@ -153,7 +153,7 @@
         {pdfText}     
     </Button>
 </div>
-<Sidebar>
+<Sidebar page="analysis">
     <div class="system-info">
         <System3dModel
             data={$currentSystemJSON.json}
@@ -258,7 +258,7 @@
         margin: 40px 40px 0 40px;
         font-size: 14px;
         border-radius: var(--main-border-radius);
-        border: solid 3px var(--main-grey-color);
+        border: var(--main-border);
     }
     .system-info h2, .system-info p {
         margin: 0;

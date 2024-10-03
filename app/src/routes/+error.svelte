@@ -5,7 +5,7 @@
     import { goto } from '$app/navigation';
 </script>
 <svelte:head>
-    <title>Error | Co-Des Interface</title>
+    <title>Error | OpenTorsion Editor</title>
 </svelte:head>
 <Header />
 <div class="main-page">
@@ -56,6 +56,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: var(--main-grey-color);
+        background-color: white;
     }
 </style>

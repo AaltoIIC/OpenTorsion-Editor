@@ -144,6 +144,7 @@
         cursor: grab;
         border-radius: var(--main-border-radius);
         background: white;
+        border: var(--main-border);
     }
     .component-list-item.hover {
         background: var(--main-hover-color);

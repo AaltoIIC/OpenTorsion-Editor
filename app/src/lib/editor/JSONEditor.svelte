@@ -216,12 +216,14 @@
     .line-number {
         height: 18px;
         width: 26px;
-        background-color: rgb(240, 240, 240);
+        background-color: var(--main-grey-color);
         color: rgba(0, 0, 0, 0.5);
         font-size: 14px;
         text-align: right;
         padding: 0 4px;
         font-family: 'Roboto Mono', monospace;
+        border-left: var(--main-border);
+        border-right: var(--main-border);
     }
     .highlighted .line-number {
         background-color: var(--main-color-dark);
@@ -249,11 +251,13 @@
     .code-line:first-of-type div {
         border-top-left-radius: var(--main-border-radius);
         border-top-right-radius: var(--main-border-radius);
+        border-top: var(--main-border);
         overflow: hidden;
     }
     .code-line:last-of-type div {
         border-bottom-left-radius: var(--main-border-radius);
         border-bottom-right-radius: var(--main-border-radius);
+        border-bottom: var(--main-border);
         overflow: hidden;
     }
     .highlighted:nth-of-type(1) {

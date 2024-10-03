@@ -72,7 +72,6 @@
         padding: 0 5px;
         vertical-align: middle;
         margin-top: 25px;
-        box-shadow: rgba(149, 157, 165, 0.1) 0px 8px 24px;
         z-index: 10;
         position: relative;
     }
@@ -80,7 +79,8 @@
         width: 360px;
         height: calc(100vh - 126px);
         overflow-y: scroll;
-        background: var(--main-grey-color);
+        background: white;
+        border-top: var(--main-border);
     }
     ::-webkit-scrollbar {
         width: 6px;

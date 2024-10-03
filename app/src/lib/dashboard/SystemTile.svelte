@@ -87,6 +87,7 @@
         color: rgba(0, 0, 0, 0.9);
         cursor: pointer;
         border-radius: var(--main-border-radius);
+        border: var(--main-border);
     }
     .tile:hover {
         background-color: var(--main-hover-color);
