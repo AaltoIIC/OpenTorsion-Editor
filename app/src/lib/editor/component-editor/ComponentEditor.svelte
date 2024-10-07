@@ -93,5 +93,5 @@
   fitView
 >
   <Controls />
-  <Background variant={BackgroundVariant.Dots} gap={28} />
+  <Background bgColor="rgb(245,245,245)" variant={BackgroundVariant.Dots} gap={28} />
 </SvelteFlow>

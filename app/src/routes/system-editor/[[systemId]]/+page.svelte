@@ -243,7 +243,7 @@
             </Button>
         </svelte:fragment>
     </TopBar>
-    <Sidebar page="system editor">
+    <Sidebar>
         <ComponentsList />
     </Sidebar>
 </div>

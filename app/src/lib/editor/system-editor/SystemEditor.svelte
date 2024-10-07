@@ -186,5 +186,5 @@
       deletable: true,
     }}>
     <Controls />
-    <Background variant={BackgroundVariant.Dots} gap={54} size={2} />
+    <Background bgColor="rgb(245,245,245)" variant={BackgroundVariant.Dots} gap={54} size={2} />
 </SvelteFlow>

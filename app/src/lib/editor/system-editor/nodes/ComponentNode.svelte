@@ -202,14 +202,14 @@
     .main-component-node .img-cont {
         width: 200px;
         height: 200px;
-        background-color: rgba(255, 255, 255, 0.6);
-        border: 3px solid rgba(0, 0, 0, 0.075);
-        backdrop-filter: blur(8px) brightness(0.9);
+        background-color: rgba(255, 255, 255, 0.4);
+        border: 3px solid rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(8px);
         border-radius: var(--main-border-radius);
         overflow: hidden;
     }
     .hover .img-cont {
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(255, 255, 255, 0.6);
     }
     .selected  .img-cont {
         background-image: linear-gradient(var(--main-color-tr-2), var(--main-color-tr-2));

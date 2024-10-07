@@ -326,7 +326,6 @@
         background-color: rgba(255, 255, 255, 1);
         border: solid 1px rgba(0, 0, 0, 0.06);
         z-index: 1000000;
-        box-shadow: var(--main-shadow);
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         color: rgba(0, 0, 0, 0.9);

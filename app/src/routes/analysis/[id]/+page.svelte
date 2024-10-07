@@ -153,7 +153,7 @@
         {pdfText}     
     </Button>
 </div>
-<Sidebar page="analysis">
+<Sidebar>
     <div class="system-info">
         <System3dModel
             data={$currentSystemJSON.json}

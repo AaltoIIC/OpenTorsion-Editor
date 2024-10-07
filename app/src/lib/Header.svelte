@@ -1,7 +1,7 @@
 <div class="main-header">
     <a href="/" class="logo-cont">
-        <img class="main-logo" src="./../logo.svg" alt="OpenTorsion Editor ogo">
-        Editor
+        <img class="main-logo" src="./../favicon.svg" alt="OpenTorsion Editor Logo">
+        OpenTorsion Editor
     </a>
     <p class="links">
         <a href="https://github.com/AaltoIIC/OpenTorsion-Interface/wiki/User-Guide">
@@ -30,8 +30,8 @@
         justify-content: space-between;
     }
     .main-logo {
-        width: 38px;
-        height: auto;
+        width: 36px;
+        height: 36px;
         display: block;
         margin-right: 10px;
     }

@@ -13,15 +13,15 @@
 <style>
     h1 {
         font-size: 40px;
-        color: rgba(0, 0, 0, 0.3);
+        color: rgba(0, 0, 0, 0.4);
         text-align: center;
         font-family: 'Inter', sans-serif;
-        font-weight: 650;
+        font-weight: 400;
         margin: 12px;
     }
     p {
         font-size: 20px;
-        color: rgba(0, 0, 0, 0.3);
+        color: rgba(0, 0, 0, 0.4);
         text-align: center;
         font-family: 'Inter', sans-serif;
         margin: 0;

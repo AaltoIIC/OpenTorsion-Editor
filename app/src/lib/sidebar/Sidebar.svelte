@@ -1,41 +1,24 @@
-<script lang="ts">
-    export let page: string = 'system editor';
-</script>
 <div class="main-sidebar">
-    <span class="logo-cont">
-        <a class="main-logo-link" data-sveltekit-preload-data="hover" href="/">
-            <img class="main-logo" src="../logo.svg" alt="OpenTorsion Editor Logo">
-        </a>
-        <span class="slash">/</span>
-        <span class="page">{page}</span>
-    </span>
+    <a href="/" class="logo-cont">
+        <img class="main-logo" src="./../favicon.svg" alt="OpenTorsion Editor Logo">
+        OpenTorsion Editor
+    </a>
     <slot></slot>
 </div>
 <style>
+    .main-logo {
+        width: 36px;
+        height: 36px;
+        display: block;
+        margin-right: 10px;
+    }
     .logo-cont {
         display: flex;
-        width: 100%;
         align-items: center;
+        height: 68px;
+        margin: 0 16px;
         text-decoration: none;
-    }
-    .slash {
-        font-size: 38px;
-        font-family: 'Roboto Mono' monospace;
-        font-weight: 150;
-        margin-left: -8px;
-    }
-    .page {
-        font-size: 16px;
-        font-family: 'Roboto Mono' monospace;
-        margin-left: 8px;
-    }
-    .main-logo {
-        width: 38px;
-        height: auto;
-        margin: 16px;
-        display: block;
-        z-index: 11;
-        position: relative;
+        font-weight: 550;
     }
     .main-sidebar {
         position: absolute;

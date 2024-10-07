@@ -268,7 +268,7 @@
             </Button>
         </svelte:fragment>
     </TopBar>
-    <Sidebar page="component editor">
+    <Sidebar>
         <ElementsList />
     </Sidebar>
 </div>
