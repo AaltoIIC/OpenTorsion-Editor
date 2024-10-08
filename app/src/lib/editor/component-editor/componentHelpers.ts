@@ -385,7 +385,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
         if (el.type === "Disk") {
             
             newNodes.push({
-                id: `${index + 1}`,
+                id: `${el.name}-${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
@@ -403,7 +403,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
         } else if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
 
             newNodes.push({
-                id: `${index + 1}`,
+                id: `${el.name}-${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
@@ -441,7 +441,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
             }
 
             newNodes.push({
-                id: `${index + 1}`,
+                id: `${el.name}-${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
@@ -462,7 +462,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
     // set the new flag for newly added nodes
     newNodes.forEach(node => {
         if (nodes.length !== 0 &&
-            !nodes.find(n => n.id === node.id)) {
+            !nodes.find(n => n.id.split('-')[0] === node.id.split('-')[0])) {
             node.data.new = true;
         }
     });

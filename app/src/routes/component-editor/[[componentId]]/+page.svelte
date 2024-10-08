@@ -135,18 +135,21 @@
 
     // handle pressing the back button
     const handleBack = () => {
+        const currentSystemId = $currentComponentJSON.id.split('-')[0];
+
         if ($currentComponentJSON.json.elements.length === 0 ||
         _.isEqual($currentComponentJSON.json, $customComponents.get($currentComponentJSON.id))
         ) {
             resetCurrentComponent();
             notification.set(null);
-            goto(`/system-editor/${$currentComponentJSON.id.split('-')[0]}`);
+            goto(`/system-editor/${currentSystemId}`);
         } else {
             dialogBox.openDialog("You have unsaved changes. Do you want to discard them?",
                 "Discard changes","Cancel").then((value: boolean) => {
                     if (value) {
                         resetCurrentComponent();
-                        goto(`/system-editor/${$currentComponentJSON.id.split('-')[0]}`);
+                        alert(currentSystemId);
+                        goto(`/system-editor/${currentSystemId}`);
                         notification.set(null);
                     }
                 });

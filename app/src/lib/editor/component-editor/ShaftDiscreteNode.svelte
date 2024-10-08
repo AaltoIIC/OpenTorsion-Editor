@@ -42,6 +42,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="shaft-outer"
+    id={data.data.name}
     bind:this={nodeElement}
     on:mouseenter={() => onHover = true}
     on:mouseleave={() => onHover = false}>

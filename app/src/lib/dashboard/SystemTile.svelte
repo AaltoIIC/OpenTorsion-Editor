@@ -87,13 +87,13 @@
         cursor: pointer;
         border-radius: var(--main-border-radius);
         border: var(--main-border);
+        background: linear-gradient(0deg, rgba(0,0,0,0) 10%, var(--main-color-tr) 100%);
     }
     .tile:hover {
         background-color: var(--main-hover-color);
     }
     .tile h4 {
         margin: 0;
-        color: rgba(255, 255, 255, 0.9);
     }
     .system-name-cont {
         display: flex;
@@ -101,9 +101,5 @@
     }
     .system-info {
         padding: 0 14px 14px 14px;
-        background-color: var(--main-dark-color);
-        border-bottom-left-radius: var(--main-border-radius);
-        border-bottom-right-radius: var(--main-border-radius);
-        color: rgba(255, 255, 255, 0.9);
     }
 </style>

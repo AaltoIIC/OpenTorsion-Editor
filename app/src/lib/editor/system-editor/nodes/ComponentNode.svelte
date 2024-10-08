@@ -202,10 +202,10 @@
     .main-component-node .img-cont {
         width: 200px;
         height: 200px;
-        background-color: rgba(255, 255, 255, 0.4);
-        border: 3px solid rgba(0, 0, 0, 0.08);
+        background-color: white;
+        border: 3px solid rgba(0, 0, 0, 0.07);
         backdrop-filter: blur(8px);
-        border-radius: var(--main-border-radius);
+        border-radius: 14px;
         overflow: hidden;
     }
     .hover .img-cont {

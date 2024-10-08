@@ -4,6 +4,14 @@
 <a data-sveltekit-preload-data="hover" href="/system-editor
 ">
     <div class="main-tile">
+        <span class="bg-icon">
+            <svg class="outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.85" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <svg class="inside" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+        </span>
         <p>Create New System</p>
         <div class="btn-cont">
             <Button
@@ -18,6 +26,19 @@
     </div>
 </a>
 <style>
+    .bg-icon * {
+        width: 212px;
+        height: 212px;
+        position: absolute;
+        bottom: -40px;
+        left: -60px;
+    }
+    .bg-icon .inside {
+        color: white;
+    }
+    .bg-icon .outline {
+        color: rgba(0, 0, 0, 0.06);
+    }
     .icon-arrow {
         width: 18px;
         height: 18px;
@@ -32,6 +53,7 @@
         margin: 0 0 15px 15px;
         position: relative;
         border: var(--main-border);
+        overflow: hidden;
     }
     .main-tile:hover {
         background-color: var(--main-hover-color);
@@ -39,7 +61,7 @@
     p {
         font-family: "Inter", sans-serif;
         font-size: 14px;
-        opacity: 0.7;
+        opacity: 0.9;
         width: max-content;
         position: absolute;
         top: calc(50% - 22px);
