@@ -16,6 +16,7 @@
         currentComponentJSON,
         customComponents,
         createComponent,
+        getComponent,
         saveCurrentComponent,
         notification,
         resetCurrentComponent,
@@ -66,10 +67,10 @@
             // load the system corresponding to the component
             setCurrentSystem(data.componentId.split('-')[0]);
 
-            originalName = $customComponents.get(data.componentId)?.name as string;
+            originalName = getComponent(data.componentId)?.name as string;
             currentComponentJSON.set({
                 id: data.componentId,
-                json: $customComponents.get(data.componentId) as ComponentType
+                json: getComponent(data.componentId) as ComponentType
             });
         } else {
             // component with name in url does not exist
@@ -148,7 +149,6 @@
                 "Discard changes","Cancel").then((value: boolean) => {
                     if (value) {
                         resetCurrentComponent();
-                        alert(currentSystemId);
                         goto(`/system-editor/${currentSystemId}`);
                         notification.set(null);
                     }

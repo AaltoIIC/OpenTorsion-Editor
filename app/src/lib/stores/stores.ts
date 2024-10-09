@@ -16,7 +16,7 @@ export const threeRenderer = writable<THREE.WebGLRenderer | null>(null);
 export const customComponents = persistentStore<Map<string, ComponentType>>('customComponents', new Map<string, ComponentType>()); // custom components persistent store
 
 export const getComponent = (id: string): ComponentType | null => {
-    return (get(customComponents).get(id) || null);
+    return _.cloneDeep(get(customComponents).get(id)) || null;
 }
 
 export const createComponent = (component: ComponentType | null = null, saveComponent: boolean = false) => {

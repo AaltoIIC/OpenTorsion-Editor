@@ -63,7 +63,7 @@ export const importSystem = (event: Event, createNew: boolean = true) => {
                     }
 
                     if (createNew) {
-                        let [id, sys] = createSystem(makeSystem(newJSON));
+                        let [id, sys] = createSystem(makeSystem(newJSON), true);
                         goto(`/system-editor/${id}`);
                     }  else {
                         currentSystemJSON.update(system => ({...system, json: makeSystem(newJSON)}));

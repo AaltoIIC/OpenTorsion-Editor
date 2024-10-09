@@ -45,7 +45,10 @@
 </script>
 <div class="template-cont">
     <div class="main-pdf-cont" bind:this={cont}>
-        <img class="main-logo" src="../logo.svg" alt="logo">
+        <span class="logo-cont">
+            <img class="main-logo" src="../favicon.svg" alt="logo">
+            OpenTorsion Editor
+        </span>
         <div class="main-header box">
             <div class="main-text">
                 <h1>Analysis Results</h1>
@@ -69,7 +72,15 @@
         </div>
         {#if ready && plots}
             {#each plots as {name, iframe}}
-            <div style="background: white; border-radius: 0.5em; width: 648px; height: 500px; overflow: hidden; margin: 26px auto; padding: 22px 0 42px 42px; position: relative;">
+            <div style={`background: white;
+                        border-radius: 0.5em;
+                        width: 648px;
+                        height: 500px;
+                        overflow: hidden;
+                        margin: 26px auto;
+                        padding: 22px 0 42px 42px;
+                        position: relative;
+                        border: solid 2px rgb(240, 240, 240);`}>
                 <p style="position: absolute; top: 8px; left: 50%; font-size: 16px; font-weight: 550; color: rgba(0, 0, 0, 0.9); transform: translateX(-50%);">
                     {name}
                 </p>
@@ -105,15 +116,23 @@
         font-size: 14px;
     }
     .main-logo {
-        width: 140px;
+        width: 52px;
         height: auto;
-        margin: 1.5em;
+        margin-right: 10px;
+    }
+    .logo-cont {
+        padding: 1.5em 0 0.5em 1.5em;
+        display: flex;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 550;
+        color: rgb(30, 30, 30);
     }
     .main-pdf-cont {
         width: 1000px;
         height: fit-content;
         padding: 0;
-        background-color: rgb(245, 245, 245);
+        background-color: rgb(250, 250, 250);
     }
     .info-cont {
         display: flex;
@@ -139,6 +158,7 @@
         background-color: white;
         border-radius: 0.5em;
         width: fit-content;
+        border: solid 2px rgb(240, 240, 240);
     }
     .main-text {
         width: fit-content;

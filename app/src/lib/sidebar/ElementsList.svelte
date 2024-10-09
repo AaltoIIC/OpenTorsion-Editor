@@ -270,7 +270,7 @@
     .element-list {
         width: 100%;
         background: white;
-        height: calc(100vh - 126px);
+        height: calc(100vh - 162px);
         padding-top: 5px;
         border-top: var(--main-border);
     }

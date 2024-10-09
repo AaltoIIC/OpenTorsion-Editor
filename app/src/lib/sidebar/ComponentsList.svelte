@@ -77,7 +77,7 @@
     }
     .component-list {
         width: 360px;
-        height: calc(100vh - 126px);
+        height: calc(100vh - 162px);
         overflow-y: scroll;
         background: white;
         border-top: var(--main-border);

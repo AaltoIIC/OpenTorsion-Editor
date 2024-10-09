@@ -317,6 +317,7 @@
     .tile {
         background: white;
         border-radius: var(--main-border-radius);
+        border: var(--main-border);
         width: 648px;
         height: 500px;
         overflow: hidden;

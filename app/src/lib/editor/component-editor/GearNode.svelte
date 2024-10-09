@@ -3,14 +3,13 @@
     import type { ElementType } from '$lib/types/types';
     import { possibleParams } from './componentHelpers';
     import DragAndDropHandle from './DragAndDropHandle.svelte';
-    import { onMount } from 'svelte';
+    import { eventBus } from '$lib/stores/eventBus';
    
     $$restProps
 
     let nodeElement: any;
     let layoverElement: any;
     export let data: {
-        new: boolean;
         nodeNo: string;
         data: ElementType;
     };
@@ -28,14 +27,12 @@
         event.dataTransfer.effectAllowed = 'move';
     };
 
-    onMount(() => {
-        if (data.new) {
-            setTimeout(() => {
-                layoverElement.show(
-                    nodeElement.getBoundingClientRect().left,
-                    nodeElement.getBoundingClientRect().top + 60
-                );
-            }, 200);
+    eventBus.listen('newElementPopup', (name: string) => {
+        if (name === data.data.name && layoverElement) {
+            layoverElement.show(
+                nodeElement.getBoundingClientRect().left,
+                nodeElement.getBoundingClientRect().top + 60
+            )
         }
     });
 </script>

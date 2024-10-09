@@ -34,8 +34,8 @@
 <style>
     .cookie-notice {
         position: fixed;
-        bottom: 15px;
-        left: 15px;
+        bottom: 16px;
+        left: 16px;
         width: 300px;
         height: fit-content;
         color: rgba(0, 0, 0, 0.9);

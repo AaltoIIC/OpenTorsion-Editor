@@ -4,7 +4,7 @@
     export let description: string;
     export let icon: string;
 </script>
-<a href={link}>
+<a href={link} target="_blank">
     <div class="resource-tile">
         <h4>{name}</h4>
         <p>{description}</p>

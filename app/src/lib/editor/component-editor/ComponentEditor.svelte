@@ -8,13 +8,12 @@
       Background,
       BackgroundVariant,
       useSvelteFlow,
-
       type NodeTypes,
       type Node
 
     } from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
-
+    import { eventBus } from '$lib/stores/eventBus';
     import EmptyNode from './EmptyNode.svelte';
     import DiskNode from './DiskNode.svelte';
     import ShaftDiscreteNode from './ShaftDiscreteNode.svelte';
@@ -75,8 +74,14 @@
       }
       if (data.event === 'addNew') {
         currentComponentJSON.update(value => {
-          let newVal = {...value};
-          newVal.json.elements = [...value.json.elements, defaultElement((value.json.elements ? value.json.elements : []), data.element)]
+          const newVal = {...value};
+          const newElem = defaultElement((value.json.elements ? value.json.elements : []), data.element)
+          newVal.json.elements = [...value.json.elements, newElem]
+          
+          setTimeout(() => {
+            eventBus.dispatch('newElementPopup', newElem.name);
+          }, 200);
+          
           return newVal;
         });
       }

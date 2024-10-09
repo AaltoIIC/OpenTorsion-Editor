@@ -385,12 +385,11 @@ export const updateComponentEditor = (nodes: Node[]) => {
         if (el.type === "Disk") {
             
             newNodes.push({
-                id: `${el.name}-${index + 1}`,
+                id: `${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: nodeNo.toString(),
-                    new: false,
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
@@ -403,12 +402,11 @@ export const updateComponentEditor = (nodes: Node[]) => {
         } else if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
 
             newNodes.push({
-                id: `${el.name}-${index + 1}`,
+                id: `${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: `${nodeNo}-${nodeNo+1}`,
-                    new: false,
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
@@ -441,12 +439,11 @@ export const updateComponentEditor = (nodes: Node[]) => {
             }
 
             newNodes.push({
-                id: `${el.name}-${index + 1}`,
+                id: `${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
                     nodeNo: nodeNo.toString(),
-                    new: false,
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
@@ -456,14 +453,6 @@ export const updateComponentEditor = (nodes: Node[]) => {
             });
 
             currentX += 21;
-        }
-    });
-
-    // set the new flag for newly added nodes
-    newNodes.forEach(node => {
-        if (nodes.length !== 0 &&
-            !nodes.find(n => n.id.split('-')[0] === node.id.split('-')[0])) {
-            node.data.new = true;
         }
     });
 

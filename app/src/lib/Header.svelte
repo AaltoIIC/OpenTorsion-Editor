@@ -1,7 +1,10 @@
+<script>
+    import { version } from '$app/environment'
+</script>
 <div class="main-header">
     <a href="/" class="logo-cont">
         <img class="main-logo" src="./../favicon.svg" alt="OpenTorsion Editor Logo">
-        OpenTorsion Editor
+        OpenTorsion Editor <sub>{version}</sub>
     </a>
     <p class="links">
         <a href="https://github.com/AaltoIIC/OpenTorsion-Interface/wiki/User-Guide">
@@ -42,6 +45,13 @@
         margin: 0 24px;
         text-decoration: none;
         font-weight: 550;
+    }
+    .logo-cont sub {
+        font-size: 10px;
+        position: relative;
+        top: -3.5px;
+        left: 3px;
+        color: rgba(0, 0, 0, 0.6);
     }
     .links {
         display: flex;

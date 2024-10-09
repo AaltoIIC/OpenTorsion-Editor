@@ -132,7 +132,7 @@
         font-size: 14px;
     }
     .screen {
-        background-color: white;
+        background-color: var(--main-grey-color);
         position: fixed;
         top: 0;
         left: 0;

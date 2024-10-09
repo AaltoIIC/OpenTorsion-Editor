@@ -1,6 +1,6 @@
 {
 	"name": "opentorsion-interface",
-	"version": "0.0.1",
+	"version": "1.0",
 	"private": true,
 	"scripts": {
 		"dev": "set NODE_ENV=development && concurrently \"vite dev\" \"python ../server/app.py\"",

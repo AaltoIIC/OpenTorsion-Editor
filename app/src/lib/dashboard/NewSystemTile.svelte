@@ -1,9 +1,13 @@
 <script lang="ts">
     import Button from "$lib/Button.svelte";
+    let hover = false;
 </script>
 <a data-sveltekit-preload-data="hover" href="/system-editor
 ">
-    <div class="main-tile">
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="main-tile {hover ? 'hover' : ''}"
+        on:mouseenter={() => hover = true}
+        on:mouseleave={() => hover = false}>
         <span class="bg-icon">
             <svg class="outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.85" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -36,6 +40,9 @@
     .bg-icon .inside {
         color: white;
     }
+    .hover .bg-icon .inside {
+        color: var(--main-hover-color);
+    }
     .bg-icon .outline {
         color: rgba(0, 0, 0, 0.06);
     }
@@ -55,7 +62,7 @@
         border: var(--main-border);
         overflow: hidden;
     }
-    .main-tile:hover {
+    .main-tile.hover {
         background-color: var(--main-hover-color);
     }
     p {

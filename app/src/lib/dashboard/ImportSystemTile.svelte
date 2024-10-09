@@ -3,11 +3,13 @@
     import Button from "$lib/Button.svelte";
 
     let fileInput: HTMLInputElement;
-
+    let hover = false;
 </script>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="main-tile"
+<div class="main-tile {hover ? 'hover' : ''}"
+    on:mouseenter={() => hover = true}
+    on:mouseleave={() => hover = false}
     on:click={() => fileInput.click()}>
     <span class="bg-icon">
         <svg class="outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
@@ -45,6 +47,9 @@
     .bg-icon .inside {
         color: white;
     }
+    .hover .bg-icon .inside {
+        color: var(--main-hover-color);
+    }
     .bg-icon .outline {
         color: rgba(0, 0, 0, 0.06);
     }
@@ -64,7 +69,7 @@
         border: var(--main-border);
         overflow: hidden;
     }
-    .main-tile:hover {
+    .main-tile.hover {
         background-color: var(--main-hover-color);
     }
     p {
