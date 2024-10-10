@@ -9,6 +9,7 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
+    import TableEditor from '$lib/editor/component-editor/TableEditor.svelte';
     import DialogBox from '$lib/DialogBox.svelte';
     import {
         currentSystemJSON,
@@ -29,6 +30,7 @@
     import { exportJSON, importComponent } from '$lib/utils';
     import NameField from '$lib/NameField.svelte';
     import TopBar from '$lib/TopBar.svelte';
+    import Tabs from '$lib/Tabs.svelte';
     import {
         handleJSONEditing,
         handleNameChange,
@@ -36,6 +38,7 @@
     } from '$lib/editor/component-editor/componentHelpers';
     
     let fileInput: HTMLInputElement;
+    let selectedEditor: string;
 
     let componentEditor: any;
     let isNameError = false;
@@ -157,7 +160,7 @@
     }
     
     let editorElement: HTMLElement;
-    let jsonEditorHeight = 200;
+    let jsonEditorHeight = 220;
     let jsonEditorHeightPx = "";
     $: jsonEditorHeightPx = `${jsonEditorHeight}px`;
     $: flowEditorHeight = `calc(100% - ${jsonEditorHeight}px)`;
@@ -212,10 +215,15 @@
             <div class="resize-slider"
                 on:mousedown={() => {isResizing = true;}}>
             </div>
-            <JSONEditor
-                bind:this={JSONEditorComponent}
-                bind:textContent={JSONEditorText}
-                onInput={(text) => {isError = !handleJSONEditing(text, originalName)}} />
+            <Tabs bind:selectedTab={selectedEditor} tabs={["Table", "JSON"]} />
+            {#if selectedEditor === "Table"}
+                <TableEditor />
+            {:else}
+                <JSONEditor
+                    bind:this={JSONEditorComponent}
+                    bind:textContent={JSONEditorText}
+                    onInput={(text) => {isError = !handleJSONEditing(text, originalName)}} />
+            {/if}
         </div>
     </div>
     <TopBar>
@@ -292,6 +300,7 @@
     }
     .json-editor {
         height: var(--json-editor-height);
+        position: relative;
     }
     .link-element {
         color: rgba(255, 255, 255, 0.9);
