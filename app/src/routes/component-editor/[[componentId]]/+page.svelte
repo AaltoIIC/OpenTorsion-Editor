@@ -301,6 +301,8 @@
     .json-editor {
         height: var(--json-editor-height);
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
     .link-element {
         color: rgba(255, 255, 255, 0.9);

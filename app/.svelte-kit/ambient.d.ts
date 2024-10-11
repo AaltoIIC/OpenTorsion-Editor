@@ -36,7 +36,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_7948: string;
+	export const EFC_8164: string;
 	export const FNM_ARCH: string;
 	export const FNM_COREPACK_ENABLED: string;
 	export const FNM_DIR: string;
@@ -46,8 +46,6 @@ declare module '$env/static/private' {
 	export const FNM_RESOLVE_ENGINES: string;
 	export const FNM_VERSION_FILE_STRATEGY: string;
 	export const FORCE_COLOR: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
@@ -144,7 +142,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_7948: string;
+		EFC_8164: string;
 		FNM_ARCH: string;
 		FNM_COREPACK_ENABLED: string;
 		FNM_DIR: string;
@@ -154,8 +152,6 @@ declare module '$env/dynamic/private' {
 		FNM_RESOLVE_ENGINES: string;
 		FNM_VERSION_FILE_STRATEGY: string;
 		FORCE_COLOR: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
 		HOME: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;

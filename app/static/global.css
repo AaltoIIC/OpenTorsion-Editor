@@ -54,12 +54,13 @@ h1, h2, h3, h4, p, a {
 
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgb(215, 215, 215);
     cursor: pointer;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgb(200, 200, 200);
 }

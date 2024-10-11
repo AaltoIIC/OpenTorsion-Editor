@@ -350,6 +350,36 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
     }
 }
 
+// function to get a map of element names to their respective OpenTorsion node numbers
+export const assignNodeNumbers = (elements: ElementType[]): Record<string, string> => {
+    let nodeNo = 0;
+    let nodeNumbers: Record<string, string> = {};
+    elements.forEach((el, index) => {
+        if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
+            nodeNumbers[el.name] = `${nodeNo}-${nodeNo+1}`;
+            if (elements[index + 1] &&
+                elements[index + 1].type !== "ShaftDiscrete" &&
+                elements[index + 1].type !== "ShaftContinuous") {
+                nodeNo += 1;
+            }
+        } else if (el.type === "GearElement") {
+            nodeNumbers[el.name] = nodeNo.toString();
+
+            // if the gear has a valid parent, increment nodeNo
+            if (el.parent && el.parent !== el.name &&
+                elements.find(el2 => el2.name === el.parent)?.type === "GearElement"
+            ) {
+                nodeNo += 1;
+            }
+        } else {
+            nodeNumbers[el.name] = nodeNo.toString();
+        }
+
+    });
+
+    return nodeNumbers;
+}
+
 
 // function to update the nodes in the component editor
 // based on currentComponentJSON
@@ -379,7 +409,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
     let branches = new Map<string, Junction>();
 
     // OpenTorsion node number
-    let nodeNo = 0;
+    let nodeNos = assignNodeNumbers(currentJSON.elements);
     // loop through elements and create nodes
     currentJSON.elements.forEach((el: ElementType, index: number) => {   
         if (el.type === "Disk") {
@@ -389,7 +419,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
                 type: el.type,
                 dragHandle: '.none',
                 data: {
-                    nodeNo: nodeNo.toString(),
+                    nodeNo: nodeNos[el.name],
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
@@ -400,13 +430,12 @@ export const updateComponentEditor = (nodes: Node[]) => {
             currentX += 21;
 
         } else if (el.type === "ShaftDiscrete" || el.type === "ShaftContinuous") {
-
             newNodes.push({
                 id: `${index + 1}`,
                 type: el.type,
                 dragHandle: '.none',
                 data: {
-                    nodeNo: `${nodeNo}-${nodeNo+1}`,
+                    nodeNo: nodeNos[el.name],
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
@@ -415,16 +444,10 @@ export const updateComponentEditor = (nodes: Node[]) => {
                 position: { x: currentX, y: currentY }
             });
             currentX += 72;
-
-            if (currentJSON.elements[index + 1] &&
-                currentJSON.elements[index + 1].type !== "ShaftDiscrete") {
-                nodeNo += 1;
-            }
+        
         } else if (el.type === "GearElement") {
             // check if the gear has a parent
             if (el.parent && branches.get(el.parent) && el.name !== el.parent) {
-                nodeNo += 1;
-
                 // add element to branches with shared value across all gears with the same parent
                 branches.set(el.name, branches.get(el.parent) as Junction);
 
@@ -443,7 +466,7 @@ export const updateComponentEditor = (nodes: Node[]) => {
                 type: el.type,
                 dragHandle: '.none',
                 data: {
-                    nodeNo: nodeNo.toString(),
+                    nodeNo: nodeNos[el.name],
                     data: _.pick(el, [
                         ...possibleParams[el.type].required,
                         ...possibleParams[el.type].optional
