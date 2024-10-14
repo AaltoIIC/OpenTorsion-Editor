@@ -1,7 +1,7 @@
 <script lang="ts">
     import ElementLayover from './element-layover/ElementLayover.svelte';
     import type { ElementType } from '$lib/types/types';
-    import { possibleParams } from './componentHelpers';
+    import { possibleParams } from './params';
     import DragAndDropHandle from './DragAndDropHandle.svelte';
     import { eventBus } from '$lib/stores/eventBus';
    

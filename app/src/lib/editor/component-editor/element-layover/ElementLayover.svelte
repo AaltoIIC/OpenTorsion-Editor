@@ -3,7 +3,8 @@
     import Portal from "svelte-portal";
     import type { ElementType, ExcitationType } from '$lib/types/types';
     import { isExcitationType } from '$lib/types/typeguards';
-    import { editElement, paramUnits } from '../componentHelpers';
+    import { editElement } from '../componentHelpers';
+    import { paramUnits } from '../params';
     import { currentComponentJSON, highlightLinesInEditor } from '../../../stores/stores';
     import { nthLinesInJSON } from '$lib/utils';
     import LayoverProperty from './LayoverProperty.svelte';

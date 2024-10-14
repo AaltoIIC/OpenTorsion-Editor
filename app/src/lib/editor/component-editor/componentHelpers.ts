@@ -1,7 +1,8 @@
-import type { ElementType, ComponentType, GearElementType } from '$lib/types/types';
+import type { ElementType, ComponentType } from '$lib/types/types';
 import { currentComponentJSON, notification, customComponents } from '$lib/stores/stores';
+import { possibleParams } from '$lib/editor/component-editor/params';
 import { isNameValid, isNameUnique } from '$lib/utils';
-import { get, type Writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import { isElementType } from '$lib/types/typeguards';
 import type { Node } from '@xyflow/svelte';
 import _ from 'lodash';
@@ -284,35 +285,6 @@ export const nameElement = (type: string, elements: ElementType[]) => {
     return `${type} ${largestNum ? largestNum + 1 : 1}`;
 }
 
-// object with possible parameters for each element type
-export const possibleParams = {
-    Disk: {
-        required: ["name", "type", "damping", "inertia"],
-        optional: ["excitation"]
-    },
-    ShaftDiscrete: {
-        required: ["name", "type", "damping", "stiffness"],
-        optional: ["excitation"]
-    },
-    ShaftContinuous: {
-        required: ["name", "type", "damping", "length", "innerDiameter", "outerDiameter"],
-        optional: ["density","excitation"]
-    },
-    GearElement: {
-        required: ["name", "type", "inertia", "diameter"],
-        optional: ["parent", "teeth", "excitation"]
-    }
-}
-export const paramUnits: Record<string, string> = {
-    "damping": "Nms/rad",
-    "inertia": "kgm²",
-    "stiffness": "Nm/rad",
-    "length": "mm",
-    "innerDiameter": "mm",
-    "outerDiameter": "mm",
-    "density": "kg/m³"
-}
-
 // function to construct a default element based on the type
 export const defaultElement = (elements: ElementType[], type: string): ElementType => {
     if (type === "Disk") {
@@ -348,6 +320,16 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
     } else {
         throw new Error("Invalid element type");
     }
+}
+
+// function to add an element of a certain type to the current component
+export const addElement = (type: string) => {
+    currentComponentJSON.update(value => {
+        let newVal = {...value};
+        newVal.json.elements = [...value.json.elements,
+            defaultElement((value.json.elements ? value.json.elements : []), type)];
+        return newVal;
+    });
 }
 
 // function to get a map of element names to their respective OpenTorsion node numbers
