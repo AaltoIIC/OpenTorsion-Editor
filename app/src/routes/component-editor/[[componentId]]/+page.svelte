@@ -9,7 +9,7 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import ElementsList from '$lib/sidebar/ElementsList.svelte';
     import JSONEditor from "$lib/editor/JSONEditor.svelte";
-    import TableEditor from '$lib/editor/component-editor/TableEditor.svelte';
+    import TableEditor from '$lib/editor/component-editor/table-editor/TableEditor.svelte';
     import DialogBox from '$lib/DialogBox.svelte';
     import {
         currentSystemJSON,

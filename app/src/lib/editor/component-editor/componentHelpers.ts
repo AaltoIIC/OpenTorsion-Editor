@@ -218,7 +218,7 @@ export const findComponentOutputs = (elements: ElementType[]): string[] => {
 }
 
 // edit an element in the list of elements
-// removeUndefined: if true, undefined values in newValues are removed even if they were previously defined
+// removeUndefined: if true, undefined or empty values in newValues are removed even if they were previously defined
 export const editElement = (elements: ElementType[] | undefined,
     elementName: string,
     newValues: Partial<ElementType>,
@@ -232,7 +232,8 @@ export const editElement = (elements: ElementType[] | undefined,
             let newEl: ElementType = {...el, ...newValues} as ElementType;
             
             if (removeUndefined) {
-                const undefinedKeys = Object.keys(newValues).filter(key => (newValues as any)[key] === undefined);
+                const undefinedKeys = Object.keys(newValues)
+                    .filter(key => (newValues as any)[key] === undefined || (newValues as any)[key] === "");
                 newEl = _.omit(newEl, undefinedKeys) as ElementType;
             }
 
@@ -315,7 +316,7 @@ export const defaultElement = (elements: ElementType[], type: string): ElementTy
             name: nameElement('Gear', elements),
             type: "GearElement",
             inertia: 5.72e+03,
-            diameter: 0.23
+            diameter: 230
         }
     } else {
         throw new Error("Invalid element type");

@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ExcitationType } from "$lib/types/types";
     import { camelToTitle } from "$lib/utils";
+    import { paramTypes } from "../params";
 
     export let isEditing: boolean;
     export let paramName: string;
@@ -105,7 +106,8 @@
         }</span><span class="param-colon">:</span>
     </span>
     <span class="param-val-outer">
-        <input type="text"
+        <input
+            type={paramTypes[paramName] === "number" ? "number" : "text"}
             name={paramName}
             on:input={handleChange}
             on:focus={() => {inFocus = true}}
@@ -114,7 +116,7 @@
             readonly="{paramName === "type"}"
             value={displayValue}
             style={`width: ${typeof paramValue !== 'undefined' ? displayValue?.toString().length : "4"}ch;`}
-            />
+        />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <svg
@@ -227,5 +229,16 @@
         display: flex;
         justify-content: space-between;
         font-family: "Roboto Mono", monospace;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        appearance: textfield;
+        -moz-appearance: textfield;
     }
 </style>

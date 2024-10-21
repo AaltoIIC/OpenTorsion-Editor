@@ -319,17 +319,4 @@
         line-height: 18px;
         tab-size: 2;
     }
-
-    ::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        cursor: pointer;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.15);
-    }
 </style>

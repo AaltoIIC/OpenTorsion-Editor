@@ -4,7 +4,7 @@
     import type { ElementType, ExcitationType } from '$lib/types/types';
     import { isExcitationType } from '$lib/types/typeguards';
     import { editElement } from '../componentHelpers';
-    import { paramUnits } from '../params';
+    import { paramUnits, paramTypes } from '../params';
     import { currentComponentJSON, highlightLinesInEditor } from '../../../stores/stores';
     import { nthLinesInJSON } from '$lib/utils';
     import LayoverProperty from './LayoverProperty.svelte';
@@ -140,6 +140,14 @@
             if (isEditing) {
                 currentComponentJSON.update(value => {
                 let newVal = {...value};
+
+                // go throguh allProperties and change empty strings to 0 for number type parameters
+                Object.entries(allProperties).forEach(([key, value]) => {
+                    if (paramTypes[key] === 'number' && value === '') {
+                        (allProperties as any)[key] = 0;
+                    }
+                });
+
                 newVal.json.elements =  editElement(value.json.elements, params.name, allProperties, true);
                 return newVal;
                 })

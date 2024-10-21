@@ -2,14 +2,13 @@
     import {
         assignNodeNumbers,
         addElement
-    } from "./componentHelpers";
+    } from "../componentHelpers";
     import {
-        possibleParams,
-        paramTypes
-    } from "./params";
+        possibleParams
+    } from "../params";
     import { currentComponentJSON } from "$lib/stores/stores";
-    import type { ElementType } from "$lib/types/types";
     import { onMount } from "svelte";
+    import TableCell from "./TableCell.svelte";
 
     let elements: Record<string, any>[];
     let nodeNos: Record<string, string> = {};
@@ -28,68 +27,9 @@
         possibleParamsList[key] = [...value.required, ...value.optional];
     });
 
-    const columnLengths: Record<string, number> = {};
-    const updateColLengths = (paramName: string) => {
-        let newLength = paramName.length;
-        $currentComponentJSON.json.elements.forEach((element: ElementType) => {
-            if (element[paramName as keyof ElementType] &&
-                (element[paramName as keyof ElementType]?.toString() || "").length > newLength) {
-                newLength = (element[paramName as keyof ElementType]?.toString() || "").length;
-            }
-        });
-        columnLengths[paramName] = newLength;
-    };
-
-    let isError: null | {param: string, elem: string} = null;
-
-    let editedCell: {elem: string, param: string, value: string} | null = null;
-    const handleFocus = (elemName: string, paramName: string) => {
-        editedCell = {
-            elem: elemName,
-            param: paramName,
-            value: elements.find(element => element.name === elemName)?.[paramName] || ""
-        };
-    };
-
-    const handleInput = (e: Event) => {
-        const paramVal = (e.target as HTMLInputElement).value;
-
-        currentComponentJSON.update(val => {
-            val.json.elements = val.json.elements.map(element => {
-                if (element.name === editedCell?.elem) {
-                    // milyen checkek legyenek?
-                    // type check (es eleve parseolja)
-                    // ha uresen van hagyva, torolje a key-t
-                    // nevet csekkolja hogy egyedi-e
-                    if (editedCell?.param === "name") {
-                        const elemNames = val.json.elements.map(e => e.name);
-                        if (elemNames.includes(paramVal)) {
-                            console.log("Name already exists");
-                            isError = {param: editedCell.param, elem: editedCell.elem};
-                            return element;
-                        }
-                    }
-
-                    element = {
-                        ...element,
-                        [editedCell.param]: paramVal
-                    };
-                }
-                return element;
-            });
-            return val;
-        });
-
-        // update columnLengths
-        updateColLengths(editedCell?.param || '');
-    };
-
     currentComponentJSON.subscribe(value => {
         elements = value.json.elements as Record<string, any>[];
         nodeNos = assignNodeNumbers(value.json.elements);
-        columns.forEach(column => {
-            updateColLengths(column);
-        }); 
     });
 
 
@@ -179,7 +119,6 @@
             }
         });
     });
-
 </script>
 
 <div class="table-outer"
@@ -192,41 +131,27 @@
                 <th>{column}</th>
             {/each}
         </tr>
-        {#each elements as element}
+        {#each elements as element (element.name)}
             <tr on:mouseenter={() => hoveredElement = element.name}
                 class={hoveredElement === element.name ? 'hover' : ''}>
                 <td class="nodeNo">{nodeNos[element.name]}</td>
-                <td>
-                    <input
-                        type="text" value={element['name']}
-                        style={`width: ${columnLengths['name']*9.5 + 15}px;`}
-                        class="{(isError &&
-                            isError.param === 'name' &&
-                            isError.elem === element.name ? 'name-error' : '')}"
-                        on:focus={() => handleFocus(element.name, 'name')}
-                        on:input={handleInput}
-                    />
-                </td>
-                <td class="no-edit">{element.type}</td>
+                <TableCell
+                    editable={true}
+                    element={element['name']}
+                    param="name"
+                />
+                <TableCell
+                    editable={false}
+                    element={element['name']}
+                    param="type"
+                />
                 {#each columns.slice(3) as column }
-                    {#if possibleParamsList[element.type]?.includes(column)}
-                        <td>
-                            <input
-                                type={
-                                    paramTypes[column] === "number" ? "number" : "text"
-                                }
-                                value={element[column] ? element[column] : ""}
-                                style={`width: ${
-                                    (columnLengths[column]*9 + (paramTypes[column] === "number" ? 15 : 0))
-                                    }px;`}
-                                on:focus={() => handleFocus(element.name, column)}
-                                on:input={handleInput}
-                            />
-                        </td>
-                    {:else}
-                        <td class="no-edit">
-                        </td>
-                    {/if}
+                    <TableCell
+                        editable={possibleParamsList[element.type]?.includes(column)}
+                        element={element['name']}
+                        param={column}
+                        required={possibleParams[element.type]?.required.includes(column)}
+                    />
                 {/each}
                 <div class="action-cont">
                     <div class="action-inner">
@@ -278,14 +203,14 @@
 <style>
     .action-cont {
         position: absolute;
-        right: 0;
+        right: -104px;
         width: 100%;
         pointer-events: none;
     }
     .action-inner {
         width: fit-content;
         position: sticky;
-        left: calc(100vw - 470px);
+        left: calc(100vw - 476px);
         pointer-events: all;
         margin-top: 4px;
         display: flex;
@@ -449,17 +374,10 @@
         content: "";
         position: absolute;
         top: 0;
-        right: -1px;
-        width: 1px;
+        right: 0px;
+        width: 2px;
         height: 100%;
         background-color: white;
-    }
-    input {
-        padding: 8px;
-        border: none;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 14px;
-        background-color: rgba(0, 0, 0, 0.03);
     }
     .no-edit {
         white-space: nowrap;

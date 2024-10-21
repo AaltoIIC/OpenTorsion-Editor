@@ -1,5 +1,5 @@
 // object with possible parameters for each element type
-export const possibleParams = {
+export const possibleParams: Record<string, Record<string, string[]>> = {
     Disk: {
         required: ["name", "type", "damping", "inertia"],
         optional: ["excitation"]
@@ -24,6 +24,7 @@ export const paramUnits: Record<string, string> = {
     "length": "mm",
     "innerDiameter": "mm",
     "outerDiameter": "mm",
+    "diameter": "mm",
     "density": "kg/m³"
 }
 
