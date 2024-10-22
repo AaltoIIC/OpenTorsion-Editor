@@ -5,7 +5,7 @@ OpenTorsion Editor is a web application to make it easier to use the [OpenTorsio
 
 [![GitHub stars](https://img.shields.io/github/stars/AaltoIIC/OpenTorsion-Interface.svg)](https://github.com/AaltoIIC/OpenTorsion-Interface) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/AaltoIIC/OpenTorsion-Interface/blob/main/LICENSE)
 
-![Screenshot](https://github.com/AaltoIIC/OpenTorsion-Interface/blob/main/docs/images/screenshots.jpg?raw=true "Screenshot")
+![Screenshot](https://github.com/AaltoIIC/OpenTorsion-Editor/blob/main/docs/images/screenshots.png?raw=true "Screenshot")
 
 Features include:
 - Creating systems, each consisting of multiple components
