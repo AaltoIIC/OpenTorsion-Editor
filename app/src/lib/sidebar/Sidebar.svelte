@@ -3,7 +3,7 @@
 </script>
 <div class="main-sidebar">
     <a href="/" class="logo-cont">
-        <img class="main-logo" src="./../favicon.svg" alt="OpenTorsion Editor Logo">
+        <img class="main-logo" src="./../icon.svg" alt="OpenTorsion Editor Logo">
         OpenTorsion Editor <sub>{version}</sub>
     </a>
     <slot></slot>

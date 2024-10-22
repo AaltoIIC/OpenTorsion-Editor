@@ -238,7 +238,7 @@
             </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="link-element"
+            <span class="link-element import-btn"
                 on:click={() => fileInput.click()}>
                 Import
             </span>
@@ -250,7 +250,7 @@
                 accept=".json">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="link-element"
+            <span class="link-element analysis-btn"
                 on:click={handleAnalysis}>
                 Analysis
             </span>
@@ -333,5 +333,15 @@
         left: 0;
         width: 100vw;
         height: 100vh;
+    }
+    @media (max-width: 1300px) {
+        .import-btn {
+            display: none;
+        }
+    }
+    @media (max-width: 1200px) {
+        .analysis-btn {
+            display: none;
+        }
     }
 </style>

@@ -3,7 +3,7 @@
 </script>
 <div class="main-header">
     <a href="/" class="logo-cont">
-        <img class="main-logo" src="./../favicon.svg" alt="OpenTorsion Editor Logo">
+        <img class="main-logo" src="./../icon.svg" alt="OpenTorsion Editor Logo">
         OpenTorsion Editor <sub>{version}</sub>
     </a>
     <p class="links">
@@ -62,5 +62,15 @@
     .links a {
         text-decoration: none;
         font-size: 14px;
+    }
+
+    @media (max-width: 1100px) {
+        .main-header {
+            width: calc(100% - 20px);
+            left: 10px;
+        }
+        .links {
+            display: none;
+        }
     }
 </style>

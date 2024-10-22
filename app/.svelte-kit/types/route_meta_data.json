@@ -1,12 +1,21 @@
 {
-	"/": [],
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
 	"/analysis/[id]": [
-		"src/routes/analysis/[id]/+page.ts"
+		"src/routes/analysis/[id]/+page.ts",
+		"src/routes/+layout.ts"
 	],
 	"/component-editor/[[componentId]]": [
-		"src/routes/component-editor/[[componentId]]/+page.ts"
+		"src/routes/component-editor/[[componentId]]/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/mobile": [
+		"src/routes/+layout.ts"
 	],
 	"/system-editor/[[systemId]]": [
-		"src/routes/system-editor/[[systemId]]/+page.ts"
+		"src/routes/system-editor/[[systemId]]/+page.ts",
+		"src/routes/+layout.ts"
 	]
 }

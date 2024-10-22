@@ -201,7 +201,7 @@
             </span>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span on:click={() => fileInput.click()} class="link-element">
+            <span on:click={() => fileInput.click()} class="link-element import-btn">
                 Import
             </span>
             <input type="file" class="hidden"
@@ -306,5 +306,10 @@
         left: 0;
         width: 100vw;
         height: 100vh;
+    }
+    @media (max-width: 1200px) {
+        .import-btn {
+            display: none;
+        }
     }
 </style>

@@ -46,7 +46,7 @@
 <div class="template-cont">
     <div class="main-pdf-cont" bind:this={cont}>
         <span class="logo-cont">
-            <img class="main-logo" src="../favicon.svg" alt="logo">
+            <img class="main-logo" src="../icon.svg" alt="logo">
             OpenTorsion Editor
         </span>
         <div class="main-header box">
