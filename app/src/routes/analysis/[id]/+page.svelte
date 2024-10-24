@@ -15,6 +15,7 @@
     import Button from "$lib/Button.svelte";
     import PdfTemplate from "$lib/analysis/PdfTemplate.svelte";
     import { formatDate, trimText } from "$lib/utils";
+    import { API_URL } from "../../../config.js";
     
     // load the system or component data from the store
     export let data;
@@ -64,9 +65,8 @@
 
     const runAnalysis = () => {
         isError = false;
-        let url = "/api/analysis";
         let data = $currentSystemJSON.json;
-        fetch(url, {
+        fetch(`${API_URL}/analysis`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -207,6 +207,7 @@
         transform: translateY(-100%);
         display: flex;
         align-items: center;
+        border: var(--main-border);
     }
     .error-desc {
         width: 300px;

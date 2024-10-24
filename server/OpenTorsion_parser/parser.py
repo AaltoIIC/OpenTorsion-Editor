@@ -88,7 +88,7 @@ def parse(json):
                 parent_gear = None
 
                 if ('parent' in element and
-                    f'{component['name']}.{element['parent']}' in elements['gears']):
+                    f'{component["name"]}.{element["parent"]}' in elements['gears']):
                     i += 1
                     parent_gear = elements['gears'][f'{component["name"]}.{element["parent"]}']
 

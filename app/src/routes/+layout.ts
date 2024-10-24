@@ -1,5 +1,7 @@
 import { browser } from '$app/environment';
 
+export const ssr = false;
+
 const minWidth = 1140;
 const mobilePath = '/mobile';
 
@@ -9,4 +11,4 @@ export function load() {
         window.location.href = mobilePath;
       }
     }
-  }
+}
