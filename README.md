@@ -1,4 +1,4 @@
-# OpenTorsion Editor
+# <img src="https://github.com/AaltoIIC/OpenTorsion-Editor/blob/main/docs/images/logo.svg?raw=true" height="32px" /> OpenTorsion Editor
 OpenTorsion Editor is a web application to make it easier to use the [OpenTorsion](https://github.com/Aalto-Arotor/openTorsion "OpenTorsion") library for torsional vibration analysis.
 
 ![](https://raw.githubusercontent.com/AaltoIIC/OpenTorsion-Interface/59c0834bb506e4073082b3b6eba06e7383764853/docs/images/readme-button.svg)
