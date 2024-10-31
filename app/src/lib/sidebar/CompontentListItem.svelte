@@ -6,10 +6,7 @@
     import {
         currentSystemJSON,
         removeComponent,
-        createComponent,
-
-        resetCurrentComponent
-
+        createComponent
     } from "$lib/stores/stores";
     import { nameComponentInstance, addConnectionTolastComponent } from "$lib/editor/system-editor/systemHelpers";
     import DropdownMenu from "$lib/DropdownMenu.svelte";
@@ -20,7 +17,17 @@
     let dialogBox: SvelteComponent;
 
     export let data: ComponentType;
+    export let type: string;
     export let id = "";
+
+    let twinRepo = '';
+    let twinBaseUrl = '';
+    if (type === "twin") {
+        const org = id.split('/')[2].split('.')[0];
+        const repo = id.split('/')[3];
+        twinRepo = trimText(`${org}/${repo}`, 25);
+        twinBaseUrl = `https://${org}.github.io/${repo}`;
+    }
 
     const onDragStart = (event: DragEvent) => {
         if (!event.dataTransfer) {
@@ -84,14 +91,25 @@
                     onClick={handleMenu}
                 />
             </h4>
-            <p>{id ? "Custom Component" : "Generic Component"}</p>
+            {#if type === "custom"}
+                <p>Custom Component</p>
+            {:else if type === "twin"}
+                <a class="twin-repo" href={twinBaseUrl} target="_blank">
+                    {twinRepo}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+                    </svg>                      
+                </a>
+            {:else}
+                <p>Generic Component</p>
+            {/if}
         </div>
         <div>
             <Button
                 onClick={onAdd}
                 color={"rgb(30, 30, 30)"}>
                 Add
-                <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>  
             </Button>
@@ -100,6 +118,24 @@
 </div>
 <DialogBox bind:this={dialogBox} />
 <style>
+    .twin-repo {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.6);
+        text-decoration: none;
+        background-color: rgb(243, 243, 243);
+        border-radius: 50px;
+        padding: 1px 6px;
+        transition: .2s;
+    }
+    .twin-repo:hover {
+        background-color: var(--main-grey-color-2);
+    }
+    .twin-repo svg {
+        width: 12px;
+        height: 12px;
+        margin-bottom: -2px;
+        
+    }
     p {
         font-size: 14px;
         color: rgba(0, 0, 0, 0.6);

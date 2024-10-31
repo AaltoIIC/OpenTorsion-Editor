@@ -1,11 +1,19 @@
 <script>
     import { version } from '$app/environment'
+    import { base } from '$app/paths';
+    import DropdownMenu from '$lib/DropdownMenu.svelte';
 </script>
 <div class="main-sidebar">
-    <a href="/" class="logo-cont">
-        <img class="main-logo" src="./../icon.svg" alt="OpenTorsion Editor Logo">
-        OpenTorsion Editor <sub>{version}</sub>
-    </a>
+    <div class="upper-cont">
+        <a href="/" class="logo-cont">
+            <img class="main-logo" src="{base}/icon.svg" alt="OpenTorsion Editor Logo">
+            OpenTorsion Editor <sub>{version}</sub>
+        </a>
+        <DropdownMenu
+            options={["Digital Twins", "Dark Mode"]}
+            toggles={true}
+        />
+    </div>
     <slot></slot>
     <div class="lower-menu">
         <a href="https://github.com/AaltoIIC/OpenTorsion-Editor/issues" target="_blank">
@@ -16,6 +24,13 @@
     </div>
 </div>
 <style>
+    .upper-cont {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 68px;
+        padding: 0 16px;
+    }
     .main-logo {
         width: 36px;
         height: 36px;
@@ -26,7 +41,6 @@
         display: flex;
         align-items: center;
         height: 68px;
-        margin: 0 16px;
         text-decoration: none;
         font-weight: 550;
     }

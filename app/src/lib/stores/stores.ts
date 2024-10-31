@@ -1,4 +1,9 @@
-import type { ComponentType, SystemType, NotificationType } from '../types/types';
+import type {
+    ComponentType,
+    SystemType,
+    NotificationType,
+    SettingsType
+} from '../types/types';
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import persistentStore from './persistentStore';
@@ -164,4 +169,40 @@ const generateId = (ids: string[]) => {
     }
 
     return randomString;
+}
+
+// twinbases persistent store
+
+export const twinbases = persistentStore<string[]>('twinbases', []);
+
+export const getTwinbases = () => {
+    return _.cloneDeep(get(twinbases));
+}
+
+export const addTwinbase = (twinbase: string) => {
+    twinbases.update((twinbases) => {
+        twinbases.push(twinbase);
+        return twinbases;
+    });
+}
+
+export const removeTwinbase = (twinbase: string) => {
+    twinbases.update((twinbases) => {
+        twinbases = twinbases.filter(tb => tb !== twinbase);
+        return twinbases;
+    });
+}
+
+// settings persistent store
+
+export const settings = persistentStore<SettingsType>('settings', {'digitalTwinsEnabled': false});
+
+export const getSettings = () => {
+    return _.cloneDeep(get(settings));
+}
+
+export const setSettings = (newSettings: Partial<SettingsType>) => {
+    settings.update((val) => {
+        return {...val, ...newSettings};
+    });
 }

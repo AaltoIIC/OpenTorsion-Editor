@@ -1,9 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import ToggleSwitch from './ToggleSwitch.svelte';
+
     export let options: string[] = [];
     export let optionIcons: string[] = [];
     export let onClick: (option: string) => void = () => {};
     export let visible = true;
+    export let toggles: boolean = false;
 
     let isDropdownOpen = false;
     let onHover = false;
@@ -31,10 +34,14 @@
 <div class="main-dropdown">
     {#each options as option, index}
         <button on:click={(e) => {e.stopPropagation(); onClick(option); isDropdownOpen = false;}}>
-            {#if optionIcons.length > index}
-                <span class="option-icon">
-                    {@html optionIcons[index]}
-                </span>
+            {#if toggles}
+                <ToggleSwitch size={22} />
+            {:else}
+                {#if optionIcons.length > index}
+                    <span class="option-icon">
+                        {@html optionIcons[index]}
+                    </span>
+                {/if}
             {/if}
             <span class="option-text">
                 {option}
@@ -47,7 +54,7 @@
     .icon-menu {
         width: 20px;
         height: 20px;
-        margin: 0 -2px -5px 0;
+        margin: 0 -2px -2px 0;
         stroke: rgba(0, 0, 0, 0.4);
         cursor: pointer;
         visibility: hidden;
@@ -57,6 +64,7 @@
     }
     .option-text {
         line-height: 34px;
+        white-space: nowrap;
     }
     .option-icon {
         display: block;

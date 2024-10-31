@@ -10,7 +10,11 @@ import {
 import { goto } from "$app/navigation";
 import { get } from "svelte/store";
 import type { ElementType, ComponentType, SystemType } from "./types/types";
-import { isAlmostComponentType, isAlmostSystemType } from "./types/typeguards";
+import {
+    isAlmostComponentType,
+    isAlmostSystemType,
+    isComponentType
+} from "./types/typeguards";
 import { nameElement } from "./editor/component-editor/componentHelpers";
 import _ from 'lodash';
 
@@ -238,4 +242,67 @@ export const trimText = (text: string, maxLength: number) => {
 
 export const camelToTitle = (camelCase: string) => {
     return camelCase.replace(/([A-Z])/g, " $1").toLowerCase();
+}
+
+export const titleCase = (str: string) => {
+    let splitStr = str.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    return splitStr.join(' '); 
+ }
+
+export const isTwinBaseUrl = async (url: string) => {
+    try {
+        const response = await fetch(`${url}/index.json`);
+        if (!response.ok) {
+            return false;
+        }
+        const json = await response.json();
+        if (json.hasOwnProperty('twins')) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
+export const fetchComponents = async (twinBaseUrl: string) => {
+    const trimmedUrl = twinBaseUrl.endsWith('/') ? twinBaseUrl.slice(0, -1) : twinBaseUrl;
+    
+    try {
+        const response = await fetch(`${trimmedUrl}/index.json`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch components');
+        }
+        const json = await response.json();
+        const twinUrls = json.twins.map((twin: any) => twin.url);
+        
+
+        const components: {id: string, component: ComponentType}[] = [];
+
+        await Promise.all(twinUrls.map(async (url: string) => {
+            const response = await fetch(`${url}/index.json`);
+            if (response.ok) {
+                const twinJson = await response.json();
+                const component = {
+                    name: titleCase(twinJson.name),
+                    elements: twinJson.elements
+                }
+                if (isComponentType(component)) {
+                    components.push({
+                        id: twinJson['dt-id'],
+                        component: component
+                    });
+                }
+            }
+        }));
+
+        return components;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
 }
