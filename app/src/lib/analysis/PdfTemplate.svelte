@@ -3,7 +3,6 @@
     import type { SystemType } from '$lib/types/types';
     import System3dModel from '$lib/System3dModel.svelte';
     import { formatDate, trimText } from '$lib/utils';
-    import { base } from '$app/paths';
 
     type Plot = {
         name: string;
@@ -47,7 +46,7 @@
 <div class="template-cont">
     <div class="main-pdf-cont" bind:this={cont}>
         <span class="logo-cont">
-            <img class="main-logo" src="{base}/icon.svg" alt="logo">
+            <img class="main-logo" src="../icon.svg" alt="logo">
             OpenTorsion Editor
         </span>
         <div class="main-header box">

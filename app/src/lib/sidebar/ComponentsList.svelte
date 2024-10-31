@@ -2,11 +2,10 @@
     import type { ComponentType } from "$lib/types/types";
     import DropdownButton from "$lib/DropdownButton.svelte";
     import ComponentListItem from "$lib/sidebar/CompontentListItem.svelte";
+    import { basicComponents } from "../editor/component-editor/basicComponents";
     import { customComponents, currentSystemJSON } from "$lib/stores/stores";
     import { importComponent } from "$lib/utils";
     import { goto } from "$app/navigation";
-    import { twinBaseUrl } from "../../config";
-    import { fetchComponents } from "$lib/utils";
 
     const toComponentType = (json: any) => json as ComponentType;
     let componentInput: HTMLInputElement;
@@ -27,11 +26,6 @@
             componentInput.click()
         }
     }
-
-    let digitalTwins: any[];
-    fetchComponents(twinBaseUrl).then((components) => {
-        digitalTwins = components;
-    })
 </script>
 
 <div class="component-cont">
@@ -57,15 +51,11 @@
     </div>
     <div class="component-list">
         {#each shownComponents as [id, component] (id)}
-            <ComponentListItem type="custom" id={id} data={component} />
+            <ComponentListItem id={id} data={component} />
         {/each}
-        {#if digitalTwins}
-            {#each digitalTwins as {id, component}}
-                <ComponentListItem type="twin" id={id} data={component} />
-            {/each}
-        {:else}
-            <div>Loading...</div>
-        {/if}
+        {#each basicComponents as component}
+            <ComponentListItem data={toComponentType(component.json)} />
+        {/each}
     </div>
 </div>
 <style>

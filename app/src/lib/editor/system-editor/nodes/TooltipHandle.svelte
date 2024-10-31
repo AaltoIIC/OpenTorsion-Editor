@@ -65,7 +65,7 @@
         width: 36px;
         height: 36px;
         border-radius: 36px;
-        padding: 12px;
+        padding: 11px;
         transform: translate(-50%, -50%);
         box-sizing: border-box;
         position: absolute;

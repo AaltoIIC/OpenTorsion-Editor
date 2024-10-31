@@ -1,8 +1,6 @@
 import { browser } from '$app/environment';
 
-export const prerender = false;
 export const ssr = false;
-export const trailingSlash = 'always';
 
 const minWidth = 1140;
 const mobilePath = '/mobile';

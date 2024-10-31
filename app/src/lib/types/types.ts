@@ -58,7 +58,3 @@ export interface SystemType {
     components: ComponentType[];
     structure: string[][];
 }
-
-export interface SettingsType {
-    digitalTwinsEnabled: boolean;
-}
